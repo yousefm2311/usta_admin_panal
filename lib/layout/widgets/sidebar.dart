@@ -29,6 +29,12 @@ class Sidebar extends StatelessWidget {
       _SidebarItem('Analytics'.tr, Icons.analytics_outlined, '/analytics'),
       _SidebarItem('AI Tools'.tr, Icons.auto_awesome, '/ai/reviews'),
       _SidebarItem('Settings'.tr, Icons.settings_outlined, '/settings'),
+      _SidebarItem('Orders'.tr, Icons.shopping_bag_outlined, '/orders'),
+      _SidebarItem('Complaints'.tr, Icons.support_agent, '/complaints'),
+      _SidebarItem('Marketing'.tr, Icons.campaign_outlined, '/marketing/coupons'),
+      _SidebarItem('Roles'.tr, Icons.admin_panel_settings_outlined, '/roles'),
+      _SidebarItem('Logs'.tr, Icons.list_alt_outlined, '/logs/activity'),
+      _SidebarItem('Profile'.tr, Icons.account_circle_outlined, '/profile'),
     ];
 
     return AnimatedContainer(
