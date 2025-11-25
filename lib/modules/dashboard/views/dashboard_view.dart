@@ -123,7 +123,7 @@ class DashboardView extends StatelessWidget {
       ('Total Requests'.tr, '384', AppColors.primary, Icons.timeline),
       ('Completed Requests'.tr, '227', AppColors.success, Icons.check_circle_outline),
       ('Active Requests'.tr, '14', Colors.amber, Icons.run_circle_outlined),
-      ('Total Earnings'.tr, 'EG 12,480', Colors.tealAccent, Icons.payments_outlined),
+      ('Total Earnings'.tr, 'AED 12,480', Colors.tealAccent, Icons.payments_outlined),
     ];
 
     return stats
@@ -131,7 +131,8 @@ class DashboardView extends StatelessWidget {
           (s) => SizedBox(
             width: cardWidth < 220 ? double.infinity : cardWidth,
             child: _card(
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     height: 48,
@@ -142,23 +143,21 @@ class DashboardView extends StatelessWidget {
                     ),
                     child: Icon(s.$4, color: s.$3),
                   ),
-                  const SizedBox(width: AppSizes.md),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        s.$2,
-                        style: const TextStyle(
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      Text(
-                        s.$1,
-                        style: const TextStyle(color: AppColors.textMuted),
-                      ),
-                    ],
+                  const SizedBox(height: AppSizes.sm),
+                  Text(
+                    s.$2,
+                    style: const TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    s.$1,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: AppColors.textMuted),
                   ),
                 ],
               ),
