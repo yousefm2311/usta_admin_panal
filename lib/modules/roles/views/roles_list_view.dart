@@ -50,6 +50,12 @@ class RolesListView extends StatelessWidget {
                   icon: const Icon(Icons.add, color: AppColors.primary),
                   label: Text('Add'.tr, style: const TextStyle(color: AppColors.primary)),
                 ),
+                const SizedBox(width: AppSizes.sm),
+                TextButton.icon(
+                  onPressed: () => _openAdminDialog(controller),
+                  icon: const Icon(Icons.person_add, color: AppColors.primary),
+                  label: Text('Add admin'.tr, style: const TextStyle(color: AppColors.primary)),
+                ),
               ],
             ),
             const SizedBox(height: AppSizes.md),
@@ -147,6 +153,67 @@ class RolesListView extends StatelessWidget {
                 if (emailCtrl.text.trim().isNotEmpty) 'adminEmail': emailCtrl.text.trim(),
                 if (passwordCtrl.text.trim().isNotEmpty) 'adminPassword': passwordCtrl.text.trim(),
               });
+              Get.back();
+            },
+            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openAdminDialog(RolesController controller) {
+    final nameCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    final passwordCtrl = TextEditingController();
+    final roleCtrl = TextEditingController();
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.card,
+        title: Text('Add admin'.tr, style: const TextStyle(color: AppColors.text)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(labelText: 'Name'),
+              style: const TextStyle(color: AppColors.text),
+            ),
+            TextField(
+              controller: emailCtrl,
+              decoration: const InputDecoration(labelText: 'Email'),
+              style: const TextStyle(color: AppColors.text),
+            ),
+            TextField(
+              controller: passwordCtrl,
+              decoration: const InputDecoration(labelText: 'Password'),
+              style: const TextStyle(color: AppColors.text),
+              obscureText: true,
+            ),
+            TextField(
+              controller: roleCtrl,
+              decoration: const InputDecoration(labelText: 'Role name'),
+              style: const TextStyle(color: AppColors.text),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: Get.back, child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted))),
+          TextButton(
+            onPressed: () async {
+              if (nameCtrl.text.trim().isEmpty ||
+                  emailCtrl.text.trim().isEmpty ||
+                  passwordCtrl.text.trim().isEmpty ||
+                  roleCtrl.text.trim().isEmpty) {
+                showError('Please fill required fields'.tr);
+                return;
+              }
+              await controller.createAdmin(
+                name: nameCtrl.text.trim(),
+                email: emailCtrl.text.trim(),
+                password: passwordCtrl.text.trim(),
+                role: roleCtrl.text.trim(),
+              );
               Get.back();
             },
             child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),

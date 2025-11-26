@@ -3,10 +3,14 @@ import 'package:get/get.dart';
 import '../../../core/services/api_exceptions.dart';
 import '../../../core/utils/notify.dart';
 import '../services/roles_service.dart';
+import '../../auth/services/auth_service.dart';
 
 class RolesController extends GetxController {
   final RolesService _service;
-  RolesController({RolesService? service}) : _service = service ?? RolesService();
+  final AuthService _authService;
+  RolesController({RolesService? service, AuthService? authService})
+      : _service = service ?? RolesService(),
+        _authService = authService ?? AuthService();
 
   final roles = <dynamic>[].obs;
   final loading = false.obs;
@@ -51,6 +55,23 @@ class RolesController extends GetxController {
         );
       }
       await load();
+      showSuccess('Success'.tr);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    } finally {
+      saving.value = false;
+    }
+  }
+
+  Future<void> createAdmin({
+    required String name,
+    required String email,
+    required String password,
+    required String role,
+  }) async {
+    saving.value = true;
+    try {
+      await _authService.createAdmin(name: name, email: email, password: password, role: role);
       showSuccess('Success'.tr);
     } catch (e) {
       showError(e is ApiException ? e.message : e.toString());

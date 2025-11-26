@@ -28,12 +28,17 @@ class OrderDetailsController extends GetxController {
       } else if (tData is Map<String, dynamic>) {
         timeline.assignAll(tData['timeline'] ?? tData['data'] ?? []);
       }
-      final msgRes = await _service.messages(id);
-      final mData = msgRes.data;
-      if (mData is List) {
-        messages.assignAll(mData);
-      } else if (mData is Map<String, dynamic>) {
-        messages.assignAll(mData['messages'] ?? mData['data'] ?? []);
+      try {
+        final msgRes = await _service.messages(id);
+        final mData = msgRes.data;
+        if (mData is List) {
+          messages.assignAll(mData);
+        } else if (mData is Map<String, dynamic>) {
+          messages.assignAll(mData['messages'] ?? mData['data'] ?? []);
+        }
+      } catch (e) {
+        // Ignore missing messages endpoint (404) gracefully
+        messages.clear();
       }
     } catch (e) {
       final msg = e is ApiException ? e.message : e.toString();
