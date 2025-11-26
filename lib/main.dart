@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:usta_admin_panal/core/bindings/app_binding.dart';
 import 'package:usta_admin_panal/core/constants/app_translations.dart';
 import 'package:usta_admin_panal/core/routing/app_routes.dart';
 
-import 'core/bindings/app_binding.dart';
 import 'core/services/token_storage.dart';
 import 'core/theme/app_theme.dart';
 
