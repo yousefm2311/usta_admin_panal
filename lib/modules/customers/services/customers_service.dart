@@ -18,6 +18,13 @@ class CustomersService {
   }
 
   Future<Response> block(String id) {
-    return _dio.put('/api/admin/customers/block', data: {'customerId': id});
+    final payload = {'customerId': id, 'blocked': true};
+    return _dio.put('/api/admin/customers/block', data: payload).catchError((_) async {
+      try {
+        return await _dio.put('/api/admin/customers/$id/block', data: {'blocked': true});
+      } catch (_) {
+        return await _dio.post('/api/admin/customers/block', data: payload);
+      }
+    });
   }
 }

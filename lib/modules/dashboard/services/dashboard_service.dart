@@ -14,6 +14,11 @@ class DashboardService {
       // Fallback when endpoint is not available
       if (e.response?.statusCode == 404) {
         try {
+          final altDash = await _dio.get('/api/admin/dashboard');
+          final d = altDash.data;
+          if (d is Map<String, dynamic>) return d['data'] ?? d;
+        } catch (_) {}
+        try {
           final alt = await _dio.get('/api/admin/analytics/daily');
           final data = alt.data;
           if (data is Map<String, dynamic>) return data['data'] ?? data;

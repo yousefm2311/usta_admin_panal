@@ -102,7 +102,8 @@ class RequestDetailsView extends StatelessWidget {
                         () => DropdownButton<String>(
                           value: timelineStatus.value,
                           dropdownColor: AppColors.card,
-                          items: ['pending', 'accepted', 'in-progress', 'completed', 'canceled']
+                          items: ['pending', 'accepted', 'in_progress', 'assigned', 'in_progress', 'completed', 'canceled', 'closed']
+                              .toSet()
                               .map((s) => DropdownMenuItem(value: s, child: Text(s.tr)))
                               .toList(),
                           onChanged: (v) => timelineStatus.value = v ?? timelineStatus.value,
@@ -333,7 +334,8 @@ class RequestDetailsView extends StatelessWidget {
 
   Widget _statusChip(String status) {
     Color color;
-    switch (status.toLowerCase()) {
+    final normalized = status.replaceAll('_', ' ').toLowerCase();
+    switch (normalized) {
       case 'completed':
         color = AppColors.success;
         break;
@@ -345,6 +347,10 @@ class RequestDetailsView extends StatelessWidget {
         break;
       case 'in progress':
         color = Colors.amber;
+        break;
+      case 'canceled':
+      case 'cancelled':
+        color = Colors.redAccent;
         break;
       default:
         color = AppColors.primary;

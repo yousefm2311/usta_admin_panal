@@ -17,17 +17,40 @@ class OrdersService {
 
   Future<Response> timeline(String id) => _dio.get('/api/admin/orders/$id/timeline');
 
-  Future<Response> addTimeline(String id, {required String status, String? note}) =>
-      _dio.post('/api/admin/orders/$id/timeline', data: {'status': status, if (note != null) 'note': note});
+  Future<Response> addTimeline(String id, {required String status, String? note}) async {
+    final payload = {'status': status, if (note != null) 'note': note};
+    try {
+      return await _dio.post('/api/admin/orders/$id/timeline', data: payload);
+    } catch (_) {
+      return await _dio.put('/api/admin/orders/$id/timeline', data: payload);
+    }
+  }
 
-  Future<Response> cancel(String id, {String? reason, String? note}) =>
-      _dio.put('/api/admin/orders/$id/cancel', data: {'reason': reason, 'note': note});
+  Future<Response> cancel(String id, {String? reason, String? note}) async {
+    final payload = {'reason': reason, 'note': note};
+    try {
+      return await _dio.put('/api/admin/orders/$id/cancel', data: payload);
+    } catch (_) {
+      return await _dio.post('/api/admin/orders/$id/cancel', data: payload);
+    }
+  }
 
-  Future<Response> close(String id, {String? note}) =>
-      _dio.put('/api/admin/orders/$id/close', data: {'note': note});
+  Future<Response> close(String id, {String? note}) async {
+    final payload = {'note': note};
+    try {
+      return await _dio.put('/api/admin/orders/$id/close', data: payload);
+    } catch (_) {
+      return await _dio.post('/api/admin/orders/$id/close', data: payload);
+    }
+  }
 
   Future<Response> messages(String id) => _dio.get('/api/admin/orders/$id/messages');
 
-  Future<Response> sendMessage(String id, {required String message}) =>
-      _dio.post('/api/admin/orders/$id/messages', data: {'message': message});
+  Future<Response> sendMessage(String id, {required String message}) async {
+    try {
+      return await _dio.post('/api/admin/orders/$id/messages', data: {'message': message});
+    } catch (_) {
+      return await _dio.put('/api/admin/orders/$id/messages', data: {'message': message});
+    }
+  }
 }

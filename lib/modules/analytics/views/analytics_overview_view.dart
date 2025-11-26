@@ -189,7 +189,7 @@ class AnalyticsOverviewView extends StatelessWidget {
 
   Widget _statCard(String title, String value, IconData icon) {
     return Container(
-      width: 220,
+      constraints: const BoxConstraints(minWidth: 160, maxWidth: 220),
       padding: const EdgeInsets.all(AppSizes.md),
       decoration: BoxDecoration(
         color: AppColors.card,

@@ -103,7 +103,7 @@ class OrderTimelineView extends StatelessWidget {
                       () => DropdownButton<String>(
                         value: status.value,
                         dropdownColor: AppColors.card,
-                        items: ['pending', 'accepted', 'in-progress', 'completed', 'canceled']
+                        items: ['pending', 'accepted', 'in_progress', 'completed', 'canceled', 'closed']
                             .map((s) => DropdownMenuItem(value: s, child: Text(s.tr)))
                             .toList(),
                         onChanged: (v) => status.value = v ?? status.value,
