@@ -65,34 +65,40 @@ class ArtisansListView extends StatelessWidget {
                 ],
                 rows: controller.artisans
                     .map(
-                      (artisan) => DataRow(
-                        cells: [
-                          DataCell(Text(artisan['name']?.toString() ?? '')),
-                          DataCell(Text(artisan['category']?.toString() ?? '')),
-                          DataCell(Text(artisan['rating']?.toString() ?? '0')),
-                          DataCell(_statusChip(artisan['status']?.toString() ?? '')),
-                          DataCell(
-                            Row(
-                              children: [
-                                TextButton(
-                                  onPressed: () => Get.toNamed('/artisan/details', arguments: artisan),
-                                  child: Text('View details'.tr),
-                                ),
-                                const SizedBox(width: AppSizes.xs),
-                                TextButton(
-                                  onPressed: () => controller.approve(artisan['id']?.toString() ?? ''),
-                                  child: Text('Approve'.tr, style: const TextStyle(color: AppColors.success)),
-                                ),
-                                const SizedBox(width: AppSizes.xs),
-                                TextButton(
-                                  onPressed: () => controller.reject(artisan['id']?.toString() ?? ''),
-                                  child: Text('Reject'.tr, style: const TextStyle(color: Colors.redAccent)),
-                                ),
-                              ],
+                      (artisan) {
+                        final rating = artisan['rating'] ?? artisan['score'] ?? 0;
+                        final profession = artisan['category'] ?? artisan['profession'] ?? '';
+                        final status = artisan['status'] ?? (artisan['suspended'] == true ? 'Suspended' : 'Active');
+                        final id = artisan['id'] ?? artisan['_id'] ?? '';
+                        return DataRow(
+                          cells: [
+                            DataCell(Text(artisan['name']?.toString() ?? '')),
+                            DataCell(Text(profession.toString())),
+                            DataCell(Text(rating.toString())),
+                            DataCell(_statusChip(status.toString())),
+                            DataCell(
+                              Row(
+                                children: [
+                                  TextButton(
+                                    onPressed: () => Get.toNamed('/artisan/details', arguments: artisan),
+                                    child: Text('View details'.tr),
+                                  ),
+                                  const SizedBox(width: AppSizes.xs),
+                                  TextButton(
+                                    onPressed: () => controller.approve(id.toString()),
+                                    child: Text('Approve'.tr, style: const TextStyle(color: AppColors.success)),
+                                  ),
+                                  const SizedBox(width: AppSizes.xs),
+                                  TextButton(
+                                    onPressed: () => controller.reject(id.toString()),
+                                    child: Text('Reject'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        );
+                      },
                     )
                     .toList(),
                 headingTextStyle: const TextStyle(

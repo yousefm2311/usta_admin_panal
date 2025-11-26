@@ -46,15 +46,23 @@ class WalletSummaryView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Wallet balances placeholder'.tr, style: const TextStyle(color: AppColors.text)),
+              Text('Wallet balances'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
               const SizedBox(height: AppSizes.sm),
               ...controller.wallets.map(
                 (w) => Padding(
                   padding: const EdgeInsets.only(bottom: AppSizes.sm),
                   child: Row(
                     children: [
-                      Expanded(child: Text((w['owner'] ?? w['name'] ?? '').toString(), style: const TextStyle(color: AppColors.text))),
-                      Text((w['balance'] ?? w['amount'] ?? '').toString(), style: const TextStyle(color: AppColors.text)),
+                      Expanded(
+                        child: Text(
+                          (w['owner'] ?? w['name'] ?? w['user'] ?? '').toString(),
+                          style: const TextStyle(color: AppColors.text),
+                        ),
+                      ),
+                      Text(
+                        (w['balance'] ?? w['amount'] ?? '').toString(),
+                        style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
+                      ),
                     ],
                   ),
                 ),

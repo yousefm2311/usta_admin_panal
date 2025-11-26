@@ -77,29 +77,36 @@ class CustomersListView extends StatelessWidget {
                 ],
                 rows: controller.customers
                     .map(
-                      (customer) => DataRow(
-                        cells: [
-                          DataCell(Text(customer['name']?.toString() ?? '')),
-                          DataCell(Text(customer['phone']?.toString() ?? '')),
-                          DataCell(Text(customer['requests']?.toString() ?? '0')),
-                          DataCell(_statusChip(customer['status']?.toString() ?? '')),
-                          DataCell(
-                            Row(
-                              children: [
-                                TextButton(
-                                  onPressed: () => Get.toNamed('/customer/details', arguments: customer),
-                                  child: Text('View details'.tr),
-                                ),
-                                const SizedBox(width: AppSizes.xs),
-                                TextButton(
-                                  onPressed: () => controller.blockCustomer(customer['id']?.toString() ?? ''),
-                                  child: Text('Block'.tr, style: const TextStyle(color: Colors.redAccent)),
-                                ),
-                              ],
+                      (customer) {
+                        final status = customer['status'] ?? (customer['blocked'] == true ? 'Blocked' : 'Active');
+                        final count = customer['requestsCount'] ??
+                            customer['requests'] ??
+                            (customer['requests'] is List ? (customer['requests'] as List).length : 0);
+                        final id = customer['id'] ?? customer['_id'] ?? '';
+                        return DataRow(
+                          cells: [
+                            DataCell(Text(customer['name']?.toString() ?? '')),
+                            DataCell(Text(customer['phone']?.toString() ?? '')),
+                            DataCell(Text(count.toString())),
+                            DataCell(_statusChip(status.toString())),
+                            DataCell(
+                              Row(
+                                children: [
+                                  TextButton(
+                                    onPressed: () => Get.toNamed('/customer/details', arguments: customer),
+                                    child: Text('View details'.tr),
+                                  ),
+                                  const SizedBox(width: AppSizes.xs),
+                                  TextButton(
+                                    onPressed: () => controller.blockCustomer(id.toString()),
+                                    child: Text('Block'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        );
+                      },
                     )
                     .toList(),
                 headingTextStyle: const TextStyle(

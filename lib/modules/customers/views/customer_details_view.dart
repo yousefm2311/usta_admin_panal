@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/responsive.dart';
-import '../../../data/providers/mock_data.dart';
 import '../../../layout/admin_layout.dart';
+import '../controllers/customer_details_controller.dart';
 
 class CustomerDetailsView extends StatefulWidget {
   const CustomerDetailsView({super.key});
@@ -15,261 +15,196 @@ class CustomerDetailsView extends StatefulWidget {
 }
 
 class _CustomerDetailsViewState extends State<CustomerDetailsView> {
-  bool active = true;
-
   @override
   Widget build(BuildContext context) {
+    final args = Get.arguments as Map<String, dynamic>?;
+    final id = (args?['_id'] ?? args?['id'] ?? '').toString();
     final isMobile = Responsive.isMobile(context);
-    final customer = MockData.customers.first;
-    final recentRequests = MockData.requests.take(4).toList();
+    final controller = Get.put(CustomerDetailsController());
+    if (id.isNotEmpty) controller.load(id);
 
     return AdminLayout(
-      title: 'Customer details',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (isMobile)
-            Column(
-              children: [
-                _card(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+      title: 'Customer details'.tr,
+      child: Obx(() {
+        if (controller.loading.value) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSizes.lg),
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+          );
+        }
+        if (controller.error.value != null) {
+          return Padding(
+            padding: const EdgeInsets.all(AppSizes.md),
+            child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+          );
+        }
+        final data = controller.customer.value;
+        if (data == null) {
+          return Padding(
+            padding: const EdgeInsets.all(AppSizes.md),
+            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          );
+        }
+        final requests = (data['lastRequests'] ?? []) as List<dynamic>;
+        final isBlocked = data['blocked'] == true;
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(AppSizes.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.card,
+                        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            radius: 32,
-                            backgroundColor: AppColors.primary.withOpacity(0.18),
-                            child: const Icon(Icons.person, color: AppColors.text, size: 32),
-                          ),
-                          const SizedBox(width: AppSizes.md),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          Row(
                             children: [
-                              Text(
-                                customer.name,
-                                style: const TextStyle(
-                                  color: AppColors.text,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
+                              CircleAvatar(
+                                backgroundColor: AppColors.primary.withOpacity(0.16),
+                                child: const Icon(Icons.person, color: AppColors.primary),
                               ),
-                              Text(customer.phone, style: const TextStyle(color: AppColors.textMuted)),
-                            ],
-                          ),
-                          const Spacer(),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Row(
+                              const SizedBox(width: AppSizes.sm),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Active'.tr, style: const TextStyle(color: AppColors.textMuted)),
-                                  Switch(
-                                    activeThumbColor: AppColors.primary,
-                                    value: active,
-                                    onChanged: (v) => setState(() => active = v),
-                                  ),
+                                  Text((data['name'] ?? '').toString(),
+                                      style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                                  Text(isBlocked ? 'Blocked'.tr : 'Active'.tr,
+                                      style: TextStyle(color: isBlocked ? AppColors.danger : AppColors.success)),
                                 ],
                               ),
-                              Text(
-                                active ? 'Status: Active'.tr : 'Status: Blocked'.tr,
-                                style: TextStyle(
-                                  color: active ? AppColors.success : AppColors.danger,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              const Spacer(),
+                              Switch(
+                                value: !isBlocked,
+                                onChanged: (val) => controller.blockToggle(id, block: !val),
+                                activeColor: AppColors.primary,
                               ),
                             ],
+                          ),
+                          const SizedBox(height: AppSizes.md),
+                          Wrap(
+                            spacing: AppSizes.md,
+                            runSpacing: AppSizes.md,
+                            children: [
+                              _stat('Total requests label'.tr, (data['requests'] ?? data['totalRequests'] ?? '0').toString()),
+                              _stat('Completed label'.tr, (data['completed'] ?? '').toString()),
+                              _stat('Canceled'.tr, (data['canceled'] ?? '').toString()),
+                              _stat('Lifetime spend'.tr, (data['lifetimeSpend'] ?? '').toString()),
+                            ],
+                          ),
+                          const SizedBox(height: AppSizes.md),
+                          Text(
+                            (data['location'] ?? data['preferredLocation'] ?? '').toString(),
+                            style: const TextStyle(color: AppColors.textMuted),
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppSizes.md),
-                       Text(
-                        'Preferred location: Dubai Marina • Joined May 2024'.tr,
-                        style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                    ),
+                  ),
+                  if (!isMobile) const SizedBox(width: AppSizes.md),
+                  if (!isMobile)
+                    Container(
+                      width: 240,
+                      padding: const EdgeInsets.all(AppSizes.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.card,
+                        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppSizes.md),
-                _card(
-                  child: Wrap(
-                    spacing: AppSizes.md,
-                    runSpacing: AppSizes.md,
-                    children: [
-                      _miniStat('Total requests label'.tr, '28'),
-                      _miniStat('Completed label'.tr, '22'),
-                      _miniStat('Canceled'.tr, '3'),
-                      _miniStat('Lifetime spend'.tr, 'EG 6,420'),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          else
-            Row(
-              children: [
-                Expanded(
-                  child: _card(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 32,
-                              backgroundColor: AppColors.primary.withOpacity(0.18),
-                              child: const Icon(Icons.person, color: AppColors.text, size: 32),
-                            ),
-                            const SizedBox(width: AppSizes.md),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  customer.name,
-                                  style: const TextStyle(
-                                    color: AppColors.text,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                Text(customer.phone, style: const TextStyle(color: AppColors.textMuted)),
-                              ],
-                            ),
-                            const Spacer(),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Text('Active', style: TextStyle(color: AppColors.textMuted)),
-                                    Switch(
-                                      activeThumbColor: AppColors.primary,
-                                      value: active,
-                                      onChanged: (v) => setState(() => active = v),
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  active ? 'Status: Active' : 'Status: Blocked',
-                                  style: TextStyle(
-                                    color: active ? AppColors.success : AppColors.danger,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSizes.md),
-                        const Text(
-                          'Preferred location: Dubai Marina • Joined May 2024',
-                          style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSizes.md),
-                Expanded(
-                  child: _card(
-                    child: Wrap(
-                      spacing: AppSizes.md,
-                      runSpacing: AppSizes.md,
-                      children: [
-                        _miniStat('Total requests'.tr, '28'),
-                        _miniStat('Completed'.tr, '22'),
-                        _miniStat('Canceled'.tr, '3'),
-                        _miniStat('Lifetime spend'.tr, 'EG 6,420'),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          const SizedBox(height: AppSizes.lg),
-          _sectionTitle('Last requests'.tr),
-          const SizedBox(height: AppSizes.sm),
-          _card(
-            child: Column(
-              children: [
-                for (final req in recentRequests)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: AppSizes.sm),
-                    padding: const EdgeInsets.all(AppSizes.md),
-                    decoration: BoxDecoration(
-                      color: AppColors.overlay,
-                      borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.build, color: AppColors.textMuted),
-                        const SizedBox(width: AppSizes.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(req.service, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600)),
-                              const SizedBox(height: 4),
-                              Text(
-                              '${req.artisan} • ${req.status.tr} • EG ${req.price.toStringAsFixed(0)}',
-                                style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Last requests'.tr, style: const TextStyle(color: AppColors.text)),
+                          const SizedBox(height: AppSizes.sm),
+                          ...requests.map(
+                            (r) => Padding(
+                              padding: const EdgeInsets.only(bottom: AppSizes.xs),
+                              child: Row(
+                                children: [
+                                  Expanded(child: Text((r['service'] ?? '').toString(), style: const TextStyle(color: AppColors.text))),
+                                  _statusChip((r['status'] ?? '').toString()),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${req.date.day}/${req.date.month}',
-                          style: const TextStyle(color: AppColors.textMuted),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-              ],
-            ),
+                ],
+              ),
+              const SizedBox(height: AppSizes.md),
+              Container(
+                padding: const EdgeInsets.all(AppSizes.md),
+                decoration: BoxDecoration(
+                  color: AppColors.card,
+                  borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                  border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Last requests'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: AppSizes.sm),
+                    ...requests.map(
+                      (r) => ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text((r['service'] ?? '').toString(), style: const TextStyle(color: AppColors.text)),
+                        subtitle: Text(
+                            '${r['customer'] ?? ''} • ${r['artisan'] ?? ''}', style: const TextStyle(color: AppColors.textMuted)),
+                        trailing: _statusChip((r['status'] ?? '').toString()),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 
-  Widget _miniStat(String title, String value) {
+  Widget _stat(String label, String value) {
     return Container(
-      width: 150,
-      padding: const EdgeInsets.all(AppSizes.md),
+      padding: const EdgeInsets.all(AppSizes.sm),
       decoration: BoxDecoration(
         color: AppColors.overlay,
         borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(value, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text(title, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
         ],
       ),
     );
   }
 
-  Widget _card({required Widget child}) {
+  Widget _statusChip(String status) {
+    final color = status.toLowerCase() == 'completed' ? AppColors.success : AppColors.primary;
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSizes.md),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        color: color.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withOpacity(0.5)),
       ),
-      child: child,
+      child: Text(
+        status.tr,
+        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+      ),
     );
   }
-
-  Widget _sectionTitle(String text) => Text(
-        text,
-        style: const TextStyle(
-          color: AppColors.text,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      );
 }

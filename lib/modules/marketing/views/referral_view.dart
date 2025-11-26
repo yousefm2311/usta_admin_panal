@@ -40,16 +40,66 @@ class ReferralView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Referral stats placeholder'.tr, style: const TextStyle(color: AppColors.text)),
+              Text('Referral'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
               const SizedBox(height: AppSizes.sm),
-              Text(
-                (data?['summary'] ?? data?['stats'] ?? 'Top referrers list'.tr).toString(),
-                style: const TextStyle(color: AppColors.textMuted),
-              ),
+              if (data != null)
+                ...[
+                  Wrap(
+                    spacing: AppSizes.md,
+                    runSpacing: AppSizes.sm,
+                    children: [
+                      _pill('Total referrals'.tr, (data['total'] ?? data['count'] ?? data['totalReferrals'] ?? '0').toString()),
+                      _pill('Active'.tr, (data['active'] ?? data['activeReferrals'] ?? data['activeCount'] ?? '0').toString()),
+                      _pill('Rewards'.tr, (data['rewards'] ?? data['points'] ?? '0').toString()),
+                    ],
+                  ),
+                  const SizedBox(height: AppSizes.md),
+                  Text('Top referrers'.tr, style: const TextStyle(color: AppColors.text)),
+                  const SizedBox(height: AppSizes.xs),
+                  ...(data['top'] ?? data['topReferrers'] ?? <dynamic>[])
+                      .map<Widget>(
+                        (item) => Padding(
+                          padding: const EdgeInsets.only(bottom: AppSizes.xs),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  (item['name'] ?? item['user'] ?? '').toString(),
+                                  style: const TextStyle(color: AppColors.text),
+                                ),
+                              ),
+                              Text((item['count'] ?? item['referrals'] ?? '').toString(),
+                                  style: const TextStyle(color: AppColors.textMuted)),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ]
+              else
+                Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
             ],
           ),
         );
       }),
+    );
+  }
+
+  Widget _pill(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.md, vertical: AppSizes.sm),
+      decoration: BoxDecoration(
+        color: AppColors.overlay,
+        borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          const SizedBox(height: 4),
+          Text(value, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w700)),
+        ],
+      ),
     );
   }
 }
