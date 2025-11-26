@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
-import '../../../data/providers/mock_data.dart';
+import '../controllers/customers_controller.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
 
@@ -12,7 +12,7 @@ class CustomersListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customers = MockData.customers;
+    final controller = Get.put(CustomersController());
 
     return AdminLayout(
       title: 'Customers',
@@ -33,6 +33,8 @@ class CustomersListView extends StatelessWidget {
               SizedBox(
                 width: 260,
                 child: TextField(
+                  onChanged: controller.setQuery,
+                  onSubmitted: (v) => controller.loadCustomers(search: v),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
                     hintText: 'Search by name or phone'.tr,
@@ -43,41 +45,73 @@ class CustomersListView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSizes.md),
-          TableWrapper(
-            child: DataTable(
-              columns: [
-                DataColumn(label: Text('Name'.tr)),
-                DataColumn(label: Text('Phone'.tr)),
-                DataColumn(label: Text('Requests count'.tr)),
-                DataColumn(label: Text('Status'.tr)),
-                DataColumn(label: Text('Actions'.tr)),
-              ],
-              rows: [
-                for (final customer in customers)
-                  DataRow(
-                    cells: [
-                      DataCell(Text(customer.name)),
-                      DataCell(Text(customer.phone)),
-                      DataCell(Text(customer.requests.toString())),
-                      DataCell(_statusChip(customer.status)),
-                      DataCell(
-                        TextButton(
-                          onPressed: () => Get.toNamed('/customer/details'),
-                          child: Text('View details'.tr),
-                        ),
+          Obx(() {
+            if (controller.loading.value) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSizes.lg),
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              );
+            }
+            if (controller.error.value != null) {
+              return Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+              );
+            }
+            if (controller.customers.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+              );
+            }
+            return TableWrapper(
+              child: DataTable(
+                columns: [
+                  DataColumn(label: Text('Name'.tr)),
+                  DataColumn(label: Text('Phone'.tr)),
+                  DataColumn(label: Text('Requests count'.tr)),
+                  DataColumn(label: Text('Status'.tr)),
+                  DataColumn(label: Text('Actions'.tr)),
+                ],
+                rows: controller.customers
+                    .map(
+                      (customer) => DataRow(
+                        cells: [
+                          DataCell(Text(customer['name']?.toString() ?? '')),
+                          DataCell(Text(customer['phone']?.toString() ?? '')),
+                          DataCell(Text(customer['requests']?.toString() ?? '0')),
+                          DataCell(_statusChip(customer['status']?.toString() ?? '')),
+                          DataCell(
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () => Get.toNamed('/customer/details', arguments: customer),
+                                  child: Text('View details'.tr),
+                                ),
+                                const SizedBox(width: AppSizes.xs),
+                                TextButton(
+                                  onPressed: () => controller.blockCustomer(customer['id']?.toString() ?? ''),
+                                  child: Text('Block'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-              ],
-              headingTextStyle: const TextStyle(
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.w600,
+                    )
+                    .toList(),
+                headingTextStyle: const TextStyle(
+                  color: AppColors.textMuted,
+                  fontWeight: FontWeight.w600,
+                ),
+                dataTextStyle: const TextStyle(color: AppColors.text),
+                headingRowColor: MaterialStateProperty.all(AppColors.overlay),
+                dividerThickness: 0.2,
               ),
-              dataTextStyle: const TextStyle(color: AppColors.text),
-              headingRowColor: MaterialStateProperty.all(AppColors.overlay),
-              dividerThickness: 0.2,
-            ),
-          ),
+            );
+          }),
           const SizedBox(height: AppSizes.md),
           Align(
             alignment: Alignment.centerRight,

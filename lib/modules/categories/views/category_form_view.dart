@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/modules/categories/controllers/categories_controller.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
@@ -15,9 +16,11 @@ class CategoryFormView extends StatefulWidget {
 
 class _CategoryFormViewState extends State<CategoryFormView> {
   String selectedIcon = 'cleaning';
+  final _nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<CategoriesController>();
     return AdminLayout(
       title: 'Add category',
       child: Column(
@@ -38,6 +41,7 @@ class _CategoryFormViewState extends State<CategoryFormView> {
             child: Column(
               children: [
                 TextField(
+                  controller: _nameController,
                   style: const TextStyle(color: AppColors.text),
                   decoration: InputDecoration(
                     labelText: 'Category name'.tr,
@@ -69,17 +73,33 @@ class _CategoryFormViewState extends State<CategoryFormView> {
                   ],
                 ),
                 const SizedBox(height: AppSizes.lg),
-                PrimaryButton(
-                  expand: true,
-                  label: 'Save category'.tr,
-                  icon: Icons.save_outlined,
-                  onPressed: () {},
-                ),
+                Obx(() {
+                  final saving = controller.saving.value;
+                  return PrimaryButton(
+                    expand: true,
+                    label: saving ? 'Loading'.tr : 'Save category'.tr,
+                    icon: Icons.save_outlined,
+                    onPressed: saving
+                        ? null
+                        : () {
+                            controller.addCategory(
+                              name: _nameController.text.trim(),
+                              icon: selectedIcon,
+                            );
+                          },
+                  );
+                }),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
   }
 }

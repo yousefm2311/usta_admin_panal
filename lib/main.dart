@@ -2,13 +2,19 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:usta_admin_panal/core/constants/app_translations.dart';
 import 'package:usta_admin_panal/core/routing/app_routes.dart';
 
+import 'core/bindings/app_binding.dart';
+import 'core/services/token_storage.dart';
 import 'core/theme/app_theme.dart';
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
+  Get.put(TokenStorage());
   runApp(const UstaAdminApp());
 }
 
@@ -28,6 +34,7 @@ class UstaAdminApp extends StatelessWidget {
       fallbackLocale: const Locale('en'),
       supportedLocales: const [Locale('en'), Locale('ar')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      initialBinding: AppBinding(),
       initialRoute: '/login',
       getPages: AppPages.pages,
       scrollBehavior: const MaterialScrollBehavior().copyWith(

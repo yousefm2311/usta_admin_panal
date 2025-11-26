@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   get: ^4.7.3
   fl_chart: ^1.1.1
+  dio: ^5.5.0+1
+  get_storage: ^2.1.1
+  connectivity_plus: ^6.0.5
   flutter_localizations:
     sdk: flutter
 

@@ -3,25 +3,15 @@ import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
-import '../../../data/providers/mock_data.dart';
 import '../../../layout/admin_layout.dart';
+import '../controllers/reviews_controller.dart';
 
-class ReviewsListView extends StatefulWidget {
+class ReviewsListView extends StatelessWidget {
   const ReviewsListView({super.key});
 
   @override
-  State<ReviewsListView> createState() => _ReviewsListViewState();
-}
-
-class _ReviewsListViewState extends State<ReviewsListView> {
-  String filter = 'All';
-
-  @override
   Widget build(BuildContext context) {
-    final reviews = filter == 'All'
-        ? MockData.reviews
-        : MockData.reviews.where((r) => r.rating >= 4).toList();
-
+    final controller = Get.put(ReviewsController());
     return AdminLayout(
       title: 'Reviews',
       child: Column(
@@ -34,65 +24,104 @@ class _ReviewsListViewState extends State<ReviewsListView> {
                 style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const Spacer(),
-              DropdownButton<String>(
-                value: filter,
-                dropdownColor: AppColors.card,
-                items: [
-                  DropdownMenuItem(value: 'All', child: Text('All ratings'.tr)),
-                  DropdownMenuItem(value: 'Positive', child: Text('4 stars and above'.tr)),
-                ],
-                onChanged: (value) => setState(() => filter = value ?? 'All'),
+              Obx(
+                () => DropdownButton<String>(
+                  value: controller.filter.value,
+                  dropdownColor: AppColors.card,
+                  items: [
+                    DropdownMenuItem(value: 'All', child: Text('All ratings'.tr)),
+                    DropdownMenuItem(value: 'Positive', child: Text('4 stars and above'.tr)),
+                  ],
+                  onChanged: (value) => controller.filter.value = value ?? 'All',
+                ),
               ),
             ],
           ),
           const SizedBox(height: AppSizes.md),
-          ...reviews.map(
-            (review) => Container(
-              margin: const EdgeInsets.only(bottom: AppSizes.sm),
-              padding: const EdgeInsets.all(AppSizes.md),
-              decoration: BoxDecoration(
-                color: AppColors.card,
-                borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Row(
-                        children: List.generate(
-                          5,
-                          (i) => Icon(
-                            i < review.rating ? Icons.star : Icons.star_border,
-                            color: Colors.amber,
-                            size: 18,
+          Obx(() {
+            if (controller.loading.value) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSizes.lg),
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              );
+            }
+            if (controller.error.value != null) {
+              return Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+              );
+            }
+            final reviews = controller.filtered;
+            if (reviews.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+              );
+            }
+            return Column(
+              children: reviews
+                  .map(
+                    (review) => Container(
+                      margin: const EdgeInsets.only(bottom: AppSizes.sm),
+                      padding: const EdgeInsets.all(AppSizes.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.card,
+                        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Row(
+                                children: List.generate(
+                                  5,
+                                  (i) => Icon(
+                                    i < (review['rating'] ?? 0) ? Icons.star : Icons.star_border,
+                                    color: Colors.amber,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                _formatDate(review['date'] ?? review['createdAt']),
+                                style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                              ),
+                            ],
                           ),
-                        ),
+                          const SizedBox(height: 6),
+                          Text(
+                            (review['text'] ?? review['comment'] ?? '').toString(),
+                            style: const TextStyle(color: AppColors.text),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '${review['customer'] ?? review['customerName'] ?? ''} • ${review['artisan'] ?? review['artisanName'] ?? ''}',
+                            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      Text(
-                        '${review.date.day}/${review.date.month}/${review.date.year}',
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    review.text,
-                    style: const TextStyle(color: AppColors.text),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${review.customer} → ${review.artisan}',
-                    style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ),
+                    ),
+                  )
+                  .toList(),
+            );
+          }),
         ],
       ),
     );
+  }
+
+  String _formatDate(dynamic value) {
+    if (value is DateTime) return '${value.day}/${value.month}/${value.year}';
+    if (value is String) {
+      final parsed = DateTime.tryParse(value);
+      if (parsed != null) return '${parsed.day}/${parsed.month}/${parsed.year}';
+      return value;
+    }
+    return '';
   }
 }

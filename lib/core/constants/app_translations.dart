@@ -105,6 +105,7 @@ class AppTranslations extends Translations {
           'Platform fee': 'Platform fee',
           'Cancel': 'Cancel',
           'Close order': 'Close order',
+          'Block': 'Block',
           'Timeline'.toString(): 'Timeline',
 
           // Artisans
@@ -120,6 +121,9 @@ class AppTranslations extends Translations {
           'Ratings': 'Ratings',
           'Based on 142 reviews': 'Based on 142 reviews',
           'Top performer in Dubai': 'Top performer in Dubai',
+          'Issue': 'Issue',
+          'Assign to support': 'Assign to support',
+          'Thread': 'Thread',
 
           // Requests
           'Service': 'Service',
@@ -180,6 +184,8 @@ class AppTranslations extends Translations {
           'Type notification message': 'Type notification message',
           'Send notification': 'Send notification',
           'Notification Templates': 'Notification Templates',
+          'Target': 'Target',
+          'Updated': 'Updated',
 
           // Analytics
           'Requests this month': 'Requests this month',
@@ -193,6 +199,10 @@ class AppTranslations extends Translations {
           'App logo': 'App logo',
           'Upload logo': 'Upload logo',
           'Support email': 'Support email',
+          'Error': 'Error',
+          'Success': 'Success',
+          'No data': 'No data',
+          'Loading': 'Loading',
           'About info': 'About info',
           'Short description about USTA platform':
               'Short description about USTA platform',
@@ -361,6 +371,10 @@ class AppTranslations extends Translations {
           'Ratings': 'التقييمات',
           'Based on 142 reviews': 'بناءً على 142 تقييم',
           'Top performer in Dubai': 'الأعلى أداءً في دبي',
+          'Issue': 'المشكلة',
+          'Assign to support': 'تعيين للدعم',
+          'Thread': 'المحادثة',
+          'Block': 'حظر',
 
           // Requests
           'Service': 'الخدمة',
@@ -431,6 +445,10 @@ class AppTranslations extends Translations {
           'App logo': 'شعار التطبيق',
           'Upload logo': 'رفع الشعار',
           'Support email': 'بريد الدعم',
+          'Error': 'خطأ',
+          'Success': 'تم',
+          'No data': 'لا توجد بيانات',
+          'Loading': 'جار التحميل',
           'About info': 'نبذة عن التطبيق',
           'Short description about USTA platform':
               'وصف مختصر عن منصة يوستا',
@@ -478,6 +496,8 @@ class AppTranslations extends Translations {
           'Assign to support': 'تعيين للدعم',
           'Thread': 'المحادثة',
           'Issue': 'المشكلة',
+          'Target': 'Target',
+          'Updated': 'Updated',
         },
       };
 }

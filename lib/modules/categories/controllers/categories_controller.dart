@@ -1,5 +1,66 @@
 import 'package:get/get.dart';
 
+import '../../../core/services/api_exceptions.dart';
+import '../../../core/utils/notify.dart';
+import '../services/categories_service.dart';
+
 class CategoriesController extends GetxController {
-  // TODO: implement controller logic
+  final CategoriesService _service;
+  CategoriesController({CategoriesService? service}) : _service = service ?? CategoriesService();
+
+  final categories = <dynamic>[].obs;
+  final loading = false.obs;
+  final saving = false.obs;
+  final error = RxnString();
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadCategories();
+  }
+
+  Future<void> loadCategories() async {
+    loading.value = true;
+    error.value = null;
+    try {
+      final res = await _service.list();
+      final data = res.data;
+      if (data is List) {
+        categories.assignAll(data);
+      } else if (data is Map<String, dynamic>) {
+        categories.assignAll(data['categories'] ?? data['data'] ?? []);
+      } else {
+        categories.clear();
+      }
+    } catch (e) {
+      final msg = e is ApiException ? e.message : e.toString();
+      error.value = msg;
+      showError(msg);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  Future<void> addCategory({required String name, required String icon}) async {
+    saving.value = true;
+    try {
+      await _service.create(name: name, icon: icon);
+      showSuccess('Success'.tr);
+      await loadCategories();
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    } finally {
+      saving.value = false;
+    }
+  }
+
+  Future<void> removeCategory(String id) async {
+    try {
+      await _service.delete(id);
+      showSuccess('Success'.tr);
+      categories.removeWhere((c) => (c['id'] ?? '').toString() == id);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
 }

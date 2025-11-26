@@ -1,8 +1,15 @@
-class ApiClient {
-  const ApiClient();
+import 'package:dio/dio.dart';
+import 'http_client.dart';
 
-  // Mock delay to mimic network latency for demo interactions.
-  Future<void> simulateDelay([int milliseconds = 500]) async {
-    await Future<void>.delayed(Duration(milliseconds: milliseconds));
+class ApiClient {
+  static final ApiClient _instance = ApiClient._internal();
+  late final HttpClient http;
+
+  factory ApiClient() => _instance;
+
+  ApiClient._internal() {
+    http = HttpClient();
   }
+
+  Dio get dio => http.dio;
 }

@@ -3,25 +3,17 @@ import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
-import '../../../data/providers/mock_data.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
+import '../controllers/requests_controller.dart';
 
-class RequestsListView extends StatefulWidget {
+class RequestsListView extends StatelessWidget {
   const RequestsListView({super.key});
 
   @override
-  State<RequestsListView> createState() => _RequestsListViewState();
-}
-
-class _RequestsListViewState extends State<RequestsListView> {
-  String filter = 'All';
-
-  @override
   Widget build(BuildContext context) {
-    final requests = filter == 'All'
-        ? MockData.requests
-        : MockData.requests.where((r) => r.status.toLowerCase() == filter.toLowerCase()).toList();
+    final controller = Get.put(RequestsController());
+    final statuses = ['All', 'Pending', 'Accepted', 'In progress', 'Completed'];
 
     return AdminLayout(
       title: 'Requests',
@@ -38,66 +30,102 @@ class _RequestsListViewState extends State<RequestsListView> {
               const SizedBox(height: AppSizes.sm),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Wrap(
-                  spacing: AppSizes.sm,
-                  children: ['All', 'Pending', 'Accepted', 'In progress', 'Completed']
-                      .map(
-                        (status) => ChoiceChip(
-                          label: Text(status.tr),
-                          selected: filter == status,
-                          onSelected: (_) => setState(() => filter = status),
-                          selectedColor: AppColors.primary,
-                          backgroundColor: AppColors.card,
-                          labelStyle: TextStyle(
-                            color: filter == status ? Colors.white : AppColors.textMuted,
+                child: Obx(
+                  () => Wrap(
+                    spacing: AppSizes.sm,
+                    children: statuses
+                        .map(
+                          (status) => ChoiceChip(
+                            label: Text(status.tr),
+                            selected: controller.filter.value == status,
+                            onSelected: (_) => controller.changeFilter(status),
+                            selectedColor: AppColors.primary,
+                            backgroundColor: AppColors.card,
+                            labelStyle: TextStyle(
+                              color: controller.filter.value == status ? Colors.white : AppColors.textMuted,
+                            ),
                           ),
-                        ),
-                      )
-                      .toList(),
+                        )
+                        .toList(),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSizes.md),
-          TableWrapper(
-            child: DataTable(
-              columns: [
-                DataColumn(label: Text('Service'.tr)),
-                DataColumn(label: Text('Customer'.tr)),
-                DataColumn(label: Text('Artisan'.tr)),
-                DataColumn(label: Text('Status'.tr)),
-                DataColumn(label: Text('Date'.tr)),
-                DataColumn(label: Text('Actions'.tr)),
-              ],
-              rows: requests
-                  .map(
-                    (r) => DataRow(
-                      cells: [
-                        DataCell(Text(r.service)),
-                        DataCell(Text(r.customer)),
-                        DataCell(Text(r.artisan)),
-                        DataCell(_statusChip(r.status)),
-                        DataCell(Text('${r.date.day}/${r.date.month}/${r.date.year}')),
-                        DataCell(
-                          TextButton(
-                            onPressed: () => Get.toNamed('/request/details'),
-                            child: Text('View details'.tr),
+          Obx(() {
+            if (controller.loading.value) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSizes.lg),
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              );
+            }
+            if (controller.error.value != null) {
+              return Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+              );
+            }
+            if (controller.requests.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+              );
+            }
+            return TableWrapper(
+              child: DataTable(
+                columns: [
+                  DataColumn(label: Text('Service'.tr)),
+                  DataColumn(label: Text('Customer'.tr)),
+                  DataColumn(label: Text('Artisan'.tr)),
+                  DataColumn(label: Text('Status'.tr)),
+                  DataColumn(label: Text('Date'.tr)),
+                  DataColumn(label: Text('Actions'.tr)),
+                ],
+                rows: controller.requests
+                    .map(
+                      (r) => DataRow(
+                        cells: [
+                          DataCell(Text((r['service'] ?? r['serviceName'] ?? '').toString())),
+                          DataCell(Text((r['customer'] ?? r['customerName'] ?? '').toString())),
+                          DataCell(Text((r['artisan'] ?? r['artisanName'] ?? '').toString())),
+                          DataCell(_statusChip((r['status'] ?? '').toString())),
+                          DataCell(Text(_formatDate(r['date'] ?? r['createdAt']))),
+                          DataCell(
+                            TextButton(
+                              onPressed: () => Get.toNamed('/request/details', arguments: r),
+                              child: Text('View details'.tr),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                  .toList(),
-              headingTextStyle: const TextStyle(
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.w600,
+                        ],
+                      ),
+                    )
+                    .toList(),
+                headingTextStyle: const TextStyle(
+                  color: AppColors.textMuted,
+                  fontWeight: FontWeight.w600,
+                ),
+                dataTextStyle: const TextStyle(color: AppColors.text),
               ),
-              dataTextStyle: const TextStyle(color: AppColors.text),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
+  }
+
+  String _formatDate(dynamic value) {
+    if (value is DateTime) {
+      return '${value.day}/${value.month}/${value.year}';
+    }
+    if (value is String) {
+      final parsed = DateTime.tryParse(value);
+      if (parsed != null) return '${parsed.day}/${parsed.month}/${parsed.year}';
+      return value;
+    }
+    return '';
   }
 
   Widget _statusChip(String status) {
@@ -113,6 +141,7 @@ class _RequestsListViewState extends State<RequestsListView> {
         color = Colors.lightBlueAccent;
         break;
       case 'in progress':
+      case 'in-progress':
         color = Colors.amber;
         break;
       default:

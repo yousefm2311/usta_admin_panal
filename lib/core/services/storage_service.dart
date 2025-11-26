@@ -1,12 +1,15 @@
+import 'package:get_storage/get_storage.dart';
+
 class StorageService {
-   StorageService();
+  StorageService();
 
-  // In a real app this would persist data. For this UI-only build we keep it in memory.
-  final Map<String, dynamic> _cache = {};
+  final GetStorage _box = GetStorage();
 
-  dynamic read(String key) => _cache[key];
+  T? read<T>(String key) => _box.read<T>(key);
 
-  void write(String key, dynamic value) {
-    _cache[key] = value;
+  Future<void> write(String key, dynamic value) async {
+    await _box.write(key, value);
   }
+
+  Future<void> remove(String key) => _box.remove(key);
 }

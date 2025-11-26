@@ -4,12 +4,15 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../widgets/primary_button.dart';
+import '../controllers/auth_controller.dart';
+import '../../../core/utils/notify.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final auth = Get.put(AuthController());
     final emailCtrl = TextEditingController();
     final passCtrl = TextEditingController();
 
@@ -104,11 +107,22 @@ class LoginView extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSizes.lg),
-            PrimaryButton(
-              expand: true,
-              label: 'Sign in'.tr,
-              icon: Icons.lock_open,
-              onPressed: () => Get.offAllNamed('/dashboard'),
+            Obx(
+              () => PrimaryButton(
+                expand: true,
+                label: auth.loading.value ? 'Loading'.tr : 'Sign in'.tr,
+                icon: Icons.lock_open,
+                onPressed: auth.loading.value
+                    ? null
+                    : () async {
+                        final ok = await auth.login(emailCtrl.text.trim(), passCtrl.text.trim());
+                        if (ok) {
+                          Get.offAllNamed('/dashboard');
+                        } else if (auth.error.value != null) {
+                          showError(auth.error.value!);
+                        }
+                      },
+              ),
             ),
           ],
         ),
