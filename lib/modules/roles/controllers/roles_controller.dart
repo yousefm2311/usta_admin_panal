@@ -43,6 +43,13 @@ class RolesController extends GetxController {
     saving.value = true;
     try {
       await _service.create(payload);
+      if (payload.containsKey('adminEmail') && payload.containsKey('adminPassword')) {
+        await _service.createAdminForRole(
+          roleName: payload['name'],
+          email: payload['adminEmail'],
+          password: payload['adminPassword'],
+        );
+      }
       await load();
       showSuccess('Success'.tr);
     } catch (e) {

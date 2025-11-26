@@ -98,6 +98,8 @@ class RolesListView extends StatelessWidget {
   void _openDialog(RolesController controller) {
     final nameCtrl = TextEditingController();
     final descCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    final passwordCtrl = TextEditingController();
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColors.card,
@@ -115,6 +117,20 @@ class RolesListView extends StatelessWidget {
               decoration: const InputDecoration(labelText: 'Description'),
               style: const TextStyle(color: AppColors.text),
             ),
+            const SizedBox(height: AppSizes.sm),
+            Text('Optional: create admin with this role'.tr,
+                style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+            TextField(
+              controller: emailCtrl,
+              decoration: const InputDecoration(labelText: 'Admin email'),
+              style: const TextStyle(color: AppColors.text),
+            ),
+            TextField(
+              controller: passwordCtrl,
+              decoration: const InputDecoration(labelText: 'Password'),
+              style: const TextStyle(color: AppColors.text),
+              obscureText: true,
+            ),
           ],
         ),
         actions: [
@@ -125,7 +141,12 @@ class RolesListView extends StatelessWidget {
                 showError('Please fill required fields'.tr);
                 return;
               }
-              controller.create({'name': nameCtrl.text.trim(), 'description': descCtrl.text.trim()});
+              controller.create({
+                'name': nameCtrl.text.trim(),
+                'description': descCtrl.text.trim(),
+                if (emailCtrl.text.trim().isNotEmpty) 'adminEmail': emailCtrl.text.trim(),
+                if (passwordCtrl.text.trim().isNotEmpty) 'adminPassword': passwordCtrl.text.trim(),
+              });
               Get.back();
             },
             child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),

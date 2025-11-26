@@ -11,6 +11,16 @@ class RolesService {
 
   Future<Response> create(Map<String, dynamic> payload) => _dio.post('/api/admin/roles', data: payload);
 
+  Future<Response> createAdminForRole(
+      {required String roleName, required String email, required String password}) {
+    return _dio.post('/api/admin/create', data: {
+      'name': roleName,
+      'email': email,
+      'password': password,
+      'role': roleName,
+    });
+  }
+
   Future<Response> update(String id, Map<String, dynamic> payload) =>
       _dio.put('/api/admin/roles/$id', data: payload);
 

@@ -99,9 +99,14 @@ class CouponsView extends StatelessWidget {
   void _openDialog(CouponsController controller, {Map<String, dynamic>? coupon}) {
     final code = TextEditingController(text: coupon?['code']?.toString() ?? '');
     final value = TextEditingController(text: coupon?['value']?.toString() ?? '');
-    final discountType = TextEditingController(text: coupon?['discountType']?.toString() ?? '');
+    final discountType = TextEditingController(text: coupon?['discountType']?.toString() ?? 'percent');
     final minOrder = TextEditingController(text: coupon?['minOrder']?.toString() ?? '');
     final expiresAt = TextEditingController(text: coupon?['expiresAt']?.toString() ?? '');
+    DateTime? expiryDate;
+    final expiresValue = coupon?['expiresAt'];
+    if (expiresValue != null && expiresValue.toString().isNotEmpty) {
+      expiryDate = DateTime.tryParse(expiresValue.toString());
+    }
 
     Get.dialog(
       AlertDialog(
@@ -122,7 +127,7 @@ class CouponsView extends StatelessWidget {
             ),
             TextField(
               controller: discountType,
-              decoration: const InputDecoration(labelText: 'Discount type'),
+              decoration: const InputDecoration(labelText: 'Discount type (percent/fixed)'),
               style: const TextStyle(color: AppColors.text),
             ),
             TextField(
@@ -130,10 +135,33 @@ class CouponsView extends StatelessWidget {
               decoration: const InputDecoration(labelText: 'Min order'),
               style: const TextStyle(color: AppColors.text),
             ),
-            TextField(
-              controller: expiresAt,
-              decoration: const InputDecoration(labelText: 'Expires at'),
-              style: const TextStyle(color: AppColors.text),
+            const SizedBox(height: AppSizes.sm),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    expiryDate != null ? expiryDate.toString().split('.').first : 'No expiry selected'.tr,
+                    style: const TextStyle(color: AppColors.textMuted),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final currentContext = Get.context;
+                    if (currentContext == null) return;
+                    final picked = await showDatePicker(
+                      context: currentContext,
+                      initialDate: (expiryDate ?? DateTime.now()),
+                      firstDate: DateTime.now().subtract(const Duration(days: 1)),
+                      lastDate: DateTime.now().add(const Duration(days: 365 * 3)),
+                    );
+                    if (picked != null) {
+                      expiryDate = picked;
+                      expiresAt.text = picked.toIso8601String();
+                    }
+                  },
+                  child: Text('Pick expiry'.tr),
+                ),
+              ],
             ),
           ],
         ),

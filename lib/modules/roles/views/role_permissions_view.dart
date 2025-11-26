@@ -33,7 +33,6 @@ class RolePermissionsView extends StatelessWidget {
             child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
           );
         }
-        final role = controller.role.value;
         final permissions = controller.permissions;
         return Container(
           padding: const EdgeInsets.all(AppSizes.md),
