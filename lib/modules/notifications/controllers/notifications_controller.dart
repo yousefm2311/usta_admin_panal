@@ -33,6 +33,11 @@ class NotificationsController extends GetxController {
         history.assignAll(data['notifications'] ?? data['data'] ?? []);
       }
     } catch (e) {
+      // history is optional; ignore if endpoint missing
+      if (e is ApiException && e.statusCode == 404) {
+        history.clear();
+        return;
+      }
       final msg = e is ApiException ? e.message : e.toString();
       error.value = msg;
     } finally {

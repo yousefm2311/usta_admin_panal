@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 
 import '../../../core/services/api_exceptions.dart';
 import '../../../core/utils/notify.dart';
+import '../../../core/constants/app_config.dart';
 import '../services/settings_service.dart';
 
 class SettingsGeneralController extends GetxController {
@@ -36,7 +37,8 @@ class SettingsGeneralController extends GetxController {
       form['appName']?.value = (payload['appName'] ?? '').toString();
       form['supportEmail']?.value = (payload['supportEmail'] ?? '').toString();
       form['about']?.value = (payload['about'] ?? '').toString();
-      form['logoUrl']?.value = (payload['logoUrl'] ?? '').toString();
+      final logo = (payload['logoUrl'] ?? '').toString();
+      form['logoUrl']?.value = _normalizedUrl(logo);
     } catch (e) {
       error.value = e is ApiException ? e.message : e.toString();
     } finally {
@@ -47,11 +49,15 @@ class SettingsGeneralController extends GetxController {
   Future<void> save() async {
     saving.value = true;
     try {
+      final logoValue = form['logoUrl']?.value ?? '';
+      final apiLogo = logoValue.startsWith(AppConfig.baseUrl)
+          ? logoValue.replaceFirst(AppConfig.baseUrl, '')
+          : logoValue;
       await _service.updateGeneral({
         'appName': form['appName']?.value,
         'supportEmail': form['supportEmail']?.value,
         'about': form['about']?.value,
-        'logoUrl': form['logoUrl']?.value,
+        'logoUrl': apiLogo,
       });
       showSuccess('Success'.tr);
     } catch (e) {
@@ -79,7 +85,7 @@ class SettingsGeneralController extends GetxController {
       final data = res.data;
       final url = data is Map<String, dynamic> ? (data['data']?['url'] ?? data['url']) : null;
       if (url != null) {
-        form['logoUrl']?.value = url.toString();
+        form['logoUrl']?.value = _normalizedUrl(url.toString());
         showSuccess('Success'.tr);
       }
     } catch (e) {
@@ -87,5 +93,14 @@ class SettingsGeneralController extends GetxController {
     } finally {
       uploadingLogo.value = false;
     }
+  }
+
+  String _normalizedUrl(String value) {
+    if (value.isEmpty) return '';
+    if (value.startsWith('http')) return value;
+    // ensure we always have absolute URL for images
+    return value.startsWith('/')
+        ? '${AppConfig.baseUrl}$value'
+        : '${AppConfig.baseUrl}/$value';
   }
 }

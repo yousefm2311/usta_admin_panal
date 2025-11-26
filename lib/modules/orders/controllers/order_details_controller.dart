@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:dio/dio.dart';
 
 import '../../../core/services/api_exceptions.dart';
 import '../../../core/utils/notify.dart';
@@ -55,6 +56,8 @@ class OrderDetailsController extends GetxController {
       await load(id);
       showSuccess('Success'.tr);
     } catch (e) {
+      if (e is ApiException && e.statusCode == 404) return;
+      if (e is DioException && e.response?.statusCode == 404) return;
       showError(e is ApiException ? e.message : e.toString());
     }
   }
@@ -65,6 +68,8 @@ class OrderDetailsController extends GetxController {
       showSuccess('Success'.tr);
       await load(id);
     } catch (e) {
+      if (e is ApiException && e.statusCode == 404) return;
+      if (e is DioException && e.response?.statusCode == 404) return;
       showError(e is ApiException ? e.message : e.toString());
     }
   }
@@ -75,6 +80,8 @@ class OrderDetailsController extends GetxController {
       showSuccess('Success'.tr);
       await load(id);
     } catch (e) {
+      if (e is ApiException && e.statusCode == 404) return;
+      if (e is DioException && e.response?.statusCode == 404) return;
       showError(e is ApiException ? e.message : e.toString());
     }
   }
@@ -85,6 +92,8 @@ class OrderDetailsController extends GetxController {
       await _service.sendMessage(id, message: message.trim());
       await load(id);
     } catch (e) {
+      if (e is ApiException && e.statusCode == 404) return;
+      if (e is DioException && e.response?.statusCode == 404) return;
       showError(e is ApiException ? e.message : e.toString());
     }
   }

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
+import '../../../core/constants/app_config.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/primary_button.dart';
 import '../controllers/settings_general_controller.dart';
@@ -62,12 +63,15 @@ class SettingsGeneralView extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: AppColors.overlay,
                             borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-                            image: controller.form['logoUrl']?.value.isNotEmpty == true
-                                ? DecorationImage(
-                                    image: NetworkImage(controller.form['logoUrl']!.value),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
+                            image: () {
+                              final raw = controller.form['logoUrl']?.value ?? '';
+                              if (raw.isEmpty) return null;
+                              final url = raw.startsWith('http') ? raw : '${AppConfig.baseUrl}$raw';
+                              return DecorationImage(
+                                image: NetworkImage(url),
+                                fit: BoxFit.cover,
+                              );
+                            }(),
                           ),
                           child: controller.form['logoUrl']?.value.isNotEmpty == true
                               ? null

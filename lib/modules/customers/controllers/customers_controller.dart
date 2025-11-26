@@ -51,11 +51,11 @@ class CustomersController extends GetxController {
       showSuccess('Success'.tr);
       await loadCustomers(search: query.value.isNotEmpty ? query.value : null);
     } catch (e) {
-      if (e is ApiException) {
-        showError(e.message);
-      } else {
-        showError(e.toString());
+      if (e is ApiException && e.statusCode == 404) {
+        showError('إيقاف العميل غير مدعوم حالياً من الخادم'.tr);
+        return;
       }
+      showError(e is ApiException ? e.message : e.toString());
     }
   }
 

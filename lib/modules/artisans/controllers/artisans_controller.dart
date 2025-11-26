@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:dio/dio.dart';
 
 import '../../../core/services/api_exceptions.dart';
 import '../../../core/utils/notify.dart';
@@ -46,6 +47,10 @@ class ArtisansController extends GetxController {
       showSuccess('Success'.tr);
       await loadArtisans();
     } catch (e) {
+      if ((e is ApiException && e.statusCode == 404) || (e is DioException && e.response?.statusCode == 404)) {
+        showError('هذا الإجراء غير مدعوم من الخادم حالياً'.tr);
+        return;
+      }
       showError(e is ApiException ? e.message : e.toString());
     }
   }
@@ -56,6 +61,10 @@ class ArtisansController extends GetxController {
       showSuccess('Success'.tr);
       await loadArtisans();
     } catch (e) {
+      if ((e is ApiException && e.statusCode == 404) || (e is DioException && e.response?.statusCode == 404)) {
+        showError('هذا الإجراء غير مدعوم من الخادم حالياً'.tr);
+        return;
+      }
       showError(e is ApiException ? e.message : e.toString());
     }
   }
