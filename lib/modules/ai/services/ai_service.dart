@@ -8,4 +8,6 @@ class AIService {
   Future<Response> reviewsAnalysis() => _dio.get('/api/admin/ai/reviews-analysis');
 
   Future<Response> topArtisans() => _dio.get('/api/admin/ai/top-artisans');
+
+  Future<Response> wordCloud() => _dio.get('/api/admin/ai/word-cloud');
 }

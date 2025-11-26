@@ -5,83 +5,146 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/primary_button.dart';
+import '../controllers/settings_general_controller.dart';
+import 'package:file_picker/file_picker.dart';
 
 class SettingsGeneralView extends StatelessWidget {
   const SettingsGeneralView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(SettingsGeneralController());
+    final appNameController = TextEditingController();
+    final emailController = TextEditingController();
+    final aboutController = TextEditingController();
+
     return AdminLayout(
       title: 'Settings',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'General settings'.tr,
-            style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: AppSizes.md),
-          Container(
-            padding: const EdgeInsets.all(AppSizes.lg),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+      child: Obx(() {
+        if (controller.loading.value) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSizes.lg),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('App logo'.tr, style: const TextStyle(color: AppColors.textMuted)),
-                const SizedBox(height: AppSizes.sm),
-                Row(
-                  children: [
-                    Container(
-                      height: 64,
-                      width: 64,
-                      decoration: BoxDecoration(
-                        color: AppColors.overlay,
-                        borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+          );
+        }
+        appNameController.text = controller.form['appName']?.value ?? '';
+        emailController.text = controller.form['supportEmail']?.value ?? '';
+        aboutController.text = controller.form['about']?.value ?? '';
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'General settings'.tr,
+              style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: AppSizes.md),
+            Container(
+              padding: const EdgeInsets.all(AppSizes.lg),
+              decoration: BoxDecoration(
+                color: AppColors.card,
+                borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('App logo'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                  const SizedBox(height: AppSizes.sm),
+                  Row(
+                    children: [
+                      Obx(
+                        () => Container(
+                          height: 64,
+                          width: 64,
+                          decoration: BoxDecoration(
+                            color: AppColors.overlay,
+                            borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+                            image: controller.form['logoUrl']?.value.isNotEmpty == true
+                                ? DecorationImage(
+                                    image: NetworkImage(controller.form['logoUrl']!.value),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                          ),
+                          child: controller.form['logoUrl']?.value.isNotEmpty == true
+                              ? null
+                              : const Icon(Icons.image_outlined, color: AppColors.textMuted),
+                        ),
                       ),
-                      child: const Icon(Icons.image_outlined, color: AppColors.textMuted),
-                    ),
-                    const SizedBox(width: AppSizes.md),
-                    OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.text,
-                        side: const BorderSide(color: AppColors.border),
+                      const SizedBox(width: AppSizes.md),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.text,
+                          side: const BorderSide(color: AppColors.border),
+                        ),
+                        onPressed: controller.uploadingLogo.value
+                            ? null
+                            : () async {
+                                final result =
+                                    await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
+                                if (result != null && result.files.isNotEmpty) {
+                                  final file = result.files.first;
+                                  await controller.uploadLogo(
+                                    fileName: file.name,
+                                    bytes: file.bytes,
+                                    path: file.path,
+                                  );
+                                }
+                              },
+                        icon: controller.uploadingLogo.value
+                            ? const SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                              )
+                            : const Icon(Icons.upload),
+                        label: Text('Upload logo'.tr),
                       ),
-                      onPressed: () {},
-                      icon: const Icon(Icons.upload),
-                      label: Text('Upload logo'.tr),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSizes.lg),
-                TextField(
-                  style: const TextStyle(color: AppColors.text),
-                  decoration: InputDecoration(labelText: 'Support email'.tr),
-                ),
-                const SizedBox(height: AppSizes.md),
-                TextField(
-                  style: const TextStyle(color: AppColors.text),
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                    labelText: 'About info'.tr,
-                    hintText: 'Short description about USTA platform'.tr,
+                    ],
                   ),
-                ),
-                const SizedBox(height: AppSizes.lg),
-                PrimaryButton(
-                  expand: true,
-                  label: 'Save changes'.tr,
-                  icon: Icons.save_outlined,
-                  onPressed: () {},
-                ),
-              ],
+                  const SizedBox(height: AppSizes.lg),
+                  TextField(
+                    controller: appNameController,
+                    onChanged: (v) => controller.form['appName']?.value = v,
+                    style: const TextStyle(color: AppColors.text),
+                    decoration: InputDecoration(labelText: 'App Name'),
+                  ),
+                  const SizedBox(height: AppSizes.md),
+                  TextField(
+                    controller: emailController,
+                    onChanged: (v) => controller.form['supportEmail']?.value = v,
+                    style: const TextStyle(color: AppColors.text),
+                    decoration: InputDecoration(labelText: 'Support email'.tr),
+                  ),
+                  const SizedBox(height: AppSizes.md),
+                  TextField(
+                    controller: aboutController,
+                    onChanged: (v) => controller.form['about']?.value = v,
+                    style: const TextStyle(color: AppColors.text),
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      labelText: 'About info'.tr,
+                      hintText: 'Short description about USTA platform'.tr,
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.lg),
+                  Obx(
+                    () => PrimaryButton(
+                      expand: true,
+                      label: controller.saving.value ? 'Loading'.tr : 'Save changes'.tr,
+                      icon: Icons.save_outlined,
+                      onPressed: controller.saving.value ? null : controller.save,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 }

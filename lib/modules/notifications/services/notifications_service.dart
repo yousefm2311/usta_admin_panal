@@ -10,4 +10,12 @@ class NotificationsService {
   Future<Response> templates() => _dio.get('/api/admin/notifications/templates');
 
   Future<Response> history() => _dio.get('/api/admin/notifications/history');
+
+  Future<Response> createTemplate(Map<String, dynamic> payload) =>
+      _dio.post('/api/admin/notifications/templates', data: payload);
+
+  Future<Response> updateTemplate(String id, Map<String, dynamic> payload) =>
+      _dio.put('/api/admin/notifications/templates/$id', data: payload);
+
+  Future<Response> deleteTemplate(String id) => _dio.delete('/api/admin/notifications/templates/$id');
 }

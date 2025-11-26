@@ -1,43 +1,134 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/core/utils/notify.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
+import '../controllers/roles_controller.dart';
 
 class RolesListView extends StatelessWidget {
   const RolesListView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(RolesController());
     return AdminLayout(
       title: 'Roles'.tr,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Roles & Permissions'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: AppSizes.md),
-          TableWrapper(
-            child: DataTable(
-              columns: [
-                DataColumn(label: Text('Role'.tr)),
-                DataColumn(label: Text('Modules'.tr)),
-                DataColumn(label: Text('Members'.tr)),
-                DataColumn(label: Text('Actions'.tr)),
-              ],
-              rows: List.generate(
-                4,
-                (i) => const DataRow(
-                  cells: [
-                    DataCell(Text('Admin')),
-                    DataCell(Text('All')),
-                    DataCell(Text('3')),
-                    DataCell(Text('Edit')),
-                  ],
+      child: Obx(() {
+        if (controller.loading.value) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSizes.lg),
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+          );
+        }
+        if (controller.error.value != null) {
+          return Padding(
+            padding: const EdgeInsets.all(AppSizes.md),
+            child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+          );
+        }
+        if (controller.roles.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.all(AppSizes.md),
+            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text('Roles & Permissions'.tr,
+                    style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () => _openDialog(controller),
+                  icon: const Icon(Icons.add, color: AppColors.primary),
+                  label: Text('Add'.tr, style: const TextStyle(color: AppColors.primary)),
                 ),
+              ],
+            ),
+            const SizedBox(height: AppSizes.md),
+            TableWrapper(
+              child: DataTable(
+                columns: [
+                  DataColumn(label: Text('Role'.tr)),
+                  DataColumn(label: Text('Modules'.tr)),
+                  DataColumn(label: Text('Members'.tr)),
+                  DataColumn(label: Text('Actions'.tr)),
+                ],
+                rows: controller.roles
+                    .map(
+                      (r) => DataRow(
+                        cells: [
+                          DataCell(Text((r['name'] ?? '').toString())),
+                          DataCell(Text((r['modules'] ?? r['permissions'] ?? '').toString())),
+                          DataCell(Text((r['members'] ?? '').toString())),
+                          DataCell(
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () => Get.toNamed('/roles/permissions', arguments: r),
+                                  child: Text('Edit'.tr),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      controller.deleteRole((r['_id'] ?? r['id'] ?? '').toString()),
+                                  child: Text('Delete'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                    .toList(),
               ),
             ),
+          ],
+        );
+      }),
+    );
+  }
+
+  void _openDialog(RolesController controller) {
+    final nameCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.card,
+        title: Text('Add role'.tr, style: const TextStyle(color: AppColors.text)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(labelText: 'Name'),
+              style: const TextStyle(color: AppColors.text),
+            ),
+            TextField(
+              controller: descCtrl,
+              decoration: const InputDecoration(labelText: 'Description'),
+              style: const TextStyle(color: AppColors.text),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: Get.back, child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted))),
+          TextButton(
+            onPressed: () {
+              if (nameCtrl.text.trim().isEmpty) {
+                showError('Please fill required fields'.tr);
+                return;
+              }
+              controller.create({'name': nameCtrl.text.trim(), 'description': descCtrl.text.trim()});
+              Get.back();
+            },
+            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
           ),
         ],
       ),

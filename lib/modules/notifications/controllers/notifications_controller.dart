@@ -54,6 +54,36 @@ class NotificationsController extends GetxController {
     }
   }
 
+  Future<void> createTemplate(Map<String, dynamic> payload) async {
+    try {
+      await _service.createTemplate(payload);
+      await loadTemplates();
+      showSuccess('Success'.tr);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
+
+  Future<void> updateTemplate(String id, Map<String, dynamic> payload) async {
+    try {
+      await _service.updateTemplate(id, payload);
+      await loadTemplates();
+      showSuccess('Success'.tr);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
+
+  Future<void> deleteTemplate(String id) async {
+    try {
+      await _service.deleteTemplate(id);
+      await loadTemplates();
+      showSuccess('Success'.tr);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
+
   Future<void> send({
     required String title,
     required String message,

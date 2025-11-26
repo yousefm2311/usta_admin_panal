@@ -10,8 +10,10 @@ class AIController extends GetxController {
 
   final sentiment = <String, double>{}.obs;
   final topArtisans = <dynamic>[].obs;
+  final wordCloud = <String>[].obs;
   final loadingSentiment = false.obs;
   final loadingTop = false.obs;
+  final loadingWordCloud = false.obs;
   final error = RxnString();
 
   @override
@@ -19,6 +21,7 @@ class AIController extends GetxController {
     super.onInit();
     loadSentiment();
     loadTopArtisans();
+    loadWordCloud();
   }
 
   Future<void> loadSentiment() async {
@@ -48,6 +51,26 @@ class AIController extends GetxController {
       showError(error.value!);
     } finally {
       loadingTop.value = false;
+    }
+  }
+
+  Future<void> loadWordCloud() async {
+    loadingWordCloud.value = true;
+    try {
+      final res = await _service.wordCloud();
+      final data = res.data;
+      if (data is List) {
+        wordCloud.assignAll(data.map((e) => e.toString()));
+      } else if (data is Map<String, dynamic>) {
+        final list = data['data'] ?? data['words'];
+        if (list is List) {
+          wordCloud.assignAll(list.map((e) => e.toString()));
+        }
+      }
+    } catch (_) {
+      // ignore: no error surfacing for optional word cloud
+    } finally {
+      loadingWordCloud.value = false;
     }
   }
 }

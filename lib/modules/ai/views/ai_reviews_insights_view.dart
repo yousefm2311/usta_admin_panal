@@ -116,28 +116,44 @@ class AIReviewsInsightsView extends StatelessWidget {
             style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: AppSizes.sm),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(AppSizes.lg),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
-            ),
-            child: Wrap(
-              spacing: AppSizes.sm,
-              runSpacing: AppSizes.sm,
-              children: const [
-                _Word('reliable', 18),
-                _Word('on-time', 16),
-                _Word('friendly', 14),
-                _Word('clean', 20),
-                _Word('professional', 16),
-                _Word('responsive', 18),
-                _Word('expensive', 14),
-              ],
-            ),
-          ),
+          Obx(() {
+            if (controller.loadingWordCloud.value) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSizes.md),
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              );
+            }
+            if (controller.wordCloud.isEmpty) {
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSizes.lg),
+                decoration: BoxDecoration(
+                  color: AppColors.card,
+                  borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                  border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                ),
+                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+              );
+            }
+            return Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppSizes.lg),
+              decoration: BoxDecoration(
+                color: AppColors.card,
+                borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              ),
+              child: Wrap(
+                spacing: AppSizes.sm,
+                runSpacing: AppSizes.sm,
+                children: controller.wordCloud
+                    .map((w) => _Word(w, 14 + (w.length % 6).toDouble()))
+                    .toList(),
+              ),
+            );
+          }),
         ],
       ),
     );

@@ -4,70 +4,135 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
+import '../controllers/complaint_details_controller.dart';
 
 class ComplaintDetailsView extends StatelessWidget {
   const ComplaintDetailsView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final args = Get.arguments as Map<String, dynamic>?;
+    final id = (args?['_id'] ?? args?['id'] ?? '').toString();
+    final controller = Get.put(ComplaintDetailsController());
+    if (id.isNotEmpty) {
+      controller.load(id);
+    }
+
     return AdminLayout(
       title: 'Complaint Details'.tr,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Issue: Payment delay'.tr,
-                    style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 6),
-                Text('Customer: Layla Ibrahim • Artisan: Hassan Mahmoud'.tr,
-                    style: const TextStyle(color: AppColors.textMuted)),
-              ],
+      child: Obx(() {
+        if (controller.loading.value) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSizes.lg),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
-          ),
-          const SizedBox(height: AppSizes.md),
-          _card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Thread'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-                const SizedBox(height: AppSizes.sm),
-                ...List.generate(
-                  3,
-                  (i) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSizes.sm),
-                    child: Container(
-                      padding: const EdgeInsets.all(AppSizes.sm),
-                      decoration: BoxDecoration(
-                        color: AppColors.overlay,
-                        borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+          );
+        }
+        if (controller.error.value != null) {
+          return Padding(
+            padding: const EdgeInsets.all(AppSizes.md),
+            child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+          );
+        }
+        final data = controller.complaint.value;
+        if (data == null) {
+          return Padding(
+            padding: const EdgeInsets.all(AppSizes.md),
+            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          );
+        }
+        final thread = (data['messages'] ?? data['thread'] ?? []) as List<dynamic>;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    (data['issue'] ?? data['title'] ?? '').toString(),
+                    style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '${'Customer'.tr}: ${(data['customer'] ?? data['customerName'] ?? '').toString()} • ${'Status'.tr}: ${(data['status'] ?? '').toString()}',
+                    style: const TextStyle(color: AppColors.textMuted),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSizes.md),
+            _card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Thread'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: AppSizes.sm),
+                  ...thread.map(
+                    (m) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSizes.sm),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppSizes.sm),
+                        decoration: BoxDecoration(
+                          color: AppColors.overlay,
+                          borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (m['sender'] ?? '').toString(),
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              (m['message'] ?? m['text'] ?? '').toString(),
+                              style: const TextStyle(color: AppColors.text),
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Text('Conversation history placeholder'.tr, style: const TextStyle(color: AppColors.text)),
                     ),
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSizes.md),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () => controller.updateStatus(id, 'assigned'),
+                  child: Text('Assign to support'.tr),
+                ),
+                const SizedBox(width: AppSizes.sm),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.border),
+                    foregroundColor: AppColors.text,
+                  ),
+                  onPressed: () => controller.updateStatus(id, 'closed'),
+                  child: Text('Close'.tr),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: AppSizes.md),
-          Row(
-            children: [
-              ElevatedButton(onPressed: () {}, child: Text('Assign to support'.tr)),
-              const SizedBox(width: AppSizes.sm),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.border),
-                  foregroundColor: AppColors.text,
-                ),
-                onPressed: () {},
-                child: Text('Close'.tr),
+            const SizedBox(height: AppSizes.md),
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Type notification message'.tr,
+                filled: true,
               ),
-            ],
-          ),
-        ],
-      ),
+              style: const TextStyle(color: AppColors.text),
+              onSubmitted: (v) {
+                if (v.trim().isNotEmpty) {
+                  controller.addMessage(id, v.trim());
+                }
+              },
+            ),
+          ],
+        );
+      }),
     );
   }
 

@@ -3,25 +3,17 @@ import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
-import '../../../data/providers/mock_data.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
+import '../controllers/orders_controller.dart';
 
-class AllOrdersView extends StatefulWidget {
+class AllOrdersView extends StatelessWidget {
   const AllOrdersView({super.key});
 
   @override
-  State<AllOrdersView> createState() => _AllOrdersViewState();
-}
-
-class _AllOrdersViewState extends State<AllOrdersView> {
-  String statusFilter = 'All';
-
-  @override
   Widget build(BuildContext context) {
-    final orders = statusFilter == 'All'
-        ? MockData.requests
-        : MockData.requests.where((r) => r.status.toLowerCase() == statusFilter.toLowerCase()).toList();
+    final controller = Get.put(OrdersController());
+    final statuses = ['All', 'active', 'completed', 'canceled'];
 
     return AdminLayout(
       title: 'Orders'.tr,
@@ -35,69 +27,103 @@ class _AllOrdersViewState extends State<AllOrdersView> {
               const SizedBox(height: AppSizes.sm),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Wrap(
-                  spacing: AppSizes.sm,
-                  children: ['All', 'Active', 'Completed', 'Canceled']
-                      .map(
-                        (s) => ChoiceChip(
-                          label: Text(s.tr),
-                          selected: statusFilter == s,
-                          onSelected: (_) => setState(() => statusFilter = s),
-                          selectedColor: AppColors.primary,
-                          backgroundColor: AppColors.card,
-                          labelStyle: TextStyle(
-                            color: statusFilter == s ? Colors.white : AppColors.textMuted,
+                child: Obx(
+                  () => Wrap(
+                    spacing: AppSizes.sm,
+                    children: statuses
+                        .map(
+                          (s) => ChoiceChip(
+                            label: Text(s.tr),
+                            selected: controller.status.value == s,
+                            onSelected: (_) => controller.setStatus(s),
+                            selectedColor: AppColors.primary,
+                            backgroundColor: AppColors.card,
+                            labelStyle: TextStyle(
+                              color: controller.status.value == s ? Colors.white : AppColors.textMuted,
+                            ),
                           ),
-                        ),
-                      )
-                      .toList(),
+                        )
+                        .toList(),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSizes.md),
-          TableWrapper(
-            child: DataTable(
-              columns: [
-                DataColumn(label: Text('Service'.tr)),
-                DataColumn(label: Text('Customer'.tr)),
-                DataColumn(label: Text('Artisan'.tr)),
-                DataColumn(label: Text('Status'.tr)),
-                DataColumn(label: Text('Price'.tr)),
-                DataColumn(label: Text('Actions'.tr)),
-              ],
-              rows: orders
-                  .map(
-                    (o) => DataRow(
-                      cells: [
-                        DataCell(Text(o.service)),
-                        DataCell(Text(o.customer)),
-                        DataCell(Text(o.artisan)),
-                        DataCell(_statusChip(o.status)),
-                        DataCell(Text('AED ${o.price.toStringAsFixed(0)}')),
-                        DataCell(
-                          Row(
-                            children: [
-                              TextButton(
-                                onPressed: () => Get.toNamed('/order/details'),
-                                child: Text('Details'.tr),
-                              ),
-                              TextButton(
-                                onPressed: () => Get.toNamed('/order/timeline'),
-                                child: Text('Timeline'.tr),
-                              ),
-                            ],
+          Obx(() {
+            if (controller.loading.value) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSizes.lg),
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              );
+            }
+            if (controller.error.value != null) {
+              return Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+              );
+            }
+            if (controller.orders.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+              );
+            }
+            return TableWrapper(
+              child: DataTable(
+                columns: [
+                  DataColumn(label: Text('Service'.tr)),
+                  DataColumn(label: Text('Customer'.tr)),
+                  DataColumn(label: Text('Artisan'.tr)),
+                  DataColumn(label: Text('Status'.tr)),
+                  DataColumn(label: Text('Date'.tr)),
+                  DataColumn(label: Text('Actions'.tr)),
+                ],
+                rows: controller.orders
+                    .map(
+                      (o) => DataRow(
+                        cells: [
+                          DataCell(Text((o['serviceType'] ?? o['service'] ?? '').toString())),
+                          DataCell(Text((o['customer'] ?? o['customerName'] ?? '').toString())),
+                          DataCell(Text((o['artisan'] ?? o['artisanName'] ?? '').toString())),
+                          DataCell(_statusChip((o['status'] ?? '').toString())),
+                          DataCell(Text(_formatDate(o['createdAt']))),
+                          DataCell(
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () => Get.toNamed('/order/details', arguments: o),
+                                  child: Text('Details'.tr),
+                                ),
+                                TextButton(
+                                  onPressed: () => Get.toNamed('/order/timeline', arguments: o),
+                                  child: Text('Timeline'.tr),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
+            );
+          }),
         ],
       ),
     );
+  }
+
+  String _formatDate(dynamic value) {
+    if (value is DateTime) return '${value.day}/${value.month}/${value.year}';
+    if (value is String) {
+      final parsed = DateTime.tryParse(value);
+      if (parsed != null) return '${parsed.day}/${parsed.month}/${parsed.year}';
+      return value;
+    }
+    return '';
   }
 
   Widget _statusChip(String status) {
@@ -107,13 +133,18 @@ class _AllOrdersViewState extends State<AllOrdersView> {
         color = AppColors.success;
         break;
       case 'pending':
+      case 'new':
         color = AppColors.warning;
         break;
       case 'accepted':
+      case 'active':
         color = Colors.lightBlueAccent;
         break;
       case 'in progress':
         color = Colors.amber;
+        break;
+      case 'canceled':
+        color = AppColors.danger;
         break;
       default:
         color = AppColors.primary;

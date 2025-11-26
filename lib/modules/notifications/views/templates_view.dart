@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/core/utils/notify.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
@@ -18,7 +19,17 @@ class NotificationTemplatesView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Templates'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+          Row(
+            children: [
+              Text('Templates'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: () => _openTemplateDialog(controller),
+                icon: const Icon(Icons.add, color: AppColors.primary),
+                label: Text('Add', style: const TextStyle(color: AppColors.primary)),
+              ),
+            ],
+          ),
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.templates.isEmpty && controller.loading.value) {
@@ -45,19 +56,97 @@ class NotificationTemplatesView extends StatelessWidget {
                 ],
                 rows: controller.templates
                     .map(
-                      (t) => DataRow(
-                        cells: [
-                          DataCell(Text((t['name'] ?? '').toString())),
-                          DataCell(Text((t['target'] ?? '').toString())),
-                          DataCell(Text((t['updatedAt'] ?? '').toString())),
-                          const DataCell(Text('Edit')),
-                        ],
-                      ),
+                      (t) => DataRow(cells: [
+                        DataCell(Text((t['name'] ?? '').toString())),
+                        DataCell(Text((t['target'] ?? '').toString())),
+                        DataCell(Text((t['updatedAt'] ?? '').toString())),
+                        DataCell(
+                          Row(
+                            children: [
+                              TextButton(
+                                onPressed: () => _openTemplateDialog(controller, template: t),
+                                child: Text('Edit'.tr),
+                              ),
+                              TextButton(
+                                onPressed: () => controller.deleteTemplate((t['_id'] ?? t['id'] ?? '').toString()),
+                                child: Text('Delete'.tr, style: const TextStyle(color: Colors.redAccent)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ]),
                     )
                     .toList(),
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+
+  void _openTemplateDialog(NotificationsController controller, {Map<String, dynamic>? template}) {
+    final name = TextEditingController(text: template?['name']?.toString() ?? '');
+    final target = TextEditingController(text: template?['target']?.toString() ?? '');
+    final title = TextEditingController(text: template?['title']?.toString() ?? '');
+    final message = TextEditingController(text: template?['message']?.toString() ?? '');
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.card,
+        title: Text(template == null ? 'Add' : 'Edit', style: const TextStyle(color: AppColors.text)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: name,
+              decoration: const InputDecoration(labelText: 'Name'),
+              style: const TextStyle(color: AppColors.text),
+            ),
+            TextField(
+              controller: target,
+              decoration: const InputDecoration(labelText: 'Target'),
+              style: const TextStyle(color: AppColors.text),
+            ),
+            TextField(
+              controller: title,
+              decoration: const InputDecoration(labelText: 'Title'),
+              style: const TextStyle(color: AppColors.text),
+            ),
+            TextField(
+              controller: message,
+              decoration: const InputDecoration(labelText: 'Message'),
+              style: const TextStyle(color: AppColors.text),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: Get.back,
+            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (name.text.trim().isEmpty || title.text.trim().isEmpty || message.text.trim().isEmpty) {
+                showError('Please fill required fields'.tr);
+                return;
+              }
+              final payload = {
+                'name': name.text.trim(),
+                'target': target.text.trim(),
+                'title': title.text.trim(),
+                'message': message.text.trim(),
+              };
+              if (template == null) {
+                controller.createTemplate(payload);
+              } else {
+                controller.updateTemplate((template['_id'] ?? template['id'] ?? '').toString(), payload);
+              }
+              Get.back();
+            },
+            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
+          ),
         ],
       ),
     );
