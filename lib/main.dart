@@ -8,13 +8,15 @@ import 'package:usta_admin_panal/core/constants/app_translations.dart';
 import 'package:usta_admin_panal/core/routing/app_routes.dart';
 
 import 'core/services/token_storage.dart';
+import 'core/services/locale_service.dart';
 import 'core/theme/app_theme.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  Get.put(TokenStorage());
+  final tokenStorage = Get.put(TokenStorage());
+  final localeService = LocaleService();
   runApp(const UstaAdminApp());
 }
 
@@ -23,6 +25,9 @@ class UstaAdminApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokenStorage = Get.find<TokenStorage>();
+    final localeService = LocaleService();
+    final initialRoute = (tokenStorage.token ?? '').isNotEmpty ? '/dashboard' : '/login';
     return GetMaterialApp(
       title: 'USTA Admin',
       debugShowCheckedModeBanner: false,
@@ -30,12 +35,12 @@ class UstaAdminApp extends StatelessWidget {
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
       translations: AppTranslations(),
-      locale: const Locale('en'),
+      locale: localeService.storedLocale,
       fallbackLocale: const Locale('en'),
       supportedLocales: const [Locale('en'), Locale('ar')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       initialBinding: AppBinding(),
-      initialRoute: '/login',
+      initialRoute: initialRoute,
       getPages: AppPages.pages,
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {

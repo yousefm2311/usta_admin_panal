@@ -102,8 +102,12 @@ class LoginView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Validation only - no backend'.tr, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
-                Text('Forgot password?'.tr, style: const TextStyle(color: AppColors.primary, fontSize: 12)),
+                // Text('Validation only - no backend'.tr, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                InkWell(
+                  onTap: () {
+                    Get.offAllNamed('/reset');
+                  },
+                  child: Text('Forgot password?'.tr, style: const TextStyle(color: AppColors.primary, fontSize: 12))),
               ],
             ),
             const SizedBox(height: AppSizes.lg),

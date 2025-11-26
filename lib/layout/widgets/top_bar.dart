@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
+import '../../core/services/locale_service.dart';
 
 class TopBar extends StatelessWidget {
   final String title;
@@ -107,6 +108,7 @@ class TopBar extends StatelessWidget {
 
   void _toggleLocale() {
     final isArabic = Get.locale?.languageCode == 'ar';
-    Get.updateLocale(isArabic ? const Locale('en') : const Locale('ar'));
+    final locale = isArabic ? const Locale('en') : const Locale('ar');
+    LocaleService().save(locale);
   }
 }

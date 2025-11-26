@@ -43,7 +43,12 @@ class ArtisanDetailsView extends StatelessWidget {
           );
         }
         final docs = (data['documents'] ?? []) as List<dynamic>;
-        final stats = (data['stats'] ?? {}) as Map<String, dynamic>;
+        final statsRaw = data['stats'] ?? {};
+        final stats = statsRaw is Map<String, dynamic>
+            ? statsRaw
+            : statsRaw is Map
+                ? Map<String, dynamic>.from(statsRaw)
+                : <String, dynamic>{};
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
