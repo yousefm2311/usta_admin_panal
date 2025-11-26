@@ -93,8 +93,11 @@ class OrderTimelineView extends StatelessWidget {
               const SizedBox(height: AppSizes.md),
               Align(
                 alignment: Alignment.centerRight,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: AppSizes.sm,
+                  runSpacing: AppSizes.xs,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Obx(
                       () => DropdownButton<String>(
@@ -106,7 +109,6 @@ class OrderTimelineView extends StatelessWidget {
                         onChanged: (v) => status.value = v ?? status.value,
                       ),
                     ),
-                    const SizedBox(width: AppSizes.sm),
                     SizedBox(
                       width: 160,
                       child: TextField(
@@ -115,13 +117,11 @@ class OrderTimelineView extends StatelessWidget {
                         decoration: InputDecoration(hintText: 'Note'.tr),
                       ),
                     ),
-                    const SizedBox(width: AppSizes.sm),
                     ElevatedButton.icon(
                       onPressed: () => controller.addTimeline(id, status: status.value, note: noteCtrl.text),
                       icon: const Icon(Icons.add),
                       label: Text('Add'.tr),
                     ),
-                    const SizedBox(width: AppSizes.sm),
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.border),
