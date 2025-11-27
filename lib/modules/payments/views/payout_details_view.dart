@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/payouts_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class PayoutDetailsView extends StatelessWidget {
   const PayoutDetailsView({super.key});
@@ -20,12 +21,7 @@ class PayoutDetailsView extends StatelessWidget {
       title: 'Payout Details'.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 200, lines: 4);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -98,3 +94,5 @@ class PayoutDetailsView extends StatelessWidget {
     );
   }
 }
+
+

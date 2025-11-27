@@ -3,7 +3,8 @@ import 'package:dio/dio.dart';
 import '../../../core/services/api_client.dart';
 
 class PaymentsService {
-  final Dio _dio = ApiClient().dio;
+  final ApiClient _client = ApiClient();
+  Dio get _dio => _client.dio;
 
-  Future<Response> transactions() => _dio.get('/api/admin/payments');
+  Future<Response> transactions() => _client.safe(() => _dio.get('/api/admin/payments'));
 }

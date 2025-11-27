@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/responsive.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/artisan_details_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class ArtisanDetailsView extends StatelessWidget {
   const ArtisanDetailsView({super.key});
@@ -22,12 +23,7 @@ class ArtisanDetailsView extends StatelessWidget {
       title: 'Artisan details',
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 300, lines: 6);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -189,3 +185,5 @@ class ArtisanDetailsView extends StatelessWidget {
     );
   }
 }
+
+

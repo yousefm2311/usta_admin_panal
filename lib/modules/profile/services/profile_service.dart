@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/services/api_exceptions.dart';
 
 class ProfileService {
   final Dio _dio = ApiClient().dio;
@@ -13,7 +14,7 @@ class ProfileService {
       if (e.response?.statusCode == 404) {
         return await _dio.get('/api/admin/verify-role');
       }
-      rethrow;
+      throw mapDioException(e);
     }
   }
 }

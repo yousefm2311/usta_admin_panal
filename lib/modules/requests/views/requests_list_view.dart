@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/requests_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class RequestsListView extends StatelessWidget {
   const RequestsListView({super.key});
@@ -55,12 +56,7 @@ class RequestsListView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes.lg),
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              );
+              return const ListLoading();
             }
             if (controller.error.value != null) {
               return Padding(
@@ -161,3 +157,5 @@ class RequestsListView extends StatelessWidget {
     );
   }
 }
+
+

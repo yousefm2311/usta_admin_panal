@@ -9,6 +9,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/responsive.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/analytics_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class AnalyticsOverviewView extends StatelessWidget {
   const AnalyticsOverviewView({super.key});
@@ -22,11 +23,13 @@ class AnalyticsOverviewView extends StatelessWidget {
       title: 'Analytics',
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              ShimmerGridPlaceholder(count: 2),
+              SizedBox(height: AppSizes.lg),
+              ShimmerCardPlaceholder(height: 260, lines: 4),
+            ],
           );
         }
         if (controller.error.value != null) {

@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+
+import 'api_exceptions.dart';
 import 'http_client.dart';
 
 class ApiClient {
@@ -12,4 +14,12 @@ class ApiClient {
   }
 
   Dio get dio => http.dio;
+
+  Future<Response<T>> safe<T>(Future<Response<T>> Function() fn) async {
+    try {
+      return await fn();
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
 }

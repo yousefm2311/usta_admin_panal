@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/profile_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class AdminProfileView extends StatelessWidget {
   const AdminProfileView({super.key});
@@ -17,12 +18,7 @@ class AdminProfileView extends StatelessWidget {
       title: 'Admin Profile'.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 220, lines: 5);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -110,3 +106,5 @@ class AdminProfileView extends StatelessWidget {
     );
   }
 }
+
+

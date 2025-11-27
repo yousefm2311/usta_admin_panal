@@ -12,6 +12,7 @@ analyzer:
     unused_catch_clause: ignore
     deprecated_member_use: ignore
     unused_local_variable: ignore
+    no_leading_underscores_for_local_identifiers: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:

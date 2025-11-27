@@ -6,6 +6,8 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/order_details_controller.dart';
 import '../../../core/utils/notify.dart';
+import '../../../widgets/shimmer_widgets.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class OrderDetailsView extends StatelessWidget {
   const OrderDetailsView({super.key});
@@ -21,12 +23,7 @@ class OrderDetailsView extends StatelessWidget {
       title: 'Order Details'.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 300, lines: 6);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -261,6 +258,9 @@ class OrderDetailsView extends StatelessWidget {
       case 'completed':
         color = AppColors.success;
         break;
+      case 'assigned':
+        color = Colors.lightBlueAccent;
+        break;
       case 'pending':
         color = AppColors.warning;
         break;
@@ -268,7 +268,15 @@ class OrderDetailsView extends StatelessWidget {
         color = Colors.lightBlueAccent;
         break;
       case 'in progress':
+      case 'in_progress':
         color = Colors.amber;
+        break;
+      case 'canceled':
+      case 'cancelled':
+        color = AppColors.danger;
+        break;
+      case 'closed':
+        color = AppColors.textMuted;
         break;
       default:
         color = AppColors.primary;
@@ -284,3 +292,5 @@ class OrderDetailsView extends StatelessWidget {
     );
   }
 }
+
+

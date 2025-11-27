@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../controllers/customers_controller.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class CustomersListView extends StatelessWidget {
   const CustomersListView({super.key});
@@ -53,12 +54,7 @@ class CustomersListView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes.lg),
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              );
+              return const ShimmerListPlaceholder(rows: 6, itemHeight: 70);
             }
             if (controller.error.value != null) {
               return Padding(

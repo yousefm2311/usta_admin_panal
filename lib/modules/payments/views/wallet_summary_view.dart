@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/payouts_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class WalletSummaryView extends StatelessWidget {
   const WalletSummaryView({super.key});
@@ -17,12 +18,7 @@ class WalletSummaryView extends StatelessWidget {
       title: 'Wallet Summary'.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 200, lines: 4);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -74,3 +70,5 @@ class WalletSummaryView extends StatelessWidget {
     );
   }
 }
+
+

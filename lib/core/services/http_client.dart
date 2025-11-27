@@ -74,28 +74,16 @@ class HttpClient {
     }
   }
 
-  ApiException _mapError(DioException e) {
-    if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout) {
-      return TimeoutException('Request timed out');
-    }
-    if (e.error is SocketException) {
-      return NetworkException('No internet connection');
-    }
-    final status = e.response?.statusCode;
-    if (status == 401) return UnauthorizedException('Unauthorized');
-    if (status != null && status >= 500) {
-      return ServerException('Server error', statusCode: status);
-    }
-    final message = e.response?.data is Map<String, dynamic>
-        ? (e.response?.data['message']?.toString() ?? 'Request error')
-        : e.message ?? 'Request error';
-    return ApiException(message, statusCode: status);
-  }
+  ApiException _mapError(DioException e) => mapDioException(e);
 
   Future<void> _ensureOnline() async {
+    String t(String en, String ar) {
+      final isAr = Get.locale?.languageCode == 'ar';
+      return isAr ? ar : en;
+    }
     final connectivity = await Connectivity().checkConnectivity();
     if (connectivity == ConnectivityResult.none) {
-      throw NetworkException('No internet connection');
+      throw NetworkException(t('No internet connection', 'لا يوجد اتصال بالإنترنت'));
     }
   }
 }
@@ -121,6 +109,15 @@ class _AuthInterceptor extends Interceptor {
     final status = err.response?.statusCode;
     final path = err.requestOptions.path;
     final refreshToken = tokenStorage.refreshToken;
+    final sessionExpired = _isSessionExpired(err.response?.data);
+    if (status == 401 && sessionExpired) {
+      await tokenStorage.clear();
+      // Try to send user to login if Get is available
+      if (Get.isRegistered<GetMaterialController>()) {
+        Get.offAllNamed('/login');
+      }
+      return handler.reject(err);
+    }
     if (status == 401 && refreshToken != null && refreshToken.isNotEmpty && !_refreshing && !path.contains('refresh-token')) {
       _refreshing = true;
       try {
@@ -140,6 +137,15 @@ class _AuthInterceptor extends Interceptor {
       await tokenStorage.clear();
     }
     super.onError(err, handler);
+  }
+
+  bool _isSessionExpired(dynamic data) {
+    if (data is Map) {
+      final error = data['error']?.toString().toLowerCase() ?? '';
+      final message = data['message']?.toString().toLowerCase() ?? '';
+      if (error.contains('session expired') || message.contains('session expired')) return true;
+    }
+    return false;
   }
 
   Future<String?> _refreshAccessToken(String refreshToken) async {
@@ -184,3 +190,4 @@ class _LoggingInterceptor extends Interceptor {
     super.onError(err, handler);
   }
 }
+

@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/system_health_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class SystemHealthView extends StatelessWidget {
   const SystemHealthView({super.key});
@@ -17,12 +18,7 @@ class SystemHealthView extends StatelessWidget {
       title: 'System Health'.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 180, lines: 3);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -65,3 +61,5 @@ class SystemHealthView extends StatelessWidget {
     );
   }
 }
+
+

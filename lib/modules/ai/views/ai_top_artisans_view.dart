@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/ai_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class AITopArtisansView extends StatelessWidget {
   const AITopArtisansView({super.key});
@@ -40,12 +41,7 @@ class AITopArtisansView extends StatelessWidget {
             ),
             child: Obx(() {
               if (controller.loadingTop.value) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(AppSizes.lg),
-                    child: CircularProgressIndicator(color: AppColors.primary),
-                  ),
-                );
+                return const ListLoading(rows: 5, itemHeight: 72);
               }
               if (controller.topArtisans.isEmpty) {
                 return Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted));
@@ -115,3 +111,5 @@ class AITopArtisansView extends StatelessWidget {
     );
   }
 }
+
+

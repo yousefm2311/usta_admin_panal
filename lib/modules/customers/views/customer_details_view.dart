@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/responsive.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/customer_details_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class CustomerDetailsView extends StatefulWidget {
   const CustomerDetailsView({super.key});
@@ -27,12 +28,7 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
       title: 'Customer details'.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 260, lines: 6);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -208,3 +204,5 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
     );
   }
 }
+
+

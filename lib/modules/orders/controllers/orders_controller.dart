@@ -28,7 +28,8 @@ class OrdersController extends GetxController {
     loading.value = true;
     error.value = null;
     try {
-      final res = await _service.list(status: status.value == 'All' ? null : status.value);
+      final mappedStatus = _mapStatus(status.value);
+      final res = await _service.list(status: mappedStatus);
       final data = res.data;
       if (data is List) {
         orders.assignAll(data);
@@ -41,6 +42,29 @@ class OrdersController extends GetxController {
       showError(msg);
     } finally {
       loading.value = false;
+    }
+  }
+
+  String? _mapStatus(String value) {
+    if (value == 'All') return null;
+    switch (value.toLowerCase()) {
+      case 'new':
+      case 'pending':
+        return 'new';
+      case 'assigned':
+        return 'assigned';
+      case 'in_progress':
+      case 'in progress':
+        return 'in_progress';
+      case 'completed':
+        return 'completed';
+      case 'canceled':
+      case 'cancelled':
+        return 'cancelled';
+      case 'closed':
+        return 'closed';
+      default:
+        return value.toLowerCase();
     }
   }
 }

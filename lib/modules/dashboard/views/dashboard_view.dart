@@ -9,6 +9,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/responsive.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/dashboard_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
@@ -22,11 +23,15 @@ class DashboardView extends StatelessWidget {
       title: 'Dashboard',
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              ShimmerGridPlaceholder(count: 4),
+              SizedBox(height: AppSizes.lg),
+              ShimmerCardPlaceholder(height: 280, lines: 4),
+              SizedBox(height: AppSizes.lg),
+              ShimmerListPlaceholder(rows: 6, itemHeight: 60),
+            ],
           );
         }
         if (controller.error.value != null) {

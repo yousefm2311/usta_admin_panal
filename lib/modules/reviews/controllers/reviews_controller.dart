@@ -27,7 +27,13 @@ class ReviewsController extends GetxController {
     try {
       final res = await _service.list();
       final data = res.data;
-      reviews.assignAll(data is List ? data : data['data'] ?? []);
+      if (data is List) {
+        reviews.assignAll(data);
+      } else if (data is Map<String, dynamic>) {
+        reviews.assignAll(data['reviews'] ?? data['data'] ?? []);
+      } else {
+        reviews.clear();
+      }
     } catch (e) {
       final msg = e is ApiException ? e.message : e.toString();
       error.value = msg;
@@ -40,7 +46,8 @@ class ReviewsController extends GetxController {
   Future<void> loadStats() async {
     try {
       final res = await _service.stats();
-      stats.value = res.data is Map<String, dynamic> ? res.data : null;
+      final data = res.data;
+      stats.value = data is Map<String, dynamic> ? (data['stats'] ?? data) : null;
     } catch (_) {
       // stats optional
     }

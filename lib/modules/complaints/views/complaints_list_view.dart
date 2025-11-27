@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/complaints_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class ComplaintsListView extends StatelessWidget {
   const ComplaintsListView({super.key});
@@ -42,12 +43,7 @@ class ComplaintsListView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes.lg),
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              );
+              return const ListLoading();
             }
             if (controller.error.value != null) {
               return Padding(
@@ -94,3 +90,5 @@ class ComplaintsListView extends StatelessWidget {
     );
   }
 }
+
+

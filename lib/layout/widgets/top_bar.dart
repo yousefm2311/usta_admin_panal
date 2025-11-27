@@ -121,9 +121,9 @@ class TopBar extends StatelessWidget {
     LocaleService().save(locale);
   }
 
-  void _logout() {
+  Future<void> _logout() async {
     try {
-      Get.find<AuthController>().logout();
+      await Get.find<AuthController>().logout();
     } catch (_) {
       // if not registered, go to login route directly
       Get.offAllNamed('/login');

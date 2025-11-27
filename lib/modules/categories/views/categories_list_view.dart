@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/responsive.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/categories_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class CategoriesListView extends StatelessWidget {
   const CategoriesListView({super.key});
@@ -34,12 +35,7 @@ class CategoriesListView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes.lg),
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              );
+              return const ShimmerGridPlaceholder(count: 6);
             }
             if (controller.error.value != null) {
               return Padding(
@@ -109,3 +105,5 @@ class CategoriesListView extends StatelessWidget {
     );
   }
 }
+
+

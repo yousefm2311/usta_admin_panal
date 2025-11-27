@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/orders_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class AllOrdersView extends StatelessWidget {
   const AllOrdersView({super.key});
@@ -13,7 +14,7 @@ class AllOrdersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(OrdersController());
-    final statuses = ['All', 'active', 'completed', 'canceled'];
+    final statuses = ['All', 'new', 'assigned', 'in_progress', 'completed', 'cancelled', 'closed'];
 
     return AdminLayout(
       title: 'Orders'.tr,
@@ -52,12 +53,7 @@ class AllOrdersView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes.lg),
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              );
+              return const ListLoading();
             }
             if (controller.error.value != null) {
               return Padding(
@@ -86,8 +82,8 @@ class AllOrdersView extends StatelessWidget {
                       (o) => DataRow(
                         cells: [
                           DataCell(Text((o['serviceType'] ?? o['service'] ?? '').toString())),
-                          DataCell(Text((o['customer'] ?? o['customerName'] ?? '').toString())),
-                          DataCell(Text((o['artisan'] ?? o['artisanName'] ?? '').toString())),
+                          DataCell(Text(_resolveName(o['customer']))),
+                          DataCell(Text(_resolveName(o['artisan']))),
                           DataCell(_statusChip((o['status'] ?? '').toString())),
                           DataCell(Text(_formatDate(o['createdAt']))),
                           DataCell(
@@ -126,6 +122,13 @@ class AllOrdersView extends StatelessWidget {
     return '';
   }
 
+  String _resolveName(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return (value['name'] ?? value['customerName'] ?? value['artisanName'] ?? '').toString();
+    }
+    return (value ?? '').toString();
+  }
+
   Widget _statusChip(String status) {
     Color color;
     switch (status.toLowerCase()) {
@@ -136,15 +139,23 @@ class AllOrdersView extends StatelessWidget {
       case 'new':
         color = AppColors.warning;
         break;
+      case 'assigned':
+        color = Colors.lightBlueAccent;
+        break;
       case 'accepted':
       case 'active':
         color = Colors.lightBlueAccent;
         break;
       case 'in progress':
+      case 'in_progress':
         color = Colors.amber;
         break;
       case 'canceled':
+      case 'cancelled':
         color = AppColors.danger;
+        break;
+      case 'closed':
+        color = AppColors.textMuted;
         break;
       default:
         color = AppColors.primary;
@@ -163,3 +174,5 @@ class AllOrdersView extends StatelessWidget {
     );
   }
 }
+
+

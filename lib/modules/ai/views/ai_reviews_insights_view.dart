@@ -6,6 +6,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/ai_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class AIReviewsInsightsView extends StatelessWidget {
   const AIReviewsInsightsView({super.key});
@@ -40,7 +42,7 @@ class AIReviewsInsightsView extends StatelessWidget {
             ),
             child: Obx(() {
               if (controller.loadingSentiment.value) {
-                return const Center(child: Padding(padding: EdgeInsets.all(AppSizes.lg), child: CircularProgressIndicator(color: AppColors.primary)));
+                return const CardLoading(height: 220, lines: 4);
               }
               if (controller.sentiment.isEmpty) {
                 return Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted));
@@ -118,12 +120,7 @@ class AIReviewsInsightsView extends StatelessWidget {
           const SizedBox(height: AppSizes.sm),
           Obx(() {
             if (controller.loadingWordCloud.value) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes.md),
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              );
+              return const ListLoading(rows: 4, itemHeight: 20, padding: EdgeInsets.zero);
             }
             if (controller.wordCloud.isEmpty) {
               return Container(
@@ -189,3 +186,5 @@ class _Word extends StatelessWidget {
     );
   }
 }
+
+

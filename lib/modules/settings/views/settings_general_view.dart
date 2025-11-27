@@ -7,6 +7,7 @@ import '../../../core/constants/app_config.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/primary_button.dart';
 import '../controllers/settings_general_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 import 'package:file_picker/file_picker.dart';
 
 class SettingsGeneralView extends StatelessWidget {
@@ -23,12 +24,7 @@ class SettingsGeneralView extends StatelessWidget {
       title: 'Settings',
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 260, lines: 6);
         }
         appNameController.text = controller.form['appName']?.value ?? '';
         emailController.text = controller.form['supportEmail']?.value ?? '';
@@ -99,11 +95,7 @@ class SettingsGeneralView extends StatelessWidget {
                                 }
                               },
                         icon: controller.uploadingLogo.value
-                            ? const SizedBox(
-                                height: 16,
-                                width: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
-                              )
+                            ? const ShimmerBox(height: 16, width: 16, radius: 6)
                             : const Icon(Icons.upload),
                         label: Text('Upload logo'.tr),
                       ),
@@ -152,3 +144,5 @@ class SettingsGeneralView extends StatelessWidget {
     );
   }
 }
+
+

@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/order_details_controller.dart';
 import '../../../core/utils/notify.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class OrderTimelineView extends StatelessWidget {
   const OrderTimelineView({super.key});
@@ -21,12 +22,7 @@ class OrderTimelineView extends StatelessWidget {
       title: 'Timeline'.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 220, lines: 4);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -103,7 +99,7 @@ class OrderTimelineView extends StatelessWidget {
                       () => DropdownButton<String>(
                         value: status.value,
                         dropdownColor: AppColors.card,
-                        items: ['pending', 'accepted', 'in_progress', 'completed', 'canceled', 'closed']
+                        items: ['pending', 'accepted', 'assigned', 'in_progress', 'completed', 'canceled', 'cancelled', 'closed']
                             .map((s) => DropdownMenuItem(value: s, child: Text(s.tr)))
                             .toList(),
                         onChanged: (v) => status.value = v ?? status.value,
@@ -141,3 +137,5 @@ class OrderTimelineView extends StatelessWidget {
     );
   }
 }
+
+

@@ -3,7 +3,8 @@ import 'package:dio/dio.dart';
 import '../../../core/services/api_client.dart';
 
 class AnalyticsService {
-  final Dio _dio = ApiClient().dio;
+  final ApiClient _client = ApiClient();
+  Dio get _dio => _client.dio;
 
-  Future<Response> daily() => _dio.get('/api/admin/analytics/daily');
+  Future<Response> daily() => _client.safe(() => _dio.get('/api/admin/analytics/daily'));
 }

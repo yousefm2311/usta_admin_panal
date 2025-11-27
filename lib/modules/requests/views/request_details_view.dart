@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/request_details_controller.dart';
 import '../../../core/utils/notify.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class RequestDetailsView extends StatelessWidget {
   const RequestDetailsView({super.key});
@@ -21,12 +22,7 @@ class RequestDetailsView extends StatelessWidget {
       title: 'Request details',
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 260, lines: 6);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -369,3 +365,5 @@ class RequestDetailsView extends StatelessWidget {
     );
   }
 }
+
+

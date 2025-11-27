@@ -7,6 +7,7 @@ import '../../../core/utils/notify.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/notifications_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class NotificationsCenterView extends StatefulWidget {
   const NotificationsCenterView({super.key});
@@ -193,13 +194,8 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
 
   Widget _historyList(NotificationsController controller) {
     return Obx(() {
-      if (controller.loading.value) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(AppSizes.lg),
-            child: CircularProgressIndicator(color: AppColors.primary),
-          ),
-        );
+      if (controller.loading.value && controller.history.isEmpty) {
+        return const ListLoading();
       }
       if (controller.error.value != null) {
         return Padding(
@@ -367,3 +363,5 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
     super.dispose();
   }
 }
+
+

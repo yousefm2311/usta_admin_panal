@@ -31,41 +31,55 @@ class AuthService {
       }
       return AuthTokens(token, refreshToken: refreshToken);
     } on DioException catch (e) {
-      rethrow;
+      throw mapDioException(e);
     }
   }
 
   Future<AuthTokens> refresh(String refreshToken) async {
-    final res = await _dio.post('/api/admin/refresh-token', data: {'refreshToken': refreshToken});
-    final map = res.data is Map<String, dynamic> ? res.data as Map<String, dynamic> : <String, dynamic>{};
-    final data = map['data'] is Map<String, dynamic> ? map['data'] as Map<String, dynamic> : <String, dynamic>{};
-    final token = map['token']?.toString() ?? data['token']?.toString() ?? map['accessToken']?.toString();
-    final newRefresh = map['refreshToken']?.toString() ??
-        data['refreshToken']?.toString() ??
-        map['refresh_token']?.toString() ??
-        data['refresh_token']?.toString();
-    if (token == null || token.isEmpty) {
-      throw ApiException('Token missing in refresh response');
+    try {
+      final res = await _dio.post('/api/admin/refresh-token', data: {'refreshToken': refreshToken});
+      final map = res.data is Map<String, dynamic> ? res.data as Map<String, dynamic> : <String, dynamic>{};
+      final data = map['data'] is Map<String, dynamic> ? map['data'] as Map<String, dynamic> : <String, dynamic>{};
+      final token = map['token']?.toString() ?? data['token']?.toString() ?? map['accessToken']?.toString();
+      final newRefresh = map['refreshToken']?.toString() ??
+          data['refreshToken']?.toString() ??
+          map['refresh_token']?.toString() ??
+          data['refresh_token']?.toString();
+      if (token == null || token.isEmpty) {
+        throw ApiException('Token missing in refresh response');
+      }
+      return AuthTokens(token, refreshToken: newRefresh ?? refreshToken);
+    } on DioException catch (e) {
+      throw mapDioException(e);
     }
-    return AuthTokens(token, refreshToken: newRefresh ?? refreshToken);
   }
 
   Future<void> verifyRole() async {
-    await _dio.get('/api/admin/verify-role');
+    try {
+      await _dio.get('/api/admin/verify-role');
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
   }
 
   Future<void> createAdmin({required String name, required String email, required String password, String role = 'admin'}) async {
-    await _dio.post('/api/admin/create', data: {
-      'name': name,
-      'email': email,
-      'password': password,
-      'role': role,
-    });
+    try {
+      await _dio.post('/api/admin/create', data: {
+        'name': name,
+        'email': email,
+        'password': password,
+        'role': role,
+      });
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
   }
 
   Future<void> logout() async {
     try {
       await _dio.post('/api/admin/logout');
+    } on DioException catch (e) {
+      throw mapDioException(e);
     } catch (_) {
       // swallow logout errors
     }

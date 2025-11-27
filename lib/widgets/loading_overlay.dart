@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
+import 'shimmer_widgets.dart';
 
 class LoadingOverlay extends StatelessWidget {
   final bool isLoading;
@@ -24,9 +25,7 @@ class LoadingOverlay extends StatelessWidget {
                 color: AppColors.background.withOpacity(0.7),
               ),
               child: const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.primary,
-                ),
+                child: ShimmerBox(height: 60, width: 60, radius: 16),
               ),
             ),
           ),

@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/role_permissions_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class RolePermissionsView extends StatelessWidget {
   const RolePermissionsView({super.key});
@@ -20,12 +21,7 @@ class RolePermissionsView extends StatelessWidget {
       title: 'Role Permissions'.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.lg),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const CardLoading(height: 200, lines: 4);
         }
         if (controller.error.value != null) {
           return Padding(
@@ -50,17 +46,21 @@ class RolePermissionsView extends StatelessWidget {
               ...permissions.asMap().entries.map(
                 (entry) => Padding(
                   padding: const EdgeInsets.only(bottom: AppSizes.sm),
-                  child: Row(
+                  child: Wrap(
+                    spacing: AppSizes.sm,
+                    runSpacing: AppSizes.xs,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Expanded(
-                          child:
-                              Text((entry.value['module'] ?? '').toString().tr, style: const TextStyle(color: AppColors.text))),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(minWidth: 120),
+                        child: Text(
+                          (entry.value['module'] ?? '').toString().tr,
+                          style: const TextStyle(color: AppColors.text),
+                        ),
+                      ),
                       _permChip('Read', entry.value['read'] == true, () => controller.toggle(entry.key, 'read')),
-                      const SizedBox(width: AppSizes.sm),
                       _permChip('Create', entry.value['create'] == true, () => controller.toggle(entry.key, 'create')),
-                      const SizedBox(width: AppSizes.sm),
                       _permChip('Update', entry.value['update'] == true, () => controller.toggle(entry.key, 'update')),
-                      const SizedBox(width: AppSizes.sm),
                       _permChip('Delete', entry.value['delete'] == true, () => controller.toggle(entry.key, 'delete')),
                     ],
                   ),
@@ -93,3 +93,5 @@ class RolePermissionsView extends StatelessWidget {
     );
   }
 }
+
+

@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../controllers/reviews_controller.dart';
+import '../../../widgets/shimmer_widgets.dart';
 
 class ReviewsListView extends StatelessWidget {
   const ReviewsListView({super.key});
@@ -40,12 +41,7 @@ class ReviewsListView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes.lg),
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              );
+              return const ListLoading();
             }
             if (controller.error.value != null) {
               return Padding(
@@ -125,3 +121,5 @@ class ReviewsListView extends StatelessWidget {
     return '';
   }
 }
+
+
