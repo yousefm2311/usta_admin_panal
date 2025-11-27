@@ -13,7 +13,7 @@ class RequestsListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(RequestsController());
-    final statuses = ['All', 'Pending', 'Accepted', 'In progress', 'Completed'];
+    final statuses = ['All', 'New', 'Pending', 'Accepted', 'Assigned', 'In progress', 'Completed', 'Cancelled'];
 
     return AdminLayout(
       title: 'Requests',

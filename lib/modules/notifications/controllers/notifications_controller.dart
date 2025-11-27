@@ -25,21 +25,35 @@ class NotificationsController extends GetxController {
     loading.value = true;
     error.value = null;
     try {
-      final res = await _service.history();
+      // Primary: list notifications
+      final res = await _service.list();
       final data = res.data;
       if (data is List) {
         history.assignAll(data);
       } else if (data is Map<String, dynamic>) {
         history.assignAll(data['notifications'] ?? data['data'] ?? []);
       }
-    } catch (e) {
-      // history is optional; ignore if endpoint missing
-      if (e is ApiException && e.statusCode == 404) {
-        history.clear();
-        return;
+      if (history.isNotEmpty) return;
+    } on ApiException catch (e) {
+      // Fallback to history endpoint if list not available
+      if (e.statusCode == 404) {
+        try {
+          final res = await _service.history();
+          final data = res.data;
+          if (data is List) {
+            history.assignAll(data);
+          } else if (data is Map<String, dynamic>) {
+            history.assignAll(data['notifications'] ?? data['data'] ?? []);
+          }
+          return;
+        } catch (_) {
+          history.clear();
+          return;
+        }
       }
-      final msg = e is ApiException ? e.message : e.toString();
-      error.value = msg;
+      error.value = e.message;
+    } catch (e) {
+      error.value = e.toString();
     } finally {
       loading.value = false;
     }
@@ -89,6 +103,16 @@ class NotificationsController extends GetxController {
     }
   }
 
+  Future<void> deleteNotification(String id) async {
+    try {
+      await _service.deleteNotification(id);
+      showSuccess('Success'.tr);
+      await loadHistory();
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
+
   Future<void> send({
     required String title,
     required String message,
@@ -96,7 +120,13 @@ class NotificationsController extends GetxController {
   }) async {
     sending.value = true;
     try {
-      await _service.send({'title': title, 'message': message, 'target': target.toLowerCase()});
+      await _service.send({
+        'title': title,
+        // Send both for compatibility with backend naming
+        'body': message,
+        'message': message,
+        'target': target.toLowerCase(),
+      });
       showSuccess('Success'.tr);
       await loadHistory();
     } catch (e) {

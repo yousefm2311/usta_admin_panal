@@ -55,10 +55,14 @@ class CategoriesController extends GetxController {
   }
 
   Future<void> removeCategory(String id) async {
+    if (id.isEmpty) {
+      showError('Invalid category'.tr);
+      return;
+    }
     try {
       await _service.delete(id);
       showSuccess('Success'.tr);
-      categories.removeWhere((c) => (c['id'] ?? '').toString() == id);
+      categories.removeWhere((c) => (c['id'] ?? c['_id'] ?? '').toString() == id);
     } catch (e) {
       showError(e is ApiException ? e.message : e.toString());
     }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../core/services/locale_service.dart';
+import '../../modules/auth/controllers/auth_controller.dart';
 
 class TopBar extends StatelessWidget {
   final String title;
@@ -64,6 +65,14 @@ class TopBar extends StatelessWidget {
                     children: [
                       if (actions != null) ...actions!,
                       TextButton.icon(
+                        onPressed: _logout,
+                        icon: const Icon(Icons.logout, color: AppColors.textMuted, size: 18),
+                        label: Text(
+                          'Logout'.tr,
+                          style: const TextStyle(color: AppColors.text),
+                        ),
+                      ),
+                      TextButton.icon(
                         onPressed: _toggleLocale,
                         icon: const Icon(Icons.language, color: AppColors.textMuted, size: 18),
                         label: Text(
@@ -110,5 +119,14 @@ class TopBar extends StatelessWidget {
     final isArabic = Get.locale?.languageCode == 'ar';
     final locale = isArabic ? const Locale('en') : const Locale('ar');
     LocaleService().save(locale);
+  }
+
+  void _logout() {
+    try {
+      Get.find<AuthController>().logout();
+    } catch (_) {
+      // if not registered, go to login route directly
+      Get.offAllNamed('/login');
+    }
   }
 }

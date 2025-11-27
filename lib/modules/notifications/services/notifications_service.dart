@@ -7,6 +7,8 @@ class NotificationsService {
 
   Future<Response> send(Map<String, dynamic> payload) => _dio.post('/api/admin/notifications', data: payload);
 
+  Future<Response> list() => _dio.get('/api/admin/notifications');
+
   Future<Response> templates() => _dio.get('/api/admin/notifications/templates');
 
   Future<Response> history() => _dio.get('/api/admin/notifications/history');
@@ -18,4 +20,6 @@ class NotificationsService {
       _dio.put('/api/admin/notifications/templates/$id', data: payload);
 
   Future<Response> deleteTemplate(String id) => _dio.delete('/api/admin/notifications/templates/$id');
+
+  Future<Response> deleteNotification(String id) => _dio.delete('/api/admin/notifications/$id');
 }

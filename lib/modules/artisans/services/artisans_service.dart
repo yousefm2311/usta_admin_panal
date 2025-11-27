@@ -11,11 +11,11 @@ class ArtisansService {
 
   Future<Response> approve(String id) async {
     try {
-      return await _dio.put('/api/admin/artisans/approve', data: {'artisanId': id});
+      // Prefer per-id endpoint to avoid 404 noise
+      return await _dio.put('/api/admin/artisans/$id/approve');
     } catch (_) {
-      // fallback to per-id endpoint or POST if server expects it
       try {
-        return await _dio.put('/api/admin/artisans/$id/approve');
+        return await _dio.put('/api/admin/artisans/approve', data: {'artisanId': id});
       } catch (_) {
         return await _dio.post('/api/admin/artisans/approve', data: {'artisanId': id});
       }
@@ -24,12 +24,17 @@ class ArtisansService {
 
   Future<Response> reject(String id, {String? reason}) async {
     try {
-      return await _dio.put('/api/admin/artisans/reject', data: {'artisanId': id, if (reason != null) 'reason': reason});
+      // Primary endpoint per Postman collection uses DELETE on the id path
+      return await _dio.delete('/api/admin/artisans/$id/reject', data: {'reason': reason});
     } catch (_) {
       try {
         return await _dio.put('/api/admin/artisans/$id/reject', data: {'reason': reason});
       } catch (_) {
-        return await _dio.post('/api/admin/artisans/reject', data: {'artisanId': id, if (reason != null) 'reason': reason});
+        try {
+          return await _dio.put('/api/admin/artisans/reject', data: {'artisanId': id, if (reason != null) 'reason': reason});
+        } catch (_) {
+          return await _dio.post('/api/admin/artisans/reject', data: {'artisanId': id, if (reason != null) 'reason': reason});
+        }
       }
     }
   }

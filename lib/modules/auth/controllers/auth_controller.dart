@@ -19,8 +19,8 @@ class AuthController extends GetxController {
     loading.value = true;
     error.value = null;
     try {
-      final token = await _authService.login(email: email, password: password);
-      await _tokenStorage.saveToken(token);
+      final tokens = await _authService.login(email: email, password: password);
+      await _tokenStorage.saveTokens(tokens.token, refreshToken: tokens.refreshToken);
       await _authService.verifyRole();
       return true;
     } catch (e) {
@@ -36,6 +36,9 @@ class AuthController extends GetxController {
   }
 
   Future<void> logout() async {
+    try {
+      await _authService.logout();
+    } catch (_) {}
     await _tokenStorage.clear();
     Get.offAllNamed('/login');
   }

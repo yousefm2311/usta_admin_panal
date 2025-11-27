@@ -92,7 +92,9 @@ class CategoriesListView extends StatelessWidget {
                               foregroundColor: AppColors.text,
                               side: const BorderSide(color: AppColors.border),
                             ),
-                            onPressed: () => controller.removeCategory((category['id'] ?? '').toString()),
+                            onPressed: () => controller.removeCategory(
+                              (category['_id'] ?? category['id'] ?? '').toString(),
+                            ),
                             child: Text('Delete'.tr),
                           ),
                         ],

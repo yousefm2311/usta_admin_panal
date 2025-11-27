@@ -38,7 +38,11 @@ class DashboardView extends StatelessWidget {
 
         final stats = controller.stats.value ?? <String, dynamic>{};
         final chartData = (stats['monthly'] ?? stats['analytics'] ?? stats['chart'] ?? []) as List<dynamic>;
-        final latest = (stats['latestRequests'] ?? stats['latest'] ?? controller.activities).cast<dynamic>();
+        // normalize latest requests to avoid mixed data
+        final latestRaw = (stats['latestRequests'] ?? stats['latest'] ?? []) as List<dynamic>;
+        final latest = controller.latestRequests.isNotEmpty
+            ? controller.latestRequests
+            : (latestRaw.isNotEmpty ? latestRaw : controller.activities);
         final topArtisans = controller.topArtisans;
 
         return Column(

@@ -43,8 +43,10 @@ class OrderDetailsView extends StatelessWidget {
         }
         final price = double.tryParse((order['amount'] ?? order['price'] ?? 0).toString()) ?? 0;
         final messages = controller.messages;
-        final msgController = TextEditingController();
+        final timelineStatus = 'in_progress'.obs;
+        final timelineNote = TextEditingController();
         final actionNote = TextEditingController();
+        final msgController = TextEditingController();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -68,6 +70,102 @@ class OrderDetailsView extends StatelessWidget {
                   _statusChip((order['status'] ?? '').toString()),
                 ],
               ),
+            ),
+            const SizedBox(height: AppSizes.md),
+            _card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Status timeline'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: AppSizes.sm),
+                  Wrap(
+                    spacing: AppSizes.sm,
+                    children: controller.timeline
+                        .map(
+                          (step) => _statusChip((step['status'] ?? '').toString()),
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: AppSizes.sm),
+                  Row(
+                    children: [
+                      Obx(
+                        () => DropdownButton<String>(
+                          value: timelineStatus.value,
+                          dropdownColor: AppColors.card,
+                          items: const [
+                            DropdownMenuItem(value: 'pending', child: Text('pending')),
+                            DropdownMenuItem(value: 'accepted', child: Text('accepted')),
+                            DropdownMenuItem(value: 'assigned', child: Text('assigned')),
+                            DropdownMenuItem(value: 'in_progress', child: Text('in_progress')),
+                            DropdownMenuItem(value: 'completed', child: Text('completed')),
+                            DropdownMenuItem(value: 'canceled', child: Text('canceled')),
+                            DropdownMenuItem(value: 'closed', child: Text('closed')),
+                          ],
+                          onChanged: (v) => timelineStatus.value = v ?? timelineStatus.value,
+                        ),
+                      ),
+                      const SizedBox(width: AppSizes.sm),
+                      Expanded(
+                        child: TextField(
+                          controller: timelineNote,
+                          style: const TextStyle(color: AppColors.text),
+                          decoration: InputDecoration(hintText: 'Note'.tr),
+                        ),
+                      ),
+                      const SizedBox(width: AppSizes.sm),
+                      ElevatedButton(
+                        onPressed: () => controller.addTimeline(id, status: timelineStatus.value, note: timelineNote.text),
+                        child: Text('Add'.tr),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSizes.md),
+            _card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Payment info'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: AppSizes.sm),
+                  _priceRow('Service total'.tr, 'AED ${price.toStringAsFixed(0)}'),
+                  _priceRow('Platform fee'.tr, 'AED ${(price * 0.1).toStringAsFixed(2)}'),
+                  const Divider(color: AppColors.border),
+                  _priceRow('Total'.tr, 'AED ${(price * 1.1).toStringAsFixed(2)}', bold: true),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSizes.md),
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => controller.cancel(
+                    id,
+                    note: actionNote.text.trim().isEmpty ? null : actionNote.text.trim(),
+                    reason: 'Canceled by admin',
+                  ),
+                  icon: const Icon(Icons.cancel_outlined),
+                  label: Text('Cancel'.tr),
+                ),
+                const SizedBox(width: AppSizes.sm),
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.border),
+                    foregroundColor: AppColors.text,
+                  ),
+                  onPressed: () => controller.close(id, note: actionNote.text.trim().isEmpty ? null : actionNote.text.trim()),
+                  icon: const Icon(Icons.check_circle_outline),
+                  label: Text('Close order'.tr),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSizes.sm),
+            TextField(
+              controller: actionNote,
+              style: const TextStyle(color: AppColors.text),
+              decoration: InputDecoration(hintText: 'Note'.tr),
             ),
             const SizedBox(height: AppSizes.md),
             _card(
@@ -124,51 +222,6 @@ class OrderDetailsView extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: AppSizes.md),
-            _card(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Payment info'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: AppSizes.sm),
-                  _priceRow('Service total'.tr, 'AED ${price.toStringAsFixed(0)}'),
-                  _priceRow('Platform fee'.tr, 'AED ${(price * 0.1).toStringAsFixed(2)}'),
-                  const Divider(color: AppColors.border),
-                  _priceRow('Total'.tr, 'AED ${(price * 1.1).toStringAsFixed(2)}', bold: true),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSizes.md),
-            Row(
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () => controller.cancel(
-                    id,
-                    note: actionNote.text.trim().isEmpty ? null : actionNote.text.trim(),
-                    reason: 'Canceled by admin',
-                  ),
-                  icon: const Icon(Icons.cancel_outlined),
-                  label: Text('Cancel'.tr),
-                ),
-                const SizedBox(width: AppSizes.sm),
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.border),
-                    foregroundColor: AppColors.text,
-                  ),
-                  onPressed: () =>
-                      controller.close(id, note: actionNote.text.trim().isEmpty ? null : actionNote.text.trim()),
-                  icon: const Icon(Icons.check_circle_outline),
-                  label: Text('Close order'.tr),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSizes.sm),
-            TextField(
-              controller: actionNote,
-              style: const TextStyle(color: AppColors.text),
-              decoration: InputDecoration(hintText: 'Note'.tr),
             ),
           ],
         );

@@ -9,6 +9,7 @@ class DashboardController extends GetxController {
   final stats = Rxn<Map<String, dynamic>>();
   final activities = <dynamic>[].obs;
   final topArtisans = <dynamic>[].obs;
+  final latestRequests = <dynamic>[].obs;
   final loading = false.obs;
   final error = RxnString();
 
@@ -25,7 +26,9 @@ class DashboardController extends GetxController {
       stats.value = await _service.fetchStats();
       activities.assignAll(await _service.fetchActivities());
       topArtisans.assignAll(await _service.fetchTopArtisans());
+      latestRequests.assignAll(await _service.fetchLatestRequests());
     } catch (e) {
+      // avoid breaking UI on missing optional endpoints
       error.value = e.toString();
     } finally {
       loading.value = false;

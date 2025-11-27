@@ -50,14 +50,22 @@ class RequestsController extends GetxController {
   String? _mapStatus(String? status) {
     if (status == null || status == 'All') return null;
     switch (status.toLowerCase()) {
+      case 'new':
+        return 'new';
       case 'pending':
         return 'pending';
       case 'accepted':
         return 'accepted';
+      case 'assigned':
+        return 'assigned';
       case 'in progress':
+      case 'in-progress':
         return 'in-progress';
       case 'completed':
         return 'completed';
+      case 'cancelled':
+      case 'canceled':
+        return 'cancelled';
       default:
         return status.toLowerCase();
     }

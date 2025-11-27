@@ -37,8 +37,7 @@ class OrderDetailsController extends GetxController {
         } else if (mData is Map<String, dynamic>) {
           messages.assignAll(mData['messages'] ?? mData['data'] ?? []);
         }
-      } catch (e) {
-        // Ignore missing messages endpoint (404) gracefully
+      } catch (_) {
         messages.clear();
       }
     } catch (e) {
@@ -56,8 +55,6 @@ class OrderDetailsController extends GetxController {
       await load(id);
       showSuccess('Success'.tr);
     } catch (e) {
-      if (e is ApiException && e.statusCode == 404) return;
-      if (e is DioException && e.response?.statusCode == 404) return;
       showError(e is ApiException ? e.message : e.toString());
     }
   }
@@ -68,8 +65,6 @@ class OrderDetailsController extends GetxController {
       showSuccess('Success'.tr);
       await load(id);
     } catch (e) {
-      if (e is ApiException && e.statusCode == 404) return;
-      if (e is DioException && e.response?.statusCode == 404) return;
       showError(e is ApiException ? e.message : e.toString());
     }
   }
@@ -80,8 +75,6 @@ class OrderDetailsController extends GetxController {
       showSuccess('Success'.tr);
       await load(id);
     } catch (e) {
-      if (e is ApiException && e.statusCode == 404) return;
-      if (e is DioException && e.response?.statusCode == 404) return;
       showError(e is ApiException ? e.message : e.toString());
     }
   }
@@ -92,8 +85,6 @@ class OrderDetailsController extends GetxController {
       await _service.sendMessage(id, message: message.trim());
       await load(id);
     } catch (e) {
-      if (e is ApiException && e.statusCode == 404) return;
-      if (e is DioException && e.response?.statusCode == 404) return;
       showError(e is ApiException ? e.message : e.toString());
     }
   }

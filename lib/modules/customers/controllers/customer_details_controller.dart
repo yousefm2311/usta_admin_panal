@@ -30,10 +30,8 @@ class CustomerDetailsController extends GetxController {
 
   Future<void> blockToggle(String id, {required bool block}) async {
     try {
-      if (block) {
-        await _service.block(id);
-      }
-      showSuccess('Success'.tr);
+      await _service.block(id, blocked: block);
+      showSuccess(block ? 'Blocked'.tr : 'Unblocked'.tr);
       await load(id);
     } catch (e) {
       showError(e is ApiException ? e.message : e.toString());

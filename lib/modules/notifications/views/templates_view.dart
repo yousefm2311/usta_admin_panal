@@ -87,7 +87,7 @@ class NotificationTemplatesView extends StatelessWidget {
 
   void _openTemplateDialog(NotificationsController controller, {Map<String, dynamic>? template}) {
     final name = TextEditingController(text: template?['name']?.toString() ?? '');
-    final target = TextEditingController(text: template?['target']?.toString() ?? '');
+    final target = RxString((template?['target']?.toString() ?? 'customers').toLowerCase());
     final title = TextEditingController(text: template?['title']?.toString() ?? '');
     final message = TextEditingController(text: template?['message']?.toString() ?? '');
 
@@ -103,10 +103,27 @@ class NotificationTemplatesView extends StatelessWidget {
               decoration: const InputDecoration(labelText: 'Name'),
               style: const TextStyle(color: AppColors.text),
             ),
-            TextField(
-              controller: target,
-              decoration: const InputDecoration(labelText: 'Target'),
-              style: const TextStyle(color: AppColors.text),
+            const SizedBox(height: AppSizes.sm),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Target', style: const TextStyle(color: AppColors.textMuted)),
+            ),
+            Obx(
+              () => Wrap(
+                spacing: AppSizes.sm,
+                children: ['all', 'customers', 'artisans']
+                    .map(
+                      (t) => ChoiceChip(
+                        label: Text(t.tr),
+                        selected: target.value == t,
+                        onSelected: (_) => target.value = t,
+                        selectedColor: AppColors.primary,
+                        backgroundColor: AppColors.card,
+                        labelStyle: TextStyle(color: target.value == t ? Colors.white : AppColors.textMuted),
+                      ),
+                    )
+                    .toList(),
+              ),
             ),
             TextField(
               controller: title,
@@ -134,7 +151,7 @@ class NotificationTemplatesView extends StatelessWidget {
               }
               final payload = {
                 'name': name.text.trim(),
-                'target': target.text.trim(),
+                'target': target.value,
                 'title': title.text.trim(),
                 'message': message.text.trim(),
               };

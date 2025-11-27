@@ -8,10 +8,12 @@ import 'package:get/get.dart' hide Response;
 import '../constants/app_config.dart';
 import 'api_exceptions.dart';
 import 'token_storage.dart';
+import '../../modules/auth/services/auth_service.dart';
 
 class HttpClient {
   final Dio dio;
   final TokenStorage _tokenStorage;
+  final AuthService _authService;
   HttpClient({TokenStorage? tokenStorage})
       : _tokenStorage = tokenStorage ?? Get.find<TokenStorage>(),
         dio = Dio(
@@ -21,8 +23,18 @@ class HttpClient {
             receiveTimeout: AppConfig.receiveTimeout,
             responseType: ResponseType.json,
           ),
+        ),
+        _authService = AuthService(
+          dio: Dio(
+            BaseOptions(
+              baseUrl: AppConfig.baseUrl,
+              connectTimeout: AppConfig.connectTimeout,
+              receiveTimeout: AppConfig.receiveTimeout,
+              responseType: ResponseType.json,
+            ),
+          ),
         ) {
-    dio.interceptors.add(_AuthInterceptor(_tokenStorage));
+    dio.interceptors.add(_AuthInterceptor(dio, _tokenStorage, _authService));
     dio.interceptors.add(_LoggingInterceptor());
   }
 
@@ -89,8 +101,11 @@ class HttpClient {
 }
 
 class _AuthInterceptor extends Interceptor {
+  final Dio dio;
   final TokenStorage tokenStorage;
-  _AuthInterceptor(this.tokenStorage);
+  final AuthService authService;
+  bool _refreshing = false;
+  _AuthInterceptor(this.dio, this.tokenStorage, this.authService);
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -103,12 +118,40 @@ class _AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (err.response?.statusCode == 401) {
-      // Auto logout hook: clear token and redirect if needed.
+    final status = err.response?.statusCode;
+    final path = err.requestOptions.path;
+    final refreshToken = tokenStorage.refreshToken;
+    if (status == 401 && refreshToken != null && refreshToken.isNotEmpty && !_refreshing && !path.contains('refresh-token')) {
+      _refreshing = true;
+      try {
+        final newToken = await _refreshAccessToken(refreshToken);
+        if (newToken != null && newToken.isNotEmpty) {
+          // retry original request with new token
+          final opts = err.requestOptions;
+          opts.headers['Authorization'] = 'Bearer $newToken';
+          final cloneResponse = await dio.fetch(opts);
+          _refreshing = false;
+          return handler.resolve(cloneResponse);
+        }
+      } catch (_) {
+        // fallthrough to clear tokens
+      }
+      _refreshing = false;
       await tokenStorage.clear();
-      // Optional: Get.offAllNamed('/login');
     }
     super.onError(err, handler);
+  }
+
+  Future<String?> _refreshAccessToken(String refreshToken) async {
+    try {
+      final tokens = await authService.refresh(refreshToken);
+      if (tokens.token.isNotEmpty) {
+        await tokenStorage.saveTokens(tokens.token, refreshToken: tokens.refreshToken ?? refreshToken);
+      }
+      return tokens.token;
+    } catch (e) {
+      return null;
+    }
   }
 }
 

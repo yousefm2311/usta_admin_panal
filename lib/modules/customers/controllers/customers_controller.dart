@@ -45,10 +45,10 @@ class CustomersController extends GetxController {
     }
   }
 
-  Future<void> blockCustomer(String id) async {
+  Future<void> blockCustomer(String id, {required bool block}) async {
     try {
-      await _service.block(id);
-      showSuccess('Success'.tr);
+      await _service.block(id, blocked: block);
+      showSuccess(block ? 'Blocked'.tr : 'Unblocked'.tr);
       await loadCustomers(search: query.value.isNotEmpty ? query.value : null);
     } catch (e) {
       if (e is ApiException && e.statusCode == 404) {

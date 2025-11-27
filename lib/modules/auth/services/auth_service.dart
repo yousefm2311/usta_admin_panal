@@ -3,23 +3,51 @@ import 'package:dio/dio.dart';
 import '../../../core/services/api_client.dart';
 import '../../../core/services/api_exceptions.dart';
 
-class AuthService {
-  final Dio _dio = ApiClient().dio;
+class AuthTokens {
+  final String token;
+  final String? refreshToken;
+  AuthTokens(this.token, {this.refreshToken});
+}
 
-  Future<String> login({required String email, required String password}) async {
+class AuthService {
+  final Dio _dio;
+  AuthService({Dio? dio}) : _dio = dio ?? ApiClient().dio;
+
+  Future<AuthTokens> login({required String email, required String password}) async {
     try {
       final res = await _dio.post('/api/admin/login', data: {
         'email': email,
         'password': password,
       });
-      final token = res.data?['token']?.toString();
+      final map = res.data is Map<String, dynamic> ? res.data as Map<String, dynamic> : <String, dynamic>{};
+      final data = map['data'] is Map<String, dynamic> ? map['data'] as Map<String, dynamic> : <String, dynamic>{};
+      final token = map['token']?.toString() ?? data['token']?.toString() ?? map['accessToken']?.toString();
+      final refreshToken = map['refreshToken']?.toString() ??
+          data['refreshToken']?.toString() ??
+          map['refresh_token']?.toString() ??
+          data['refresh_token']?.toString();
       if (token == null || token.isEmpty) {
         throw ApiException('Token missing in response');
       }
-      return token;
+      return AuthTokens(token, refreshToken: refreshToken);
     } on DioException catch (e) {
       rethrow;
     }
+  }
+
+  Future<AuthTokens> refresh(String refreshToken) async {
+    final res = await _dio.post('/api/admin/refresh-token', data: {'refreshToken': refreshToken});
+    final map = res.data is Map<String, dynamic> ? res.data as Map<String, dynamic> : <String, dynamic>{};
+    final data = map['data'] is Map<String, dynamic> ? map['data'] as Map<String, dynamic> : <String, dynamic>{};
+    final token = map['token']?.toString() ?? data['token']?.toString() ?? map['accessToken']?.toString();
+    final newRefresh = map['refreshToken']?.toString() ??
+        data['refreshToken']?.toString() ??
+        map['refresh_token']?.toString() ??
+        data['refresh_token']?.toString();
+    if (token == null || token.isEmpty) {
+      throw ApiException('Token missing in refresh response');
+    }
+    return AuthTokens(token, refreshToken: newRefresh ?? refreshToken);
   }
 
   Future<void> verifyRole() async {
@@ -33,5 +61,13 @@ class AuthService {
       'password': password,
       'role': role,
     });
+  }
+
+  Future<void> logout() async {
+    try {
+      await _dio.post('/api/admin/logout');
+    } catch (_) {
+      // swallow logout errors
+    }
   }
 }

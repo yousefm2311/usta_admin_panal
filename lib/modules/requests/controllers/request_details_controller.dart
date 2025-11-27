@@ -30,13 +30,8 @@ class RequestDetailsController extends GetxController {
         timeline.assignAll(t['timeline'] ?? t['data'] ?? []);
       }
 
-      final msgRes = await _service.messages(id);
-      final m = msgRes.data;
-      if (m is List) {
-        messages.assignAll(m);
-      } else if (m is Map<String, dynamic>) {
-        messages.assignAll(m['messages'] ?? m['data'] ?? []);
-      }
+      // Some backends don't expose messages for requests; avoid 404 spam by skipping this call.
+      messages.clear();
     } catch (e) {
       final msg = e is ApiException ? e.message : e.toString();
       error.value = msg;
@@ -61,19 +56,20 @@ class RequestDetailsController extends GetxController {
       await _service.cancel(id, reason: reason, note: note);
       showSuccess('Success'.tr);
       await load(id);
+    } on ApiException catch (e) {
+      if (e.statusCode == 404) {
+        showError('Cancel endpoint not available'.tr);
+        return;
+      }
+      showError(e.message);
     } catch (e) {
       showError(e is ApiException ? e.message : e.toString());
     }
   }
 
   Future<void> sendMessage(String id, String message) async {
-    if (message.trim().isEmpty) return;
-    try {
-      await _service.sendMessage(id, message: message.trim());
-      await load(id);
-    } catch (e) {
-      showError(e is ApiException ? e.message : e.toString());
-    }
+    // Endpoint not available on the current backend; avoid calling it.
+    showError('Messages endpoint not available'.tr);
   }
 
   Future<void> addTimeline(String id, {required String status, String? note}) async {
@@ -81,8 +77,14 @@ class RequestDetailsController extends GetxController {
       await _service.addTimeline(id, status: status, note: note);
       await load(id);
       showSuccess('Success'.tr);
+    } on ApiException catch (e) {
+      if (e.statusCode == 404) {
+        showError('Timeline endpoint not available'.tr);
+        return;
+      }
+      showError(e.message);
     } catch (e) {
-      showError(e is ApiException ? e.message : e.toString());
+      showError(e.toString());
     }
   }
 }

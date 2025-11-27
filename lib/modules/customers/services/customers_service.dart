@@ -17,14 +17,17 @@ class CustomersService {
     return _dio.get('/api/admin/customers/$id');
   }
 
-  Future<Response> block(String id) {
-    final payload = {'customerId': id, 'blocked': true};
-    return _dio.put('/api/admin/customers/block', data: payload).catchError((_) async {
+  Future<Response> block(String id, {bool blocked = true}) async {
+    final payload = {'customerId': id, 'blocked': blocked};
+    try {
+      // Most backends expose the per-id endpoint; try it first to avoid noisy 404s.
+      return await _dio.put('/api/admin/customers/$id/block', data: {'blocked': blocked});
+    } catch (_) {
       try {
-        return await _dio.put('/api/admin/customers/$id/block', data: {'blocked': true});
+        return await _dio.put('/api/admin/customers/block', data: payload);
       } catch (_) {
         return await _dio.post('/api/admin/customers/block', data: payload);
       }
-    });
+    }
   }
 }

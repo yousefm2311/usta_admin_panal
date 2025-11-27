@@ -21,10 +21,11 @@ class RolePermissionsController extends GetxController {
       final data = res.data;
       final r = data is Map<String, dynamic> ? (data['role'] ?? data['data'] ?? data) : null;
       role.value = r;
-      if (r != null && r['permissions'] is List) {
+      if (r != null && r['permissions'] is List && (r['permissions'] as List).isNotEmpty) {
         permissions.assignAll(List<Map<String, dynamic>>.from(r['permissions']));
       } else {
-        permissions.clear();
+        // fallback default modules when permissions are empty
+        permissions.assignAll(_defaultPermissions);
       }
     } catch (e) {
       final msg = e is ApiException ? e.message : e.toString();
@@ -34,6 +35,18 @@ class RolePermissionsController extends GetxController {
       loading.value = false;
     }
   }
+
+  List<Map<String, dynamic>> get _defaultPermissions => [
+        {'module': 'dashboard', 'read': true, 'create': false, 'update': false, 'delete': false},
+        {'module': 'customers', 'read': true, 'create': false, 'update': false, 'delete': false},
+        {'module': 'artisans', 'read': true, 'create': false, 'update': false, 'delete': false},
+        {'module': 'requests', 'read': true, 'create': false, 'update': false, 'delete': false},
+        {'module': 'orders', 'read': true, 'create': false, 'update': false, 'delete': false},
+        {'module': 'payments', 'read': true, 'create': false, 'update': false, 'delete': false},
+        {'module': 'notifications', 'read': true, 'create': false, 'update': false, 'delete': false},
+        {'module': 'categories', 'read': true, 'create': false, 'update': false, 'delete': false},
+        {'module': 'roles', 'read': true, 'create': false, 'update': false, 'delete': false},
+      ];
 
   void toggle(int index, String key) {
     if (index < 0 || index >= permissions.length) return;

@@ -37,6 +37,12 @@ class CustomersListView extends StatelessWidget {
                   onSubmitted: (v) => controller.loadCustomers(search: v),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.arrow_forward, color: AppColors.text),
+                      onPressed: () => controller.loadCustomers(
+                        search: controller.query.value.isNotEmpty ? controller.query.value : null,
+                      ),
+                    ),
                     hintText: 'Search by name or phone'.tr,
                     hintStyle: const TextStyle(color: AppColors.textMuted),
                   ),
@@ -79,6 +85,7 @@ class CustomersListView extends StatelessWidget {
                     .map(
                       (customer) {
                         final status = customer['status'] ?? (customer['blocked'] == true ? 'Blocked' : 'Active');
+                        final isBlocked = customer['blocked'] == true;
                         final count = customer['requestsCount'] ??
                             customer['requests'] ??
                             (customer['requests'] is List ? (customer['requests'] as List).length : 0);
@@ -98,8 +105,11 @@ class CustomersListView extends StatelessWidget {
                                   ),
                                   const SizedBox(width: AppSizes.xs),
                                   TextButton(
-                                    onPressed: () => controller.blockCustomer(id.toString()),
-                                    child: Text('Block'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                    onPressed: () => controller.blockCustomer(id.toString(), block: !isBlocked),
+                                    child: Text(
+                                      isBlocked ? 'Unblock'.tr : 'Block'.tr,
+                                      style: TextStyle(color: isBlocked ? AppColors.success : Colors.redAccent),
+                                    ),
                                   ),
                                 ],
                               ),
