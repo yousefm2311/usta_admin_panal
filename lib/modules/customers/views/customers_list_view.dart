@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
-import '../controllers/customers_controller.dart';
 import '../../../layout/admin_layout.dart';
-import '../../../widgets/table_wrapper.dart';
 import '../../../widgets/shimmer_widgets.dart';
+import '../../../widgets/table_wrapper.dart';
+import '../controllers/customers_controller.dart';
 
 class CustomersListView extends StatelessWidget {
   const CustomersListView({super.key});
@@ -20,36 +20,39 @@ class CustomersListView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                'Customers list'.tr,
-                style: const TextStyle(
-                  color: AppColors.text,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const Spacer(),
-              SizedBox(
-                width: 260,
-                child: TextField(
-                  onChanged: controller.setQuery,
-                  onSubmitted: (v) => controller.loadCustomers(search: v),
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.arrow_forward, color: AppColors.text),
-                      onPressed: () => controller.loadCustomers(
-                        search: controller.query.value.isNotEmpty ? controller.query.value : null,
-                      ),
-                    ),
-                    hintText: 'Search by name or phone'.tr,
-                    hintStyle: const TextStyle(color: AppColors.textMuted),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                Text(
+                  'Customers list'.tr,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
-              ),
-            ],
+                SizedBox(width: AppSizes.md),
+                SizedBox(
+                  width: 260,
+                  child: TextField(
+                    onChanged: controller.setQuery,
+                    onSubmitted: (v) => controller.loadCustomers(search: v),
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.arrow_forward, color: AppColors.text),
+                        onPressed: () => controller.loadCustomers(
+                          search: controller.query.value.isNotEmpty ? controller.query.value : null,
+                        ),
+                      ),
+                      hintText: 'Search by name or phone'.tr,
+                      hintStyle: const TextStyle(color: AppColors.textMuted),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: AppSizes.md),
           Obx(() {
