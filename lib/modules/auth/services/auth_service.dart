@@ -75,12 +75,12 @@ class AuthService {
     }
   }
 
-  Future<void> logout() async {
+Future<void> logout() async {
     try {
       await _dio.post('/api/admin/logout');
     } on DioException catch (e) {
       throw mapDioException(e);
-    } catch (_) {
-    }
+    } catch (_) {}
   }
+
 }

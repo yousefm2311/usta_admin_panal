@@ -36,4 +36,8 @@ class TokenStorage {
     // Mark as logged out so startup won't try silent refresh/login.
     await _box.write(_logoutKey, true);
   }
+
+    Future<void> markLoggedOut() async {
+    await _box.write("loggedOut", true);
+  }
 }

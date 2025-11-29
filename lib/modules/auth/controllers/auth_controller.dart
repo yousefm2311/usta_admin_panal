@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/core/services/api_client.dart';
 
 import '../../../core/services/api_exceptions.dart';
 import '../../../core/services/token_storage.dart';
@@ -21,6 +22,8 @@ class AuthController extends GetxController {
     try {
       final tokens = await _authService.login(email: email, password: password);
       await _tokenStorage.saveTokens(tokens.token, refreshToken: tokens.refreshToken);
+      ApiClient().dio.options.headers['Authorization'] =
+          "Bearer ${tokens.token}";
       await _authService.verifyRole();
       return true;
     } catch (e) {
@@ -35,13 +38,17 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> logout() async {
+Future<void> logout() async {
     try {
       await _authService.logout();
     } catch (_) {}
+
+    await _tokenStorage.markLoggedOut();
     await _tokenStorage.clear();
+    ApiClient().dio.options.headers.remove('Authorization');
     Get.offAllNamed('/login');
   }
+
 
   bool get isLoggedIn => (_tokenStorage.token ?? '').isNotEmpty;
 }
