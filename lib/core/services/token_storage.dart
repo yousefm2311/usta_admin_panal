@@ -6,8 +6,17 @@ class TokenStorage {
   static const _logoutKey = 'admin_logged_out';
   final GetStorage _box = GetStorage();
 
-  String? get token => _box.read<String>(_tokenKey);
-  String? get refreshToken => _box.read<String>(_refreshKey);
+  String? get token {
+    final logged = _box.read<bool>(_logoutKey) ?? false;
+    if (logged) return null;
+    return _box.read<String>(_tokenKey);
+  }
+  String? get refreshToken {
+    final logged = _box.read<bool>(_logoutKey) ?? false;
+    if (logged) return null;
+    return _box.read<String>(_refreshKey);
+  }
+
   bool get loggedOut => _box.read<bool>(_logoutKey) ?? false;
 
   Future<void> saveTokens(String token, {String? refreshToken}) async {
@@ -21,7 +30,10 @@ class TokenStorage {
   }
 
   Future<void> clear() async {
-    await _box.erase(); // wipe all persisted keys to avoid stale tokens
-    await _box.write(_logoutKey, true); // explicitly mark logged out
+    // Remove only auth-related keys to avoid wiping unrelated app data.
+    await _box.remove(_tokenKey);
+    await _box.remove(_refreshKey);
+    // Mark as logged out so startup won't try silent refresh/login.
+    await _box.write(_logoutKey, true);
   }
 }

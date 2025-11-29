@@ -6,7 +6,8 @@ import '../services/withdrawals_service.dart';
 
 class WithdrawalsController extends GetxController {
   final WithdrawalsService _service;
-  WithdrawalsController({WithdrawalsService? service}) : _service = service ?? WithdrawalsService();
+  WithdrawalsController({WithdrawalsService? service})
+    : _service = service ?? WithdrawalsService();
 
   final withdrawals = <dynamic>[].obs;
   final loading = false.obs;
