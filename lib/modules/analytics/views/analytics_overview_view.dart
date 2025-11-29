@@ -8,8 +8,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/responsive.dart';
 import '../../../layout/admin_layout.dart';
-import '../controllers/analytics_controller.dart';
 import '../../../widgets/shimmer_widgets.dart';
+import '../controllers/analytics_controller.dart';
 
 class AnalyticsOverviewView extends StatelessWidget {
   const AnalyticsOverviewView({super.key});
@@ -20,7 +20,7 @@ class AnalyticsOverviewView extends StatelessWidget {
     final isMobile = Responsive.isMobile(context);
 
     return AdminLayout(
-      title: 'Analytics',
+      title: '',
       child: Obx(() {
         if (controller.loading.value) {
           return Column(
@@ -35,13 +35,20 @@ class AnalyticsOverviewView extends StatelessWidget {
         if (controller.error.value != null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+            child: Text(
+              controller.error.value!,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           );
         }
 
         final data = controller.daily;
-        final maxRequests = data.isNotEmpty ? data.map((e) => (e['requests'] ?? 0) as num).reduce(max) : 0;
-        final maxEarnings = data.isNotEmpty ? data.map((e) => (e['earnings'] ?? 0) as num).reduce(max) : 0;
+        final maxRequests = data.isNotEmpty
+            ? data.map((e) => (e['requests'] ?? 0) as num).reduce(max)
+            : 0;
+        final maxEarnings = data.isNotEmpty
+            ? data.map((e) => (e['earnings'] ?? 0) as num).reduce(max)
+            : 0;
 
         final chartWidgets = <Widget>[
           _chartCard(
@@ -57,23 +64,34 @@ class AnalyticsOverviewView extends StatelessWidget {
                       reservedSize: 40,
                       getTitlesWidget: (value, meta) => Text(
                         value.toInt().toString(),
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                        style: const TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 11,
+                        ),
                       ),
                     ),
                   ),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
                         final idx = value.toInt();
-                        if (idx < 0 || idx >= data.length) return const SizedBox.shrink();
+                        if (idx < 0 || idx >= data.length)
+                          return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.only(top: 6),
                           child: Text(
                             (data[idx]['month'] ?? '').toString(),
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                            style: const TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: 10,
+                            ),
                           ),
                         );
                       },
@@ -104,19 +122,27 @@ class AnalyticsOverviewView extends StatelessWidget {
               LineChartData(
                 gridData: const FlGridData(show: false),
                 titlesData: FlTitlesData(
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
                         final idx = value.toInt();
-                        if (idx < 0 || idx >= data.length) return const SizedBox.shrink();
+                        if (idx < 0 || idx >= data.length)
+                          return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.only(top: 6),
                           child: Text(
                             (data[idx]['month'] ?? '').toString(),
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                            style: const TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: 10,
+                            ),
                           ),
                         );
                       },
@@ -128,7 +154,10 @@ class AnalyticsOverviewView extends StatelessWidget {
                       reservedSize: 48,
                       getTitlesWidget: (value, meta) => Text(
                         value.toInt().toString(),
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                        style: const TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 10,
+                        ),
                       ),
                     ),
                   ),
@@ -138,7 +167,10 @@ class AnalyticsOverviewView extends StatelessWidget {
                     isCurved: true,
                     spots: [
                       for (var i = 0; i < data.length; i++)
-                        FlSpot(i.toDouble(), (data[i]['earnings'] ?? 0).toDouble()),
+                        FlSpot(
+                          i.toDouble(),
+                          (data[i]['earnings'] ?? 0).toDouble(),
+                        ),
                     ],
                     color: AppColors.success,
                     barWidth: 3,
@@ -158,12 +190,29 @@ class AnalyticsOverviewView extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Analytics'.tr,
+              style: const TextStyle(
+                color: AppColors.text,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            SizedBox(height: 10),
             Wrap(
               spacing: AppSizes.md,
               runSpacing: AppSizes.md,
               children: [
-                _statCard('Requests this month'.tr, '${maxRequests.toInt()}', Icons.timeline),
-                _statCard('Earnings this month'.tr, 'EG ${maxEarnings.toStringAsFixed(0)}', Icons.trending_up),
+                _statCard(
+                  'Requests this month'.tr,
+                  '${maxRequests.toInt()}',
+                  Icons.timeline,
+                ),
+                _statCard(
+                  'Earnings this month'.tr,
+                  'EG ${maxEarnings.toStringAsFixed(0)}',
+                  Icons.trending_up,
+                ),
                 _statCard('Avg. rating'.tr, '4.8', Icons.star),
               ],
             ),
@@ -197,7 +246,9 @@ class AnalyticsOverviewView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border: const Border.fromBorderSide(
+          BorderSide(color: AppColors.border),
+        ),
       ),
       child: Row(
         children: [
@@ -213,7 +264,13 @@ class AnalyticsOverviewView extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               Text(title, style: const TextStyle(color: AppColors.textMuted)),
             ],
           ),
@@ -228,14 +285,19 @@ class AnalyticsOverviewView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border: const Border.fromBorderSide(
+          BorderSide(color: AppColors.border),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: AppColors.text,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: AppSizes.sm),
           SizedBox(height: 260, child: child),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/core/services/formate_date.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
-import '../controllers/order_details_controller.dart';
-import '../../../core/utils/notify.dart';
 import '../../../widgets/shimmer_widgets.dart';
+import '../controllers/order_details_controller.dart';
 
 class OrderTimelineView extends StatelessWidget {
   const OrderTimelineView({super.key});
@@ -19,10 +19,10 @@ class OrderTimelineView extends StatelessWidget {
     if (id.isNotEmpty) controller.load(id);
 
     return AdminLayout(
-      title: 'Timeline'.tr,
+      title: ''.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const CardLoading(height: 220, lines: 4);
+          return const TimelineLoading();
         }
         if (controller.error.value != null) {
           return Padding(
@@ -77,7 +77,7 @@ class OrderTimelineView extends StatelessWidget {
                               style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600)),
                           const SizedBox(height: 4),
                           Text(
-                            (e.value['note'] ?? e.value['createdAt'] ?? '').toString(),
+                            (e.value['note'] ?? formatDateString(e.value['createdAt']) ?? '').toString(),
                             style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
                           ),
                         ],

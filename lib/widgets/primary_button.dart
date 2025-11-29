@@ -18,6 +18,7 @@ class PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final button = icon != null
         ? ElevatedButton.icon(
+          
             icon: Icon(icon, color: Colors.white),
             onPressed: onPressed,
             label: Text(label),
@@ -26,7 +27,6 @@ class PrimaryButton extends StatelessWidget {
             onPressed: onPressed,
             child: Text(label),
           );
-
     return SizedBox(
       width: expand ? double.infinity : null,
       child: button,

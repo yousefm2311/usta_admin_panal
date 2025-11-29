@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
-import '../controllers/role_permissions_controller.dart';
 import '../../../widgets/shimmer_widgets.dart';
+import '../controllers/role_permissions_controller.dart';
 
 class RolePermissionsView extends StatelessWidget {
   const RolePermissionsView({super.key});
@@ -16,12 +16,11 @@ class RolePermissionsView extends StatelessWidget {
     final id = (args?['_id'] ?? args?['id'] ?? '').toString();
     final controller = Get.put(RolePermissionsController());
     if (id.isNotEmpty) controller.load(id);
-
     return AdminLayout(
-      title: 'Role Permissions'.tr,
+      title: ''.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const CardLoading(height: 200, lines: 4);
+          return const CardLoading( lines: 30);
         }
         if (controller.error.value != null) {
           return Padding(

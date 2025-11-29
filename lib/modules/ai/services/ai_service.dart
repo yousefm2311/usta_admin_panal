@@ -11,4 +11,6 @@ class AIService {
   Future<Response> topArtisans() => _client.safe(() => _dio.get('/api/admin/ai/top-artisans'));
 
   Future<Response> wordCloud() => _client.safe(() => _dio.get('/api/admin/ai/word-cloud'));
+
+  Future<Response> fraudDetection() => _client.safe(() => _dio.get('/api/admin/ai/fraud-detection'));
 }

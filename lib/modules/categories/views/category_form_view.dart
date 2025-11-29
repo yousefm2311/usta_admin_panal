@@ -22,7 +22,7 @@ class _CategoryFormViewState extends State<CategoryFormView> {
   Widget build(BuildContext context) {
     final controller = Get.find<CategoriesController>();
     return AdminLayout(
-      title: 'Add category',
+      title: '',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

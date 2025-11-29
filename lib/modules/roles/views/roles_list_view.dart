@@ -5,9 +5,9 @@ import 'package:usta_admin_panal/core/utils/notify.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
+import '../../../widgets/shimmer_widgets.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/roles_controller.dart';
-import '../../../widgets/shimmer_widgets.dart';
 
 class RolesListView extends StatelessWidget {
   const RolesListView({super.key});
@@ -16,7 +16,7 @@ class RolesListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(RolesController());
     return AdminLayout(
-      title: 'Roles'.tr,
+      title: ''.tr,
       child: Obx(() {
         if (controller.loading.value) {
           return const ListLoading();
@@ -24,13 +24,19 @@ class RolesListView extends StatelessWidget {
         if (controller.error.value != null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+            child: Text(
+              controller.error.value!,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           );
         }
         if (controller.roles.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text(
+              'No data'.tr,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
           );
         }
         return Column(
@@ -38,19 +44,31 @@ class RolesListView extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text('Roles & Permissions'.tr,
-                    style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                  'Roles & Permissions'.tr,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
                 const Spacer(),
                 TextButton.icon(
                   onPressed: () => _openDialog(controller),
                   icon: const Icon(Icons.add, color: AppColors.primary),
-                  label: Text('Add'.tr, style: const TextStyle(color: AppColors.primary)),
+                  label: Text(
+                    'Add'.tr,
+                    style: const TextStyle(color: AppColors.primary),
+                  ),
                 ),
                 const SizedBox(width: AppSizes.sm),
                 TextButton.icon(
                   onPressed: () => _openAdminDialog(controller),
                   icon: const Icon(Icons.person_add, color: AppColors.primary),
-                  label: Text('Add admin'.tr, style: const TextStyle(color: AppColors.primary)),
+                  label: Text(
+                    'Add admin'.tr,
+                    style: const TextStyle(color: AppColors.primary),
+                  ),
                 ),
               ],
             ),
@@ -68,19 +86,39 @@ class RolesListView extends StatelessWidget {
                       (r) => DataRow(
                         cells: [
                           DataCell(Text((r['name'] ?? '').toString())),
-                          DataCell(Text((r['modules'] ?? r['permissions'] ?? '').toString())),
+                          DataCell(
+                            Tooltip(
+                              message: (r['permissions'] as List)
+                                  .map((p) => p['module'])
+                                  .join(', '),
+                              child: Text(
+                                "${(r['permissions'] as List).length} ${'Modules'.tr}",
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+
                           DataCell(Text((r['members'] ?? '').toString())),
                           DataCell(
                             Row(
                               children: [
                                 TextButton(
-                                  onPressed: () => Get.toNamed('/roles/permissions', arguments: r),
+                                  onPressed: () => Get.toNamed(
+                                    '/roles/permissions',
+                                    arguments: r,
+                                  ),
                                   child: Text('Edit'.tr),
                                 ),
                                 TextButton(
-                                  onPressed: () =>
-                                      controller.deleteRole((r['_id'] ?? r['id'] ?? '').toString()),
-                                  child: Text('Delete'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                  onPressed: () => controller.deleteRole(
+                                    (r['_id'] ?? r['id'] ?? '').toString(),
+                                  ),
+                                  child: Text(
+                                    'Delete'.tr,
+                                    style: const TextStyle(
+                                      color: Colors.redAccent,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -105,7 +143,10 @@ class RolesListView extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text('Add role'.tr, style: const TextStyle(color: AppColors.text)),
+        title: Text(
+          'Add role'.tr,
+          style: const TextStyle(color: AppColors.text),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -120,8 +161,10 @@ class RolesListView extends StatelessWidget {
               style: const TextStyle(color: AppColors.text),
             ),
             const SizedBox(height: AppSizes.sm),
-            Text('Optional: create admin with this role'.tr,
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+            Text(
+              'Optional: create admin with this role'.tr,
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+            ),
             TextField(
               controller: emailCtrl,
               decoration: const InputDecoration(labelText: 'Admin email'),
@@ -136,7 +179,13 @@ class RolesListView extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(onPressed: Get.back, child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted))),
+          TextButton(
+            onPressed: Get.back,
+            child: Text(
+              'Cancel'.tr,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
+          ),
           TextButton(
             onPressed: () {
               if (nameCtrl.text.trim().isEmpty) {
@@ -146,12 +195,17 @@ class RolesListView extends StatelessWidget {
               controller.create({
                 'name': nameCtrl.text.trim(),
                 'description': descCtrl.text.trim(),
-                if (emailCtrl.text.trim().isNotEmpty) 'adminEmail': emailCtrl.text.trim(),
-                if (passwordCtrl.text.trim().isNotEmpty) 'adminPassword': passwordCtrl.text.trim(),
+                if (emailCtrl.text.trim().isNotEmpty)
+                  'adminEmail': emailCtrl.text.trim(),
+                if (passwordCtrl.text.trim().isNotEmpty)
+                  'adminPassword': passwordCtrl.text.trim(),
               });
               Get.back();
             },
-            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
+            child: Text(
+              'Save'.tr,
+              style: const TextStyle(color: AppColors.primary),
+            ),
           ),
         ],
       ),
@@ -166,7 +220,10 @@ class RolesListView extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text('Add admin'.tr, style: const TextStyle(color: AppColors.text)),
+        title: Text(
+          'Add admin'.tr,
+          style: const TextStyle(color: AppColors.text),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -194,7 +251,13 @@ class RolesListView extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(onPressed: Get.back, child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted))),
+          TextButton(
+            onPressed: Get.back,
+            child: Text(
+              'Cancel'.tr,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
+          ),
           TextButton(
             onPressed: () async {
               if (nameCtrl.text.trim().isEmpty ||
@@ -212,12 +275,13 @@ class RolesListView extends StatelessWidget {
               );
               Get.back();
             },
-            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
+            child: Text(
+              'Save'.tr,
+              style: const TextStyle(color: AppColors.primary),
+            ),
           ),
         ],
       ),
     );
   }
 }
-
-

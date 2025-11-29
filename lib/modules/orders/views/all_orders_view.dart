@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
+import '../../../widgets/shimmer_widgets.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/orders_controller.dart';
-import '../../../widgets/shimmer_widgets.dart';
 
 class AllOrdersView extends StatelessWidget {
   const AllOrdersView({super.key});
@@ -14,10 +14,10 @@ class AllOrdersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(OrdersController());
-    final statuses = ['All', 'new', 'assigned', 'in_progress', 'completed', 'cancelled', 'closed'];
+    final statuses = ['All', 'New', 'assigned', 'in_progress', 'completed', 'cancelled', 'closed'];
 
     return AdminLayout(
-      title: 'Orders'.tr,
+      title: ''.tr,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -53,7 +53,7 @@ class AllOrdersView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const ListLoading();
+              return const CardLoading(lines: 8);
             }
             if (controller.error.value != null) {
               return Padding(
@@ -71,7 +71,7 @@ class AllOrdersView extends StatelessWidget {
               child: DataTable(
                 columns: [
                   DataColumn(label: Text('Service'.tr)),
-                  DataColumn(label: Text('Customer'.tr)),
+                  DataColumn(label: Text('Customers'.tr)),
                   DataColumn(label: Text('Artisan'.tr)),
                   DataColumn(label: Text('Status'.tr)),
                   DataColumn(label: Text('Date'.tr)),

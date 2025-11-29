@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/core/services/formate_date.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
-import '../../../layout/admin_layout.dart';
-import '../controllers/order_details_controller.dart';
 import '../../../core/utils/notify.dart';
+import '../../../layout/admin_layout.dart';
 import '../../../widgets/shimmer_widgets.dart';
-import '../../../widgets/shimmer_widgets.dart';
+import '../controllers/order_details_controller.dart';
 
 class OrderDetailsView extends StatelessWidget {
   const OrderDetailsView({super.key});
@@ -20,25 +20,43 @@ class OrderDetailsView extends StatelessWidget {
     if (id.isNotEmpty) controller.load(id);
 
     return AdminLayout(
-      title: 'Order Details'.tr,
+      title: ''.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const CardLoading(height: 300, lines: 6);
+          return Column(
+            children: [
+              const CardLoading(lines: 6),
+              const CardLoading(lines: 10),
+              const CardLoading(lines: 6),
+              const ListLoading(rows: 2,),
+              const CardLoading(lines: 8,),
+            ],
+          );
         }
         if (controller.error.value != null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+            child: Text(
+              controller.error.value!,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           );
         }
         final order = controller.order.value;
         if (order == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text(
+              'No data'.tr,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
           );
         }
-        final price = double.tryParse((order['amount'] ?? order['price'] ?? 0).toString()) ?? 0;
+        final price =
+            double.tryParse(
+              (order['amount'] ?? order['price'] ?? 0).toString(),
+            ) ??
+            0;
         final messages = controller.messages;
         final timelineStatus = 'in_progress'.obs;
         final timelineNote = TextEditingController();
@@ -47,39 +65,112 @@ class OrderDetailsView extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Order Details'.tr,
+              style: const TextStyle(
+                color: AppColors.text,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: AppSizes.sm),
             _card(
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.10),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.build_rounded,
+                      color: AppColors.primary,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text((order['serviceType'] ?? order['service'] ?? '').toString(),
-                            style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 4),
+                        // اسم الخدمة
                         Text(
-                          '${order['customer'] ?? order['customerName'] ?? ''} • ${order['artisan'] ?? order['artisanName'] ?? ''}',
-                          style: const TextStyle(color: AppColors.textMuted),
+                          (order['serviceType'] ?? order['service'] ?? '')
+                              .toString(),
+                          style: const TextStyle(
+                            color: AppColors.text,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            height: 1.3,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Text(
+                            //   '${order['customer']?['name'] ?? 'Unknown'}',
+                            //   style: const TextStyle(
+                            //     color: AppColors.textMuted,
+                            //     fontSize: 13,
+                            //     height: 1.3,
+                            //   ),
+                            //   overflow: TextOverflow.ellipsis,
+                            // ),
+
+                            const SizedBox(height: 4),
+
+                            // الحرفي
+                            Text(
+                              '${order['artisan']?['name'] ?? 'No artisan'} (${order['artisan']?['phone'] ?? ''})',
+                              style: const TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 13,
+                                height: 1.3,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 6),
+                        Text(
+                          '${"created".tr}: ${formatDateString(order['createdAt'])}',
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(width: 10),
                   _statusChip((order['status'] ?? '').toString()),
                 ],
               ),
             ),
+
             const SizedBox(height: AppSizes.md),
             _card(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Status timeline'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Status timeline'.tr,
+                    style: const TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: AppSizes.sm),
                   Wrap(
-                    spacing: AppSizes.sm,
+                    spacing: AppSizes.xs,
                     children: controller.timeline
                         .map(
-                          (step) => _statusChip((step['status'] ?? '').toString()),
+                          (step) =>
+                              _statusChip((step['status'] ?? '').toString()),
                         )
                         .toList(),
                   ),
@@ -90,16 +181,38 @@ class OrderDetailsView extends StatelessWidget {
                         () => DropdownButton<String>(
                           value: timelineStatus.value,
                           dropdownColor: AppColors.card,
-                          items: const [
-                            DropdownMenuItem(value: 'pending', child: Text('pending')),
-                            DropdownMenuItem(value: 'accepted', child: Text('accepted')),
-                            DropdownMenuItem(value: 'assigned', child: Text('assigned')),
-                            DropdownMenuItem(value: 'in_progress', child: Text('in_progress')),
-                            DropdownMenuItem(value: 'completed', child: Text('completed')),
-                            DropdownMenuItem(value: 'canceled', child: Text('canceled')),
-                            DropdownMenuItem(value: 'closed', child: Text('closed')),
+                          items:  [
+                            DropdownMenuItem(
+                              value: 'pending',
+                              child: Text('pending'.tr),
+                            ),
+                            DropdownMenuItem(
+                              value: 'accepted',
+                              child: Text('accepted'.tr),
+                            ),
+                            DropdownMenuItem(
+                              value: 'assigned',
+                              child: Text('assigned'.tr),
+                            ),
+                            DropdownMenuItem(
+                              value: 'in_progress',
+                              child: Text('in_progress'.tr),
+                            ),
+                            DropdownMenuItem(
+                              value: 'completed',
+                              child: Text('completed'.tr),
+                            ),
+                            DropdownMenuItem(
+                              value: 'canceled',
+                              child: Text('cancelled'.tr),
+                            ),
+                            DropdownMenuItem(
+                              value: 'closed',
+                              child: Text('closed'.tr),
+                            ),
                           ],
-                          onChanged: (v) => timelineStatus.value = v ?? timelineStatus.value,
+                          onChanged: (v) =>
+                              timelineStatus.value = v ?? timelineStatus.value,
                         ),
                       ),
                       const SizedBox(width: AppSizes.sm),
@@ -112,7 +225,11 @@ class OrderDetailsView extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSizes.sm),
                       ElevatedButton(
-                        onPressed: () => controller.addTimeline(id, status: timelineStatus.value, note: timelineNote.text),
+                        onPressed: () => controller.addTimeline(
+                          id,
+                          status: timelineStatus.value,
+                          note: timelineNote.text,
+                        ),
                         child: Text('Add'.tr),
                       ),
                     ],
@@ -125,12 +242,28 @@ class OrderDetailsView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Payment info'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Payment info'.tr,
+                    style: const TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: AppSizes.sm),
-                  _priceRow('Service total'.tr, 'AED ${price.toStringAsFixed(0)}'),
-                  _priceRow('Platform fee'.tr, 'AED ${(price * 0.1).toStringAsFixed(2)}'),
+                  _priceRow(
+                    'Service total'.tr,
+                    'EG ${price.toStringAsFixed(0)}',
+                  ),
+                  _priceRow(
+                    'Platform fee'.tr,
+                    'EG ${(price * 0.1).toStringAsFixed(2)}',
+                  ),
                   const Divider(color: AppColors.border),
-                  _priceRow('Total'.tr, 'AED ${(price * 1.1).toStringAsFixed(2)}', bold: true),
+                  _priceRow(
+                    'Total'.tr,
+                    'EG ${(price * 1.1).toStringAsFixed(2)}',
+                    bold: true,
+                  ),
                 ],
               ),
             ),
@@ -140,7 +273,9 @@ class OrderDetailsView extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: () => controller.cancel(
                     id,
-                    note: actionNote.text.trim().isEmpty ? null : actionNote.text.trim(),
+                    note: actionNote.text.trim().isEmpty
+                        ? null
+                        : actionNote.text.trim(),
                     reason: 'Canceled by admin',
                   ),
                   icon: const Icon(Icons.cancel_outlined),
@@ -152,7 +287,12 @@ class OrderDetailsView extends StatelessWidget {
                     side: const BorderSide(color: AppColors.border),
                     foregroundColor: AppColors.text,
                   ),
-                  onPressed: () => controller.close(id, note: actionNote.text.trim().isEmpty ? null : actionNote.text.trim()),
+                  onPressed: () => controller.close(
+                    id,
+                    note: actionNote.text.trim().isEmpty
+                        ? null
+                        : actionNote.text.trim(),
+                  ),
                   icon: const Icon(Icons.check_circle_outline),
                   label: Text('Close order'.tr),
                 ),
@@ -169,7 +309,13 @@ class OrderDetailsView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Chat (view only)'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Chat (view only)'.tr,
+                    style: const TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: AppSizes.sm),
                   Container(
                     height: 160,
@@ -183,14 +329,26 @@ class OrderDetailsView extends StatelessWidget {
                             children: messages
                                 .map<Widget>(
                                   (m) => Padding(
-                                    padding: const EdgeInsets.only(bottom: AppSizes.sm),
+                                    padding: const EdgeInsets.only(
+                                      bottom: AppSizes.sm,
+                                    ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text((m['sender'] ?? '').toString(),
-                                            style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
-                                        Text((m['message'] ?? '').toString(),
-                                            style: const TextStyle(color: AppColors.text)),
+                                        Text(
+                                          (m['sender'] ?? '').toString(),
+                                          style: const TextStyle(
+                                            color: AppColors.textMuted,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        Text(
+                                          (m['message'] ?? '').toString(),
+                                          style: const TextStyle(
+                                            color: AppColors.text,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -198,7 +356,10 @@ class OrderDetailsView extends StatelessWidget {
                                 .toList(),
                           )
                         : const Center(
-                            child: Text('Conversation history placeholder', style: TextStyle(color: AppColors.textMuted)),
+                            child: Text(
+                              'Conversation history placeholder',
+                              style: TextStyle(color: AppColors.textMuted),
+                            ),
                           ),
                   ),
                   const SizedBox(height: AppSizes.sm),
@@ -231,9 +392,21 @@ class OrderDetailsView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Text(label, style: TextStyle(color: AppColors.textMuted, fontWeight: bold ? FontWeight.w700 : FontWeight.w500)),
+          Text(
+            label,
+            style: TextStyle(
+              color: AppColors.textMuted,
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
           const Spacer(),
-          Text(value, style: TextStyle(color: AppColors.text, fontWeight: bold ? FontWeight.bold : FontWeight.w600)),
+          Text(
+            value,
+            style: TextStyle(
+              color: AppColors.text,
+              fontWeight: bold ? FontWeight.bold : FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -246,7 +419,9 @@ class OrderDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border: const Border.fromBorderSide(
+          BorderSide(color: AppColors.border),
+        ),
       ),
       child: child,
     );
@@ -283,14 +458,20 @@ class OrderDetailsView extends StatelessWidget {
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 6),
+      margin: EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: color.withOpacity(0.16),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: color.withOpacity(0.5)),
       ),
-      child: Text(status.tr, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
+      child: Text(
+        status.tr,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
     );
   }
 }
-
-

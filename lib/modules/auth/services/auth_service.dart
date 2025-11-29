@@ -81,7 +81,6 @@ class AuthService {
     } on DioException catch (e) {
       throw mapDioException(e);
     } catch (_) {
-      // swallow logout errors
     }
   }
 }

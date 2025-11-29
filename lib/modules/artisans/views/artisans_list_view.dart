@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
+import '../../../widgets/shimmer_widgets.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/artisans_controller.dart';
-import '../../../widgets/shimmer_widgets.dart';
 
 class ArtisansListView extends StatelessWidget {
   const ArtisansListView({super.key});
@@ -16,7 +16,7 @@ class ArtisansListView extends StatelessWidget {
     final controller = Get.put(ArtisansController());
 
     return AdminLayout(
-      title: 'Artisans',
+      title: '',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,7 +36,7 @@ class ArtisansListView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const ListLoading();
+              return const ListLoading(itemHeight: 55);
             }
             if (controller.error.value != null) {
               return Padding(

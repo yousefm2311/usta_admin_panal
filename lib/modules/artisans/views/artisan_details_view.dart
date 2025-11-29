@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/core/services/formate_date.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/responsive.dart';
 import '../../../layout/admin_layout.dart';
-import '../controllers/artisan_details_controller.dart';
 import '../../../widgets/shimmer_widgets.dart';
+import '../controllers/artisan_details_controller.dart';
 
 class ArtisanDetailsView extends StatelessWidget {
   const ArtisanDetailsView({super.key});
@@ -20,22 +21,28 @@ class ArtisanDetailsView extends StatelessWidget {
     if (id.isNotEmpty) controller.load(id);
 
     return AdminLayout(
-      title: 'Artisan details',
+      title: '',
       child: Obx(() {
         if (controller.loading.value) {
-          return const CardLoading(height: 300, lines: 6);
+          return const CardLoading(height: 300, lines: 10);
         }
         if (controller.error.value != null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+            child: Text(
+              controller.error.value!,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           );
         }
         final data = controller.artisan.value;
         if (data == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text(
+              'No data'.tr,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
           );
         }
         final docs = (data['documents'] ?? []) as List<dynamic>;
@@ -43,12 +50,21 @@ class ArtisanDetailsView extends StatelessWidget {
         final stats = statsRaw is Map<String, dynamic>
             ? statsRaw
             : statsRaw is Map
-                ? Map<String, dynamic>.from(statsRaw)
-                : <String, dynamic>{};
+            ? Map<String, dynamic>.from(statsRaw)
+            : <String, dynamic>{};
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Artisan details'.tr,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: AppSizes.xs),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -57,8 +73,12 @@ class ArtisanDetailsView extends StatelessWidget {
                       padding: const EdgeInsets.all(AppSizes.md),
                       decoration: BoxDecoration(
                         color: AppColors.card,
-                        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                        borderRadius: BorderRadius.circular(
+                          AppSizes.cardRadius,
+                        ),
+                        border: const Border.fromBorderSide(
+                          BorderSide(color: AppColors.border),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,23 +86,42 @@ class ArtisanDetailsView extends StatelessWidget {
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundColor: AppColors.primary.withOpacity(0.16),
-                                child: const Icon(Icons.person, color: AppColors.primary),
+                                backgroundColor: AppColors.primary.withOpacity(
+                                  0.16,
+                                ),
+                                child: const Icon(
+                                  Icons.person,
+                                  color: AppColors.primary,
+                                ),
                               ),
                               const SizedBox(width: AppSizes.sm),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text((data['name'] ?? '').toString(),
-                                      style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-                                  Text((data['profession'] ?? data['category'] ?? '').toString(),
-                                      style: const TextStyle(color: AppColors.textMuted)),
+                                  Text(
+                                    (data['name'] ?? '').toString(),
+                                    style: const TextStyle(
+                                      color: AppColors.text,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    (data['profession'] ??
+                                            data['category'] ??
+                                            '')
+                                        .toString(),
+                                    style: const TextStyle(
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
                                 ],
                               ),
                               const Spacer(),
                               Text(
                                 (data['status'] ?? '').toString().tr,
-                                style: const TextStyle(color: AppColors.primary),
+                                style: const TextStyle(
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ],
                           ),
@@ -91,10 +130,24 @@ class ArtisanDetailsView extends StatelessWidget {
                             spacing: AppSizes.md,
                             runSpacing: AppSizes.md,
                             children: [
-                              _stat('Completed requests label'.tr, (stats['completed'] ?? '').toString()),
-                              _stat('Active jobs'.tr, (stats['active'] ?? '').toString()),
-                              _stat('Average ticket'.tr, (stats['avgTicket'] ?? '').toString()),
-                              _stat('Member since'.tr, (data['createdAt'] ?? '').toString()),
+                              _stat(
+                                'Completed requests label'.tr,
+                                (stats['completed'] ?? '').toString(),
+                              ),
+                              _stat(
+                                'Active jobs'.tr,
+                                (stats['active'] ?? '').toString(),
+                              ),
+                              _stat(
+                                'Average ticket'.tr,
+                                (stats['avgTicket'] ?? '').toString(),
+                              ),
+                              _stat(
+                                'Member since'.tr,
+                                (formatDateString(
+                                  data['createdAt'],
+                                )).toString(),
+                              ),
                             ],
                           ),
                           const SizedBox(height: AppSizes.md),
@@ -107,7 +160,9 @@ class ArtisanDetailsView extends StatelessWidget {
                               const SizedBox(width: AppSizes.sm),
                               OutlinedButton(
                                 style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: AppColors.border),
+                                  side: const BorderSide(
+                                    color: AppColors.border,
+                                  ),
                                   foregroundColor: AppColors.text,
                                 ),
                                 onPressed: () => controller.reject(id),
@@ -126,18 +181,34 @@ class ArtisanDetailsView extends StatelessWidget {
                       padding: const EdgeInsets.all(AppSizes.md),
                       decoration: BoxDecoration(
                         color: AppColors.card,
-                        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                        borderRadius: BorderRadius.circular(
+                          AppSizes.cardRadius,
+                        ),
+                        border: const Border.fromBorderSide(
+                          BorderSide(color: AppColors.border),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Documents'.tr, style: const TextStyle(color: AppColors.text)),
+                          Text(
+                            'Documents'.tr,
+                            style: const TextStyle(color: AppColors.text),
+                          ),
                           const SizedBox(height: AppSizes.sm),
-                          ...docs.map((d) => Padding(
-                                padding: const EdgeInsets.only(bottom: AppSizes.xs),
-                                child: Text(d.toString(), style: const TextStyle(color: AppColors.textMuted)),
-                              )),
+                          ...docs.map(
+                            (d) => Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSizes.xs,
+                              ),
+                              child: Text(
+                                d.toString(),
+                                style: const TextStyle(
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -149,14 +220,25 @@ class ArtisanDetailsView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.card,
                   borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                  border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                  border: const Border.fromBorderSide(
+                    BorderSide(color: AppColors.border),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Ratings'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                    Text(
+                      'Ratings'.tr,
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: AppSizes.sm),
-                    Text((stats['rating'] ?? '').toString(), style: const TextStyle(color: AppColors.text)),
+                    Text(
+                      (stats['rating'] ?? '').toString(),
+                      style: const TextStyle(color: AppColors.text),
+                    ),
                   ],
                 ),
               ),
@@ -173,17 +255,26 @@ class ArtisanDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.overlay,
         borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border: const Border.fromBorderSide(
+          BorderSide(color: AppColors.border),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(value, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-          Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppColors.text,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+          ),
         ],
       ),
     );
   }
 }
-
-

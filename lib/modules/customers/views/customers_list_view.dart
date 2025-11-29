@@ -16,7 +16,7 @@ class CustomersListView extends StatelessWidget {
     final controller = Get.put(CustomersController());
 
     return AdminLayout(
-      title: 'Customers',
+      title: '',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -57,7 +57,7 @@ class CustomersListView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const ShimmerListPlaceholder(rows: 6, itemHeight: 70);
+              return const ShimmerListPlaceholder(rows: 6, itemHeight: 55);
             }
             if (controller.error.value != null) {
               return Padding(

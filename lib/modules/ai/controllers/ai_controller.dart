@@ -10,7 +10,8 @@ class AIController extends GetxController {
 
   final sentiment = <String, double>{}.obs;
   final topArtisans = <dynamic>[].obs;
-  final wordCloud = <String>[].obs;
+RxList<Map<String, dynamic>> wordCloud = <Map<String, dynamic>>[].obs;
+
   final loadingSentiment = false.obs;
   final loadingTop = false.obs;
   final loadingWordCloud = false.obs;
@@ -40,12 +41,18 @@ class AIController extends GetxController {
     }
   }
 
-  Future<void> loadTopArtisans() async {
+Future<void> loadTopArtisans() async {
     loadingTop.value = true;
     try {
       final res = await _service.topArtisans();
       final data = res.data;
-      topArtisans.assignAll(data is List ? data : data['data'] ?? []);
+      List<dynamic> list;
+      if (data is List) {
+        list = data;
+      } else {
+        list = data['top'] ?? data['data'] ?? [];
+      }
+      topArtisans.assignAll(list);
     } catch (e) {
       error.value = e is ApiException ? e.message : e.toString();
       showError(error.value!);
@@ -54,23 +61,33 @@ class AIController extends GetxController {
     }
   }
 
-  Future<void> loadWordCloud() async {
+
+Future<void> loadWordCloud() async {
     loadingWordCloud.value = true;
+
     try {
       final res = await _service.wordCloud();
       final data = res.data;
+
+      List<dynamic>? list;
+
       if (data is List) {
-        wordCloud.assignAll(data.map((e) => e.toString()));
+        list = data;
       } else if (data is Map<String, dynamic>) {
-        final list = data['data'] ?? data['words'];
-        if (list is List) {
-          wordCloud.assignAll(list.map((e) => e.toString()));
-        }
+        list = data['data'] ?? data['words'];
       }
-    } catch (_) {
-      // ignore: no error surfacing for optional word cloud
+
+      if (list is List) {
+        // تأكد إنها List<Map>
+        wordCloud.assignAll(
+          list.map((e) => Map<String, dynamic>.from(e)).toList(),
+        );
+      }
+    } catch (err) {
+      // تجاهل المشكلة لو الـ word cloud optional
     } finally {
       loadingWordCloud.value = false;
     }
   }
+
 }

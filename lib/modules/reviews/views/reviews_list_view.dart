@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
-import '../controllers/reviews_controller.dart';
 import '../../../widgets/shimmer_widgets.dart';
+import '../controllers/reviews_controller.dart';
 
 class ReviewsListView extends StatelessWidget {
   const ReviewsListView({super.key});
@@ -14,7 +14,7 @@ class ReviewsListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(ReviewsController());
     return AdminLayout(
-      title: 'Reviews',
+      title: '',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -59,6 +59,7 @@ class ReviewsListView extends StatelessWidget {
             return Column(
               children: reviews
                   .map(
+                    
                     (review) => Container(
                       margin: const EdgeInsets.only(bottom: AppSizes.sm),
                       padding: const EdgeInsets.all(AppSizes.md),
@@ -96,7 +97,7 @@ class ReviewsListView extends StatelessWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            '${review['customer'] ?? review['customerName'] ?? ''} • ${review['artisan'] ?? review['artisanName'] ?? ''}',
+                            '${review['customerId']?['name'] ??  ''} • ${review['artisanId']?['name'] ?? ''}',
                             style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
                           ),
                         ],

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/core/services/formate_date.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/utils/notify.dart';
 import '../../../layout/admin_layout.dart';
+import '../../../widgets/shimmer_widgets.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/notifications_controller.dart';
-import '../../../widgets/shimmer_widgets.dart';
 
 class NotificationsCenterView extends StatefulWidget {
   const NotificationsCenterView({super.key});
@@ -27,13 +28,13 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
     final controller = Get.put(NotificationsController());
 
     return AdminLayout(
-      title: 'Notifications',
+      title: '',
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Send notification
-            Text('Send Notification'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('Send notification'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: AppSizes.sm),
             _sendCard(controller),
             const SizedBox(height: AppSizes.md),
@@ -92,7 +93,7 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
             const SizedBox(height: AppSizes.xs),
             Wrap(
               spacing: AppSizes.sm,
-              children: ['all', 'customers', 'artisans']
+              children: ['All', 'Customers', 'Artisans']
                   .map(
                     (t) => ChoiceChip(
                       label: Text(t.tr),
@@ -168,7 +169,7 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
                   cells: [
                     DataCell(Text((t['name'] ?? '').toString())),
                     DataCell(Text((t['target'] ?? '').toString())),
-                    DataCell(Text((t['updatedAt'] ?? '').toString())),
+                    DataCell(Text((formatDateString(t['updatedAt'])).toString())),
                     DataCell(
                       Row(
                         children: [

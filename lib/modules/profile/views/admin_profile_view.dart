@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
-import '../controllers/profile_controller.dart';
 import '../../../widgets/shimmer_widgets.dart';
+import '../controllers/profile_controller.dart';
 
 class AdminProfileView extends StatelessWidget {
   const AdminProfileView({super.key});
@@ -15,7 +15,7 @@ class AdminProfileView extends StatelessWidget {
     final controller = Get.put(ProfileController());
 
     return AdminLayout(
-      title: 'Admin Profile'.tr,
+      title: ''.tr,
       child: Obx(() {
         if (controller.loading.value) {
           return const CardLoading(height: 220, lines: 5);

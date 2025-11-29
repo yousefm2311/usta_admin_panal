@@ -5,8 +5,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/responsive.dart';
 import '../../../layout/admin_layout.dart';
-import '../controllers/customer_details_controller.dart';
 import '../../../widgets/shimmer_widgets.dart';
+import '../controllers/customer_details_controller.dart';
 
 class CustomerDetailsView extends StatefulWidget {
   const CustomerDetailsView({super.key});
@@ -25,22 +25,28 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
     if (id.isNotEmpty) controller.load(id);
 
     return AdminLayout(
-      title: 'Customer details'.tr,
+      title: ''.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const CardLoading(height: 260, lines: 6);
+          return const CardLoading(height: 260, lines: 10);
         }
         if (controller.error.value != null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+            child: Text(
+              controller.error.value!,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           );
         }
         final data = controller.customer.value;
         if (data == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text(
+              'No data'.tr,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
           );
         }
         final requests = (data['lastRequests'] ?? []) as List<dynamic>;
@@ -49,6 +55,15 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Customer details'.tr,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: AppSizes.md),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -57,8 +72,12 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
                       padding: const EdgeInsets.all(AppSizes.md),
                       decoration: BoxDecoration(
                         color: AppColors.card,
-                        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                        borderRadius: BorderRadius.circular(
+                          AppSizes.cardRadius,
+                        ),
+                        border: const Border.fromBorderSide(
+                          BorderSide(color: AppColors.border),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,23 +85,40 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundColor: AppColors.primary.withOpacity(0.16),
-                                child: const Icon(Icons.person, color: AppColors.primary),
+                                backgroundColor: AppColors.primary.withOpacity(
+                                  0.16,
+                                ),
+                                child: const Icon(
+                                  Icons.person,
+                                  color: AppColors.primary,
+                                ),
                               ),
                               const SizedBox(width: AppSizes.sm),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text((data['name'] ?? '').toString(),
-                                      style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-                                  Text(isBlocked ? 'Blocked'.tr : 'Active'.tr,
-                                      style: TextStyle(color: isBlocked ? AppColors.danger : AppColors.success)),
+                                  Text(
+                                    (data['name'] ?? '').toString(),
+                                    style: const TextStyle(
+                                      color: AppColors.text,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    isBlocked ? 'Blocked'.tr : 'Active'.tr,
+                                    style: TextStyle(
+                                      color: isBlocked
+                                          ? AppColors.danger
+                                          : AppColors.success,
+                                    ),
+                                  ),
                                 ],
                               ),
                               const Spacer(),
                               Switch(
                                 value: !isBlocked,
-                                onChanged: (val) => controller.blockToggle(id, block: !val),
+                                onChanged: (val) =>
+                                    controller.blockToggle(id, block: !val),
                                 activeColor: AppColors.primary,
                               ),
                             ],
@@ -92,15 +128,33 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
                             spacing: AppSizes.md,
                             runSpacing: AppSizes.md,
                             children: [
-                              _stat('Total requests label'.tr, (data['requests'] ?? data['totalRequests'] ?? '0').toString()),
-                              _stat('Completed label'.tr, (data['completed'] ?? '').toString()),
-                              _stat('Canceled'.tr, (data['canceled'] ?? '').toString()),
-                              _stat('Lifetime spend'.tr, (data['lifetimeSpend'] ?? '').toString()),
+                              _stat(
+                                'Total requests label'.tr,
+                                (data['requests'] ??
+                                        data['totalRequests'] ??
+                                        '0')
+                                    .toString(),
+                              ),
+                              _stat(
+                                'Completed label'.tr,
+                                (data['completed'] ?? '').toString(),
+                              ),
+                              _stat(
+                                'Canceled'.tr,
+                                (data['canceled'] ?? '').toString(),
+                              ),
+                              _stat(
+                                'Lifetime spend'.tr,
+                                (data['lifetimeSpend'] ?? '').toString(),
+                              ),
                             ],
                           ),
                           const SizedBox(height: AppSizes.md),
                           Text(
-                            (data['location'] ?? data['preferredLocation'] ?? '').toString(),
+                            (data['location'] ??
+                                    data['preferredLocation'] ??
+                                    '')
+                                .toString(),
                             style: const TextStyle(color: AppColors.textMuted),
                           ),
                         ],
@@ -114,20 +168,36 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
                       padding: const EdgeInsets.all(AppSizes.md),
                       decoration: BoxDecoration(
                         color: AppColors.card,
-                        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                        borderRadius: BorderRadius.circular(
+                          AppSizes.cardRadius,
+                        ),
+                        border: const Border.fromBorderSide(
+                          BorderSide(color: AppColors.border),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Last requests'.tr, style: const TextStyle(color: AppColors.text)),
+                          Text(
+                            'Last requests'.tr,
+                            style: const TextStyle(color: AppColors.text),
+                          ),
                           const SizedBox(height: AppSizes.sm),
                           ...requests.map(
                             (r) => Padding(
-                              padding: const EdgeInsets.only(bottom: AppSizes.xs),
+                              padding: const EdgeInsets.only(
+                                bottom: AppSizes.xs,
+                              ),
                               child: Row(
                                 children: [
-                                  Expanded(child: Text((r['service'] ?? '').toString(), style: const TextStyle(color: AppColors.text))),
+                                  Expanded(
+                                    child: Text(
+                                      (r['service'] ?? '').toString(),
+                                      style: const TextStyle(
+                                        color: AppColors.text,
+                                      ),
+                                    ),
+                                  ),
                                   _statusChip((r['status'] ?? '').toString()),
                                 ],
                               ),
@@ -144,19 +214,32 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
                 decoration: BoxDecoration(
                   color: AppColors.card,
                   borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                  border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                  border: const Border.fromBorderSide(
+                    BorderSide(color: AppColors.border),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Last requests'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                    Text(
+                      'Last requests'.tr,
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: AppSizes.sm),
                     ...requests.map(
                       (r) => ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text((r['service'] ?? '').toString(), style: const TextStyle(color: AppColors.text)),
+                        title: Text(
+                          (r['service'] ?? '').toString(),
+                          style: const TextStyle(color: AppColors.text),
+                        ),
                         subtitle: Text(
-                            '${r['customer'] ?? ''} • ${r['artisan'] ?? ''}', style: const TextStyle(color: AppColors.textMuted)),
+                          '${r['customer'] ?? ''} • ${r['artisan'] ?? ''}',
+                          style: const TextStyle(color: AppColors.textMuted),
+                        ),
                         trailing: _statusChip((r['status'] ?? '').toString()),
                       ),
                     ),
@@ -176,20 +259,33 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
       decoration: BoxDecoration(
         color: AppColors.overlay,
         borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border: const Border.fromBorderSide(
+          BorderSide(color: AppColors.border),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(value, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-          Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppColors.text,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+          ),
         ],
       ),
     );
   }
 
   Widget _statusChip(String status) {
-    final color = status.toLowerCase() == 'completed' ? AppColors.success : AppColors.primary;
+    final color = status.toLowerCase() == 'completed'
+        ? AppColors.success
+        : AppColors.primary;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 6),
       decoration: BoxDecoration(
@@ -199,10 +295,12 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
       ),
       child: Text(
         status.tr,
-        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
       ),
     );
   }
 }
-
-

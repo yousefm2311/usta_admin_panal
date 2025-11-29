@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/core/services/formate_date.dart';
 import 'package:usta_admin_panal/core/utils/notify.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
+import '../../../widgets/shimmer_widgets.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/coupons_controller.dart';
-import '../../../widgets/shimmer_widgets.dart';
 
 class CouponsView extends StatelessWidget {
   const CouponsView({super.key});
@@ -16,37 +17,52 @@ class CouponsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(CouponsController());
     return AdminLayout(
-      title: 'Coupons'.tr,
+      title: ''.tr,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text('Coupons manager'.tr,
-                  style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(
+                'Coupons manager'.tr,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
               const Spacer(),
               TextButton.icon(
                 onPressed: () => _openDialog(controller),
                 icon: const Icon(Icons.add, color: AppColors.primary),
-                label: Text('Add', style: const TextStyle(color: AppColors.primary)),
+                label: Text(
+                  'Add'.tr,
+                  style: const TextStyle(color: AppColors.primary),
+                ),
               ),
             ],
           ),
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const ListLoading();
+              return const ListLoading(itemHeight: 55);
             }
             if (controller.error.value != null) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+                child: Text(
+                  controller.error.value!,
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
               );
             }
             if (controller.coupons.isEmpty) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                child: Text(
+                  'No data'.tr,
+                  style: const TextStyle(color: AppColors.textMuted),
+                ),
               );
             }
             return TableWrapper(
@@ -56,6 +72,7 @@ class CouponsView extends StatelessWidget {
                   DataColumn(label: Text('Discount'.tr)),
                   DataColumn(label: Text('Usage'.tr)),
                   DataColumn(label: Text('Status'.tr)),
+                  DataColumn(label: Text('expiry'.tr)),
                   DataColumn(label: Text('Actions'.tr)),
                 ],
                 rows: controller.coupons
@@ -65,17 +82,52 @@ class CouponsView extends StatelessWidget {
                           DataCell(Text((c['code'] ?? '').toString())),
                           DataCell(Text((c['value'] ?? '').toString())),
                           DataCell(Text((c['usage'] ?? '').toString())),
-                          DataCell(Text((c['active'] ?? true) ? 'Active'.tr : 'Inactive'.tr)),
+                          DataCell(
+                            _statusChip(
+                              (c['active'] ?? true) ? 'Active'.toString() : 'Inactive'.toString(),
+                            ),
+                          ),
+                          DataCell(
+                            Text((formatDateString(c['expiresAt'].toString()))),
+                          ),
                           DataCell(
                             Row(
                               children: [
                                 TextButton(
-                                  onPressed: () => _openDialog(controller, coupon: c),
+                                  onPressed: () {
+                                    final id = (c['_id'] ?? c['id']).toString();
+                                    final newStatus = !(c['active'] ?? true);
+                                    controller.update_(id, {
+                                      "active": newStatus,
+                                    });
+                                    c['active'] = newStatus;
+                                  },
+                                  child: Text(
+                                    (c['active'] ?? true)
+                                        ? 'Deactivate'.tr
+                                        : 'Activate'.tr,
+                                    style: TextStyle(
+                                      color: (c['active'] ?? true)
+                                          ? Colors.redAccent
+                                          : AppColors.success,
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      _openDialog(controller, coupon: c),
                                   child: Text('Edit'.tr),
                                 ),
                                 TextButton(
-                                  onPressed: () => controller.delete((c['_id'] ?? c['id'] ?? '').toString()),
-                                  child: Text('Delete'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                  onPressed: () => controller.delete(
+                                    (c['_id'] ?? c['id'] ?? '').toString(),
+                                  ),
+                                  child: Text(
+                                    'Delete'.tr,
+                                    style: const TextStyle(
+                                      color: Colors.redAccent,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -92,12 +144,23 @@ class CouponsView extends StatelessWidget {
     );
   }
 
-  void _openDialog(CouponsController controller, {Map<String, dynamic>? coupon}) {
+  void _openDialog(
+    CouponsController controller, {
+    Map<String, dynamic>? coupon,
+  }) {
     final code = TextEditingController(text: coupon?['code']?.toString() ?? '');
-    final value = TextEditingController(text: coupon?['value']?.toString() ?? '');
-    final discountType = TextEditingController(text: coupon?['discountType']?.toString() ?? 'percent');
-    final minOrder = TextEditingController(text: coupon?['minOrder']?.toString() ?? '');
-    final expiresAt = TextEditingController(text: coupon?['expiresAt']?.toString() ?? '');
+    final value = TextEditingController(
+      text: coupon?['value']?.toString() ?? '',
+    );
+    final discountType = TextEditingController(
+      text: coupon?['discountType']?.toString() ?? 'percent',
+    );
+    final minOrder = TextEditingController(
+      text: coupon?['minOrder']?.toString() ?? '',
+    );
+    final expiresAt = TextEditingController(
+      text: coupon?['expiresAt']?.toString() ?? '',
+    );
     DateTime? expiryDate;
     final expiresValue = coupon?['expiresAt'];
     if (expiresValue != null && expiresValue.toString().isNotEmpty) {
@@ -107,62 +170,89 @@ class CouponsView extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text(coupon == null ? 'Add coupon' : 'Edit coupon', style: const TextStyle(color: AppColors.text)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: code,
-              decoration: const InputDecoration(labelText: 'Code'),
-              style: const TextStyle(color: AppColors.text),
-            ),
-            TextField(
-              controller: value,
-              decoration: const InputDecoration(labelText: 'Value'),
-              style: const TextStyle(color: AppColors.text),
-            ),
-            TextField(
-              controller: discountType,
-              decoration: const InputDecoration(labelText: 'Discount type (percent/fixed)'),
-              style: const TextStyle(color: AppColors.text),
-            ),
-            TextField(
-              controller: minOrder,
-              decoration: const InputDecoration(labelText: 'Min order'),
-              style: const TextStyle(color: AppColors.text),
-            ),
-            const SizedBox(height: AppSizes.sm),
-            Row(
+        title: Text(
+          coupon == null ? 'Add coupon'.tr : 'Edit coupon'.tr,
+          style: const TextStyle(color: AppColors.text),
+        ),
+        content: StatefulBuilder(
+          builder: (context, setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: Text(
-                    expiryDate != null ? expiryDate.toString().split('.').first : 'No expiry selected'.tr,
-                    style: const TextStyle(color: AppColors.textMuted),
-                  ),
+                TextField(
+                  controller: code,
+                  decoration: InputDecoration(labelText: 'Code'.tr),
+                  style: const TextStyle(color: AppColors.text),
                 ),
-                TextButton(
-                  onPressed: () async {
-                    final currentContext = Get.context;
-                    if (currentContext == null) return;
-                    final picked = await showDatePicker(
-                      context: currentContext,
-                      initialDate: (expiryDate ?? DateTime.now()),
-                      firstDate: DateTime.now().subtract(const Duration(days: 1)),
-                      lastDate: DateTime.now().add(const Duration(days: 365 * 3)),
-                    );
-                    if (picked != null) {
-                      expiryDate = picked;
-                      expiresAt.text = picked.toIso8601String();
-                    }
-                  },
-                  child: Text('Pick expiry'.tr),
+                TextField(
+                  controller: value,
+                  decoration: InputDecoration(labelText: 'Value'.tr),
+                  style: const TextStyle(color: AppColors.text),
+                ),
+                TextField(
+                  controller: discountType,
+                  decoration: InputDecoration(
+                    labelText: 'Discount type (percent/fixed)'.tr,
+                  ),
+                  style: const TextStyle(color: AppColors.text),
+                ),
+                TextField(
+                  controller: minOrder,
+                  decoration: InputDecoration(labelText: 'Min order'.tr),
+                  style: const TextStyle(color: AppColors.text),
+                ),
+                const SizedBox(height: AppSizes.sm),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        expiryDate != null
+                            ? formatDate(expiryDate!)
+                            : 'No expiry selected'.tr,
+                        style: const TextStyle(color: AppColors.textMuted),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        final context = Get.context;
+                        if (context == null) return;
+                        final now = DateTime.now();
+                        final minDate = now.subtract(const Duration(days: 1));
+                        final init = expiryDate ?? now;
+                        final safeInitialDate = init.isBefore(minDate)
+                            ? minDate
+                            : init;
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: safeInitialDate,
+                          firstDate: minDate,
+                          lastDate: now.add(const Duration(days: 365 * 3)),
+                        );
+                        if (picked != null) {
+                          setState(() {
+                            expiryDate = picked;
+                          });
+                          final formatted = formatDate(picked);
+                          expiresAt.text = formatted;
+                          // تم
+                        }
+                      },
+                      child: Text('Pick expiry'.tr),
+                    ),
+                  ],
                 ),
               ],
-            ),
-          ],
+            );
+          },
         ),
         actions: [
-          TextButton(onPressed: Get.back, child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted))),
+          TextButton(
+            onPressed: Get.back,
+            child: Text(
+              'Cancel'.tr,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
+          ),
           TextButton(
             onPressed: () {
               if (code.text.trim().isEmpty || value.text.trim().isEmpty) {
@@ -171,24 +261,64 @@ class CouponsView extends StatelessWidget {
               }
               final payload = {
                 'code': code.text.trim(),
-                'value': double.tryParse(value.text.trim()) ?? value.text.trim(),
+                'value':
+                    double.tryParse(value.text.trim()) ?? value.text.trim(),
                 'discountType': discountType.text.trim(),
                 'minOrder': minOrder.text.trim(),
                 'expiresAt': expiresAt.text.trim(),
+                "active": coupon == null ? true : (coupon['active'] ?? true),
               };
               if (coupon == null) {
                 controller.create(payload);
               } else {
-                controller.update_((coupon['_id'] ?? coupon['id'] ?? '').toString(), payload);
+                controller.update_(
+                  (coupon['_id'] ?? coupon['id'] ?? '').toString(),
+                  payload,
+                );
               }
               Get.back();
             },
-            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
+            child: Text(
+              'Save'.tr,
+              style: const TextStyle(color: AppColors.primary),
+            ),
           ),
         ],
       ),
     );
   }
+
+  String formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
+  Widget _statusChip(String status) {
+    Color color;
+    switch (status.toLowerCase()) {
+      case 'active':
+        color = AppColors.success;
+        break;
+      case 'inactive':
+        color = AppColors.danger;
+        break;
+      default:
+        color = AppColors.primary;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Text(
+        status.tr,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
 }
-
-

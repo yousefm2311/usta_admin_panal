@@ -4,10 +4,9 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
+import '../../../widgets/shimmer_widgets.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/payments_controller.dart';
-import '../../../widgets/shimmer_widgets.dart';
-import '../../../widgets/shimmer_widgets.dart';
 
 class PaymentsListView extends StatelessWidget {
   const PaymentsListView({super.key});
@@ -17,7 +16,7 @@ class PaymentsListView extends StatelessWidget {
     final controller = Get.put(PaymentsController());
 
     return AdminLayout(
-      title: 'Payments',
+      title: '',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -37,7 +36,7 @@ class PaymentsListView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const ListLoading();
+              return const CardLoading(lines: 10,);
             }
             if (controller.error.value != null) {
               return Padding(
@@ -63,8 +62,8 @@ class PaymentsListView extends StatelessWidget {
                     .map(
                       (p) => DataRow(
                         cells: [
-                          DataCell(Text((p['customer'] ?? p['customerName'] ?? '').toString())),
-                          DataCell(Text(p['amount']?.toString() ?? '0')),
+                          DataCell(Text((p['customer']?['name'] ?? '').toString())),
+                          DataCell(Text(p['finalAmount']?.toString() ?? '0')),
                           DataCell(Text((p['method'] ?? '').toString())),
                           DataCell(Text(_formatDate(p['date'] ?? p['createdAt']))),
                         ],

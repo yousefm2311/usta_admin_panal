@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:dio/dio.dart';
 
 import '../../../core/services/api_exceptions.dart';
 import '../../../core/utils/notify.dart';

@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
-import '../controllers/complaint_details_controller.dart';
 import '../../../widgets/shimmer_widgets.dart';
+import '../controllers/complaint_details_controller.dart';
 
 class ComplaintDetailsView extends StatelessWidget {
   const ComplaintDetailsView({super.key});
@@ -20,10 +20,16 @@ class ComplaintDetailsView extends StatelessWidget {
     }
 
     return AdminLayout(
-      title: 'Complaint Details'.tr,
+      title: ''.tr,
       child: Obx(() {
         if (controller.loading.value) {
-          return const CardLoading(height: 240, lines: 5);
+          return Column(
+            children: [
+              const ListLoading(rows: 1,itemHeight: 40),
+              const CardLoading(lines: 8),
+              const ListLoading(rows: 2, itemHeight: 40),
+            ],
+          );
         }
         if (controller.error.value != null) {
           return Padding(
@@ -42,6 +48,15 @@ class ComplaintDetailsView extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+                        Text(
+              'Complaint Details'.tr,
+              style: const TextStyle(
+                color: AppColors.text,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            SizedBox(height: 10),
             _card(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +67,7 @@ class ComplaintDetailsView extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '${'Customer'.tr}: ${(data['customer'] ?? data['customerName'] ?? '').toString()} • ${'Status'.tr}: ${(data['status'] ?? '').toString()}',
+                    '${"Complainant".tr} - ${(data['messages'][0]['senderType'] ?? '')}',
                     style: const TextStyle(color: AppColors.textMuted),
                   ),
                 ],
@@ -79,7 +94,7 @@ class ComplaintDetailsView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              (m['sender'] ?? '').toString(),
+                              (m['senderType'] ?? '').toString(),
                               style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
                             ),
                             const SizedBox(height: 4),
@@ -109,7 +124,7 @@ class ComplaintDetailsView extends StatelessWidget {
                     foregroundColor: AppColors.text,
                   ),
                   onPressed: () => controller.updateStatus(id, 'closed'),
-                  child: Text('Close'.tr),
+                  child: Text('close'.tr),
                 ),
               ],
             ),

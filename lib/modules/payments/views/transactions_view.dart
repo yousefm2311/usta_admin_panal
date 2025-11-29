@@ -7,7 +7,6 @@ import '../../../layout/admin_layout.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/payments_controller.dart';
 import '../../../widgets/shimmer_widgets.dart';
-import '../../../widgets/shimmer_widgets.dart';
 
 class TransactionsView extends StatelessWidget {
   const TransactionsView({super.key});

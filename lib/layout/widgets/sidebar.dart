@@ -20,7 +20,7 @@ class Sidebar extends StatelessWidget {
       _SidebarItem('Dashboard'.tr, Icons.space_dashboard_outlined, '/dashboard'),
       _SidebarItem('Customers'.tr, Icons.people_alt_outlined, '/customers'),
       _SidebarItem('Artisans'.tr, Icons.handyman, '/artisans'),
-      _SidebarItem('Requests'.tr, Icons.list_alt_outlined, '/requests'),
+      // _SidebarItem('Requests'.tr, Icons.list_alt_outlined, '/requests'),
       _SidebarItem('Payments'.tr, Icons.payments_outlined, '/payments'),
       _SidebarItem('Withdrawals'.tr, Icons.account_balance_wallet_outlined, '/withdrawals'),
       _SidebarItem('Categories'.tr, Icons.category_outlined, '/categories'),

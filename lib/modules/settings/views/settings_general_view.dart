@@ -1,14 +1,15 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:usta_admin_panal/modules/logs/views/system_health_view.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/app_config.dart';
+import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/primary_button.dart';
-import '../controllers/settings_general_controller.dart';
 import '../../../widgets/shimmer_widgets.dart';
-import 'package:file_picker/file_picker.dart';
+import '../controllers/settings_general_controller.dart';
 
 class SettingsGeneralView extends StatelessWidget {
   const SettingsGeneralView({super.key});
@@ -21,7 +22,7 @@ class SettingsGeneralView extends StatelessWidget {
     final aboutController = TextEditingController();
 
     return AdminLayout(
-      title: 'Settings',
+      title: '',
       child: Obx(() {
         if (controller.loading.value) {
           return const CardLoading(height: 260, lines: 6);
@@ -33,22 +34,42 @@ class SettingsGeneralView extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'General settings'.tr,
-              style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+            Row(
+              children: [
+                Text(
+                  'General settings'.tr,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Spacer(),
+                ElevatedButton.icon(
+                  onPressed: () =>  Get.to(()=>SystemHealthView()),
+                  icon: const Icon(Icons.health_and_safety_rounded),
+                  label: Text('Api Health'.tr),
+                ),
+              ],
             ),
+
             const SizedBox(height: AppSizes.md),
             Container(
               padding: const EdgeInsets.all(AppSizes.lg),
               decoration: BoxDecoration(
                 color: AppColors.card,
                 borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                border: const Border.fromBorderSide(
+                  BorderSide(color: AppColors.border),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('App logo'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                  Text(
+                    'App logo'.tr,
+                    style: const TextStyle(color: AppColors.textMuted),
+                  ),
                   const SizedBox(height: AppSizes.sm),
                   Row(
                     children: [
@@ -58,20 +79,30 @@ class SettingsGeneralView extends StatelessWidget {
                           width: 64,
                           decoration: BoxDecoration(
                             color: AppColors.overlay,
-                            borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.inputRadius,
+                            ),
                             image: () {
-                              final raw = controller.form['logoUrl']?.value ?? '';
+                              final raw =
+                                  controller.form['logoUrl']?.value ?? '';
                               if (raw.isEmpty) return null;
-                              final url = raw.startsWith('http') ? raw : '${AppConfig.baseUrl}$raw';
+                              final url = raw.startsWith('http')
+                                  ? raw
+                                  : '${AppConfig.baseUrl}$raw';
                               return DecorationImage(
                                 image: NetworkImage(url),
                                 fit: BoxFit.cover,
                               );
                             }(),
                           ),
-                          child: controller.form['logoUrl']?.value.isNotEmpty == true
+                          child:
+                              controller.form['logoUrl']?.value.isNotEmpty ==
+                                  true
                               ? null
-                              : const Icon(Icons.image_outlined, color: AppColors.textMuted),
+                              : const Icon(
+                                  Icons.image_outlined,
+                                  color: AppColors.textMuted,
+                                ),
                         ),
                       ),
                       const SizedBox(width: AppSizes.md),
@@ -83,8 +114,11 @@ class SettingsGeneralView extends StatelessWidget {
                         onPressed: controller.uploadingLogo.value
                             ? null
                             : () async {
-                                final result =
-                                    await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
+                                final result = await FilePicker.platform
+                                    .pickFiles(
+                                      type: FileType.image,
+                                      withData: true,
+                                    );
                                 if (result != null && result.files.isNotEmpty) {
                                   final file = result.files.first;
                                   await controller.uploadLogo(
@@ -111,7 +145,8 @@ class SettingsGeneralView extends StatelessWidget {
                   const SizedBox(height: AppSizes.md),
                   TextField(
                     controller: emailController,
-                    onChanged: (v) => controller.form['supportEmail']?.value = v,
+                    onChanged: (v) =>
+                        controller.form['supportEmail']?.value = v,
                     style: const TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'Support email'.tr),
                   ),
@@ -130,9 +165,13 @@ class SettingsGeneralView extends StatelessWidget {
                   Obx(
                     () => PrimaryButton(
                       expand: true,
-                      label: controller.saving.value ? 'Loading'.tr : 'Save changes'.tr,
+                      label: controller.saving.value
+                          ? 'Loading'.tr
+                          : 'Save changes'.tr,
                       icon: Icons.save_outlined,
-                      onPressed: controller.saving.value ? null : controller.save,
+                      onPressed: controller.saving.value
+                          ? null
+                          : controller.save,
                     ),
                   ),
                 ],
@@ -144,5 +183,3 @@ class SettingsGeneralView extends StatelessWidget {
     );
   }
 }
-
-

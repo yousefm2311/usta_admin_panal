@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
+import '../../../widgets/shimmer_widgets.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/requests_controller.dart';
-import '../../../widgets/shimmer_widgets.dart';
 
 class RequestsListView extends StatelessWidget {
   const RequestsListView({super.key});
@@ -17,7 +17,7 @@ class RequestsListView extends StatelessWidget {
     final statuses = ['All', 'New', 'Pending', 'Accepted', 'Assigned', 'In progress', 'Completed', 'Cancelled'];
 
     return AdminLayout(
-      title: 'Requests',
+      title: '',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -56,7 +56,7 @@ class RequestsListView extends StatelessWidget {
           const SizedBox(height: AppSizes.md),
           Obx(() {
             if (controller.loading.value) {
-              return const ListLoading();
+              return const CardLoading(lines: 8);
             }
             if (controller.error.value != null) {
               return Padding(
@@ -74,7 +74,7 @@ class RequestsListView extends StatelessWidget {
               child: DataTable(
                 columns: [
                   DataColumn(label: Text('Service'.tr)),
-                  DataColumn(label: Text('Customer'.tr)),
+                  DataColumn(label: Text('Customers'.tr)),
                   DataColumn(label: Text('Artisan'.tr)),
                   DataColumn(label: Text('Status'.tr)),
                   DataColumn(label: Text('Date'.tr)),

@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
+import '../../../widgets/shimmer_widgets.dart';
 import '../../../widgets/table_wrapper.dart';
 import '../controllers/withdrawals_controller.dart';
-import '../../../widgets/shimmer_widgets.dart';
 
 class WithdrawalsListView extends StatelessWidget {
   const WithdrawalsListView({super.key});
@@ -16,7 +16,7 @@ class WithdrawalsListView extends StatelessWidget {
     final controller = Get.put(WithdrawalsController());
 
     return AdminLayout(
-      title: 'Withdrawals',
+      title: '',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -1,0 +1,15 @@
+final Map<String, String> categoryIcons = {
+  "electrician": "⚡",
+  "plumbing": "🛠",
+  "car repair": "🚗",
+  "ac repair": "❄️",
+  "cleaning": "🧹",
+  "painting": "🎨",
+  "delivery": "📦",
+  "electronics": "💡",
+  "carpenter": "🪵",
+  "mechanic": "🔧",
+  "mobile repair": "📱",
+  "computer repair": "💻",
+  "home services": "🏠",
+};

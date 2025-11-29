@@ -27,7 +27,13 @@ class WithdrawalsController extends GetxController {
       if (data is List) {
         withdrawals.assignAll(data);
       } else if (data is Map<String, dynamic>) {
-        withdrawals.assignAll(data['withdrawals'] ?? data['data'] ?? []);
+        // API returns {data: {withdrawals: [...]}} structure
+        final innerData = data['data'];
+        if (innerData is Map<String, dynamic>) {
+          withdrawals.assignAll(innerData['withdrawals'] ?? []);
+        } else {
+          withdrawals.assignAll(data['withdrawals'] ?? []);
+        }
       } else {
         withdrawals.clear();
       }
@@ -44,6 +50,16 @@ class WithdrawalsController extends GetxController {
     try {
       await _service.approve(id);
       showSuccess('Success'.tr);
+      await loadWithdrawals();
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
+
+  Future<void> reject(String id) async {
+    try {
+      await _service.reject(id);
+      showSuccess('Rejected'.tr);
       await loadWithdrawals();
     } catch (e) {
       showError(e is ApiException ? e.message : e.toString());

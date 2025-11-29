@@ -31,9 +31,7 @@ class TopBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
           decoration: const BoxDecoration(
             color: AppColors.background,
-            border: Border(
-              bottom: BorderSide(color: AppColors.border),
-            ),
+            border: Border(bottom: BorderSide(color: AppColors.border)),
           ),
           child: Row(
             children: [
@@ -48,10 +46,7 @@ class TopBar extends StatelessWidget {
               ),
               if (!isCompact) ...[
                 const SizedBox(width: AppSizes.sm),
-                Text(
-                  'Admin'.tr,
-                  style: const TextStyle(color: AppColors.text),
-                ),
+                Text('Admin'.tr, style: const TextStyle(color: AppColors.text)),
               ],
               const SizedBox(width: AppSizes.sm),
               Expanded(
@@ -66,7 +61,11 @@ class TopBar extends StatelessWidget {
                       if (actions != null) ...actions!,
                       TextButton.icon(
                         onPressed: _logout,
-                        icon: const Icon(Icons.logout, color: AppColors.textMuted, size: 18),
+                        icon: const Icon(
+                          Icons.logout,
+                          color: AppColors.textMuted,
+                          size: 18,
+                        ),
                         label: Text(
                           'Logout'.tr,
                           style: const TextStyle(color: AppColors.text),
@@ -74,36 +73,45 @@ class TopBar extends StatelessWidget {
                       ),
                       TextButton.icon(
                         onPressed: _toggleLocale,
-                        icon: const Icon(Icons.language, color: AppColors.textMuted, size: 18),
+                        icon: const Icon(
+                          Icons.language,
+                          color: AppColors.textMuted,
+                          size: 18,
+                        ),
                         label: Text(
-                          Get.locale?.languageCode == 'ar' ? 'English'.tr : 'Arabic'.tr,
+                          Get.locale?.languageCode == 'ar'
+                              ? 'English'.tr
+                              : 'Arabic'.tr,
                           style: const TextStyle(color: AppColors.text),
                         ),
                       ),
                       if (onToggleSidebar != null)
-                        IconButton(
-                          icon: const Icon(Icons.view_sidebar_outlined, color: AppColors.textMuted),
-                          onPressed: onToggleSidebar,
-                        ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            title.tr,
-                            style: const TextStyle(
-                              color: AppColors.text,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                        // IconButton(
+                        //   icon: const Icon(Icons.view_sidebar_outlined, color: AppColors.textMuted),
+                        //   onPressed: onToggleSidebar,
+                        // ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              title.tr,
+                              style: const TextStyle(
+                                color: AppColors.text,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'USTA Platform'.tr,
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-                          ),
-                        ],
-                      ),
+                            const SizedBox(height: 2),
+                            Text(
+                              ''.tr,
+                              style: const TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),

@@ -106,7 +106,7 @@ class AppPages {
     GetPage(name: '/roles/permissions', page: () => const RolePermissionsView()),
 
     // Logs
-    GetPage(name: '/logs/activity', page: () => const ActivityLogsView()),
+    GetPage(name: '/logs/activity', page: () =>  ActivityLogsView()),
     GetPage(name: '/logs/health', page: () => const SystemHealthView()),
 
     // Profile
