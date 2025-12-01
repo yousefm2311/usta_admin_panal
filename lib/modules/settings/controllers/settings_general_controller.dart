@@ -67,23 +67,21 @@ class SettingsGeneralController extends GetxController {
     }
   }
 
-  Future<void> uploadLogo({
+Future<void> uploadLogo({
     required String fileName,
-    List<int>? bytes,
-    String? path,
+    required List<int> bytes, // نخليها required ونشيل path
   }) async {
     uploadingLogo.value = true;
+
     try {
-      if (bytes == null && path == null) {
-        throw ApiException('No file selected');
-      }
-      final file = bytes != null
-          ? MultipartFile.fromBytes(bytes, filename: fileName)
-          : await MultipartFile.fromFile(path!, filename: fileName);
+      final file = MultipartFile.fromBytes(bytes, filename: fileName);
       final formData = FormData.fromMap({'logo': file});
       final res = await _service.uploadLogo(formData);
       final data = res.data;
-      final url = data is Map<String, dynamic> ? (data['data']?['url'] ?? data['url']) : null;
+      final url = data is Map<String, dynamic>
+          ? (data['data']?['url'] ?? data['url'])
+          : null;
+
       if (url != null) {
         form['logoUrl']?.value = _normalizedUrl(url.toString());
         showSuccess('Success'.tr);
@@ -94,6 +92,7 @@ class SettingsGeneralController extends GetxController {
       uploadingLogo.value = false;
     }
   }
+
 
   String _normalizedUrl(String value) {
     if (value.isEmpty) return '';

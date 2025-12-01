@@ -250,31 +250,34 @@ class AnalyticsOverviewView extends StatelessWidget {
           BorderSide(color: AppColors.border),
         ),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: AppColors.primary),
-          ),
-          const SizedBox(width: AppSizes.md),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  color: AppColors.text,
-                  fontWeight: FontWeight.bold,
-                ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
               ),
-              Text(title, style: const TextStyle(color: AppColors.textMuted)),
-            ],
-          ),
-        ],
+              child: Icon(icon, color: AppColors.primary),
+            ),
+            const SizedBox(width: AppSizes.md),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(title, style: const TextStyle(color: AppColors.textMuted)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

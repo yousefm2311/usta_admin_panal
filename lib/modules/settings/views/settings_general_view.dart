@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:usta_admin_panal/modules/logs/views/system_health_view.dart';
@@ -114,19 +118,42 @@ class SettingsGeneralView extends StatelessWidget {
                         onPressed: controller.uploadingLogo.value
                             ? null
                             : () async {
-                                final result = await FilePicker.platform
+                                // final result = await FilePicker.platform
+                                //     .pickFiles(
+                                //       type: FileType.image,
+                                //       withData: true,
+                                //     );
+                                // if (result != null && result.files.isNotEmpty) {
+                                //   final file = result.files.first;
+                                //   await controller.uploadLogo(
+                                //     fileName: file.name,
+                                //     bytes: file.bytes,
+                                //     path: file.path,
+                                //   );
+                                // }
+                              final result = await FilePicker.platform
                                     .pickFiles(
-                                      type: FileType.image,
+                                      type: FileType.any,
                                       withData: true,
                                     );
                                 if (result != null && result.files.isNotEmpty) {
                                   final file = result.files.first;
+                                  Uint8List bytes;
+
+                                  if (kIsWeb) {
+                                    bytes = file.bytes!;
+                                  } else {
+                                    bytes = await File(
+                                      file.path!,
+                                    ).readAsBytes();
+                                  }
+
                                   await controller.uploadLogo(
                                     fileName: file.name,
-                                    bytes: file.bytes,
-                                    path: file.path,
+                                    bytes: bytes,
                                   );
                                 }
+
                               },
                         icon: controller.uploadingLogo.value
                             ? const ShimmerBox(height: 16, width: 16, radius: 6)
