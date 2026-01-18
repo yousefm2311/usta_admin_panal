@@ -81,6 +81,7 @@ class CategoriesController extends GetxController {
       if (index != -1) {
         final current = categories[index];
         categories[index] = {...current, 'name': name.trim()};
+        categories.refresh();
       }
     } catch (e) {
       showError(e is ApiException ? e.message : e.toString());
