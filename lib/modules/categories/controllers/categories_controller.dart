@@ -67,4 +67,25 @@ class CategoriesController extends GetxController {
       showError(e is ApiException ? e.message : e.toString());
     }
   }
+
+  Future<void> updateCategory(String id, {required String name}) async {
+    if (id.isEmpty || name.trim().isEmpty) {
+      showError('Invalid category'.tr);
+      return;
+    }
+    saving.value = true;
+    try {
+      await _service.update(id, name: name.trim());
+      showSuccess('Success'.tr);
+      final index = categories.indexWhere((c) => (c['id'] ?? c['_id'] ?? '').toString() == id);
+      if (index != -1) {
+        final current = categories[index];
+        categories[index] = {...current, 'name': name.trim()};
+      }
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    } finally {
+      saving.value = false;
+    }
+  }
 }

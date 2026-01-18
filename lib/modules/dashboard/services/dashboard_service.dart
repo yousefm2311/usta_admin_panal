@@ -30,7 +30,14 @@ class DashboardService {
   }
 
   Future<List<dynamic>> fetchActivities() async {
-    // Use activity logs endpoint directly to avoid 404 noise
+    // Prefer dashboard activity endpoint when available.
+    try {
+      final res = await _client.safe(() => _dio.get('/api/admin/dashboard/activity'));
+      final data = res.data;
+      if (data is List) return data;
+      if (data is Map<String, dynamic>) return (data['data'] ?? data['logs'] ?? []) as List<dynamic>;
+    } catch (_) {}
+    // Fallback to activity logs endpoint.
     try {
       final alt = await _client.safe(() => _dio.get('/api/admin/logs/activity'));
       final data = alt.data;

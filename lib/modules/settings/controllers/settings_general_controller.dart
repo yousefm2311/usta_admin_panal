@@ -36,9 +36,16 @@ class SettingsGeneralController extends GetxController {
       final payload = data is Map<String, dynamic> ? (data['data'] ?? data) : {};
       form['appName']?.value = (payload['appName'] ?? '').toString();
       form['supportEmail']?.value = (payload['supportEmail'] ?? '').toString();
-      form['about']?.value = (payload['about'] ?? '').toString();
       final logo = (payload['logoUrl'] ?? '').toString();
       form['logoUrl']?.value = _normalizedUrl(logo);
+      try {
+        final aboutRes = await _service.getAbout();
+        final aboutData = aboutRes.data;
+        final aboutPayload = aboutData is Map<String, dynamic> ? (aboutData['data'] ?? aboutData) : {};
+        form['about']?.value = (aboutPayload['about'] ?? '').toString();
+      } catch (_) {
+        // About is optional; keep existing value if request fails.
+      }
     } catch (e) {
       error.value = e is ApiException ? e.message : e.toString();
     } finally {
@@ -49,16 +56,19 @@ class SettingsGeneralController extends GetxController {
   Future<void> save() async {
     saving.value = true;
     try {
-      final logoValue = form['logoUrl']?.value ?? '';
-      final apiLogo = logoValue.startsWith(AppConfig.baseUrl)
-          ? logoValue.replaceFirst(AppConfig.baseUrl, '')
-          : logoValue;
-      await _service.updateGeneral({
-        'appName': form['appName']?.value,
-        'supportEmail': form['supportEmail']?.value,
-        'about': form['about']?.value,
-        'logoUrl': apiLogo,
-      });
+      final appName = form['appName']?.value.trim();
+      final supportEmail = form['supportEmail']?.value.trim();
+      final payload = <String, dynamic>{
+        if (appName != null && appName.isNotEmpty) 'appName': appName,
+        if (supportEmail != null && supportEmail.isNotEmpty) 'supportEmail': supportEmail,
+      };
+      if (payload.isNotEmpty) {
+        await _service.updateGeneral(payload);
+      }
+      final about = form['about']?.value.trim();
+      if (about != null && about.isNotEmpty) {
+        await _service.updateAbout(about);
+      }
       showSuccess('Success'.tr);
     } catch (e) {
       showError(e is ApiException ? e.message : e.toString());

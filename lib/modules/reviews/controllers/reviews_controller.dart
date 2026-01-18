@@ -62,4 +62,18 @@ class ReviewsController extends GetxController {
     }
     return reviews;
   }
+
+  Future<void> deleteReview(String id) async {
+    if (id.isEmpty) {
+      showError('Invalid review'.tr);
+      return;
+    }
+    try {
+      await _service.delete(id);
+      showSuccess('Success'.tr);
+      reviews.removeWhere((r) => (r['id'] ?? r['_id'] ?? '').toString() == id);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
 }

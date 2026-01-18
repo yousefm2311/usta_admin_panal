@@ -12,5 +12,8 @@ class CategoriesService {
     return _client.safe(() => _dio.post('/api/admin/categories', data: {'name': name, 'icon': icon}));
   }
 
+  Future<Response> update(String id, {required String name}) =>
+      _client.safe(() => _dio.put('/api/admin/categories/$id', data: {'name': name}));
+
   Future<Response> delete(String id) => _client.safe(() => _dio.delete('/api/admin/categories/$id'));
 }

@@ -46,4 +46,32 @@ class ComplaintDetailsController extends GetxController {
       showError(e is ApiException ? e.message : e.toString());
     }
   }
+
+  Future<void> assignAgent(String id, String agentId) async {
+    if (agentId.trim().isEmpty) {
+      showError('Agent ID required'.tr);
+      return;
+    }
+    try {
+      await _service.assign(id, agentId.trim());
+      showSuccess('Success'.tr);
+      await load(id);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
+
+  Future<void> addNote(String id, String note) async {
+    if (note.trim().isEmpty) {
+      showError('Note is required'.tr);
+      return;
+    }
+    try {
+      await _service.addNote(id, note.trim());
+      showSuccess('Success'.tr);
+      await load(id);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
 }

@@ -61,20 +61,39 @@ class WithdrawalsListView extends StatelessWidget {
                 ],
                 rows: controller.withdrawals
                     .map(
-                      (w) => DataRow(
-                        cells: [
-                          DataCell(Text((w['artisan'] ?? w['artisanName'] ?? '').toString())),
-                          DataCell(Text(w['amount']?.toString() ?? '0')),
-                          DataCell(Text((w['iban'] ?? '').toString())),
-                          DataCell(_statusChip((w['status'] ?? '').toString())),
-                          DataCell(
-                            ElevatedButton(
-                              onPressed: () => controller.approve(w['id']?.toString() ?? ''),
-                              child: Text('Approve'.tr),
+                      (w) {
+                        final status = (w['status'] ?? '').toString();
+                        final canApprove = _isPendingStatus(status);
+                        return DataRow(
+                          cells: [
+                            DataCell(Text((w['artisan'] ?? w['artisanName'] ?? '').toString())),
+                            DataCell(Text(w['amount']?.toString() ?? '0')),
+                            DataCell(Text((w['iban'] ?? '').toString())),
+                            DataCell(_statusChip(status)),
+                            DataCell(
+                              Row(
+                                children: [
+                                  if (canApprove)
+                                    ElevatedButton(
+                                      onPressed: () => controller.approve(w['id']?.toString() ?? ''),
+                                      child: Text('Approve'.tr),
+                                    ),
+                                  if (canApprove) const SizedBox(width: AppSizes.xs),
+                                  if (canApprove)
+                                    OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: AppColors.border),
+                                        foregroundColor: AppColors.text,
+                                      ),
+                                      onPressed: () => controller.reject(w['id']?.toString() ?? ''),
+                                      child: Text('Reject'.tr),
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        );
+                      },
                     )
                     .toList(),
                 headingTextStyle: const TextStyle(
@@ -104,6 +123,15 @@ class WithdrawalsListView extends StatelessWidget {
         style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
       ),
     );
+  }
+
+  bool _isPendingStatus(String status) {
+    final value = status.trim().toLowerCase();
+    return value.isEmpty ||
+        value == 'pending' ||
+        value == 'review' ||
+        value == 'in review' ||
+        value == 'new';
   }
 }
 

@@ -45,6 +45,8 @@ class ComplaintDetailsView extends StatelessWidget {
           );
         }
         final thread = (data['messages'] ?? data['thread'] ?? []) as List<dynamic>;
+        final agentController = TextEditingController();
+        final noteController = TextEditingController();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -127,6 +129,55 @@ class ComplaintDetailsView extends StatelessWidget {
                   child: Text('close'.tr),
                 ),
               ],
+            ),
+            const SizedBox(height: AppSizes.md),
+            _card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Assign agent'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: AppSizes.sm),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: agentController,
+                          style: const TextStyle(color: AppColors.text),
+                          decoration: InputDecoration(
+                            hintText: 'Agent ID'.tr,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSizes.sm),
+                      ElevatedButton(
+                        onPressed: () => controller.assignAgent(id, agentController.text),
+                        child: Text('Assign'.tr),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSizes.md),
+                  Text('Internal note'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: AppSizes.sm),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: noteController,
+                          style: const TextStyle(color: AppColors.text),
+                          decoration: InputDecoration(
+                            hintText: 'Add note'.tr,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSizes.sm),
+                      ElevatedButton(
+                        onPressed: () => controller.addNote(id, noteController.text),
+                        child: Text('Save'.tr),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSizes.md),
             TextField(

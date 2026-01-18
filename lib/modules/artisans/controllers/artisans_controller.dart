@@ -68,4 +68,18 @@ class ArtisansController extends GetxController {
       showError(e is ApiException ? e.message : e.toString());
     }
   }
+
+  Future<void> setSuspended(String id, {required bool suspended}) async {
+    if (id.isEmpty) {
+      showError('Invalid artisan'.tr);
+      return;
+    }
+    try {
+      await _service.updateStatus(id, suspended: suspended);
+      showSuccess('Success'.tr);
+      await loadArtisans();
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
 }

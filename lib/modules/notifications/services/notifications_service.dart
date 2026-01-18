@@ -24,4 +24,19 @@ class NotificationsService {
   Future<Response> deleteTemplate(String id) => _client.safe(() => _dio.delete('/api/admin/notifications/templates/$id'));
 
   Future<Response> deleteNotification(String id) => _client.safe(() => _dio.delete('/api/admin/notifications/$id'));
+
+  Future<Response> saveFcmToken(Map<String, dynamic> payload) =>
+      _client.safe(() => _dio.post('/api/admin/notifications/fcm-token', data: payload));
+
+  Future<Response> listFcmTokens() =>
+      _client.safe(() => _dio.get('/api/admin/notifications/fcm-token'));
+
+  Future<Response> subscribeTopic(Map<String, dynamic> payload) =>
+      _client.safe(() => _dio.post('/api/admin/notifications/subscribe-topic', data: payload));
+
+  Future<Response> unsubscribeTopic(Map<String, dynamic> payload) =>
+      _client.safe(() => _dio.post('/api/admin/notifications/unsubscribe-topic', data: payload));
+
+  Future<Response> broadcast(Map<String, dynamic> payload) =>
+      _client.safe(() => _dio.post('/api/notifications/broadcast', data: payload));
 }

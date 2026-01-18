@@ -88,6 +88,12 @@ class ReviewsListView extends StatelessWidget {
                                 _formatDate(review['date'] ?? review['createdAt']),
                                 style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
                               ),
+                              const SizedBox(width: AppSizes.xs),
+                              IconButton(
+                                tooltip: 'Delete'.tr,
+                                onPressed: () => _confirmDelete(context, controller, review),
+                                icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 6),
@@ -120,6 +126,32 @@ class ReviewsListView extends StatelessWidget {
       return value;
     }
     return '';
+  }
+
+  void _confirmDelete(BuildContext context, ReviewsController controller, Map<String, dynamic> review) {
+    final id = (review['_id'] ?? review['id'] ?? '').toString();
+    if (id.isEmpty) return;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.card,
+        title: Text('Delete'.tr, style: const TextStyle(color: AppColors.text)),
+        content: Text('Delete this review?'.tr, style: const TextStyle(color: AppColors.textMuted)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              controller.deleteReview(id);
+            },
+            child: Text('Delete'.tr, style: const TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
   }
 }
 

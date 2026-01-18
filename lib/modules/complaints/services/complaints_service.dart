@@ -24,4 +24,7 @@ class ComplaintsService {
 
   Future<Response> addMessage(String id, Map<String, dynamic> payload) =>
       _client.safe(() => _dio.post('/api/admin/complaints/$id/messages', data: payload));
+
+  Future<Response> addNote(String id, String note) =>
+      _client.safe(() => _dio.post('/api/admin/complaints/$id/note', data: {'note': note}));
 }

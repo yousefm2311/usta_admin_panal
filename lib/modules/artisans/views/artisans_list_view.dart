@@ -64,7 +64,9 @@ class ArtisansListView extends StatelessWidget {
                       (artisan) {
                         final rating = artisan['rating'] ?? artisan['score'] ?? 0;
                         final profession = artisan['category'] ?? artisan['profession'] ?? '';
-                        final status = artisan['status'] ?? (artisan['suspended'] == true ? 'Suspended' : 'Active');
+                        final status = _resolveStatus(artisan);
+                        final canTakeAction = _isPendingStatus(status);
+                        final isSuspended = _isTruthy(artisan['suspended']);
                         final id = artisan['id'] ?? artisan['_id'] ?? '';
                         return DataRow(
                           cells: [
@@ -79,16 +81,31 @@ class ArtisansListView extends StatelessWidget {
                                     onPressed: () => Get.toNamed('/artisan/details', arguments: artisan),
                                     child: Text('View details'.tr),
                                   ),
-                                  const SizedBox(width: AppSizes.xs),
-                                  TextButton(
-                                    onPressed: () => controller.approve(id.toString()),
-                                    child: Text('Approve'.tr, style: const TextStyle(color: AppColors.success)),
-                                  ),
-                                  const SizedBox(width: AppSizes.xs),
-                                  TextButton(
-                                    onPressed: () => controller.reject(id.toString()),
-                                    child: Text('Reject'.tr, style: const TextStyle(color: Colors.redAccent)),
-                                  ),
+                                  if (canTakeAction) ...[
+                                    const SizedBox(width: AppSizes.xs),
+                                    TextButton(
+                                      onPressed: () => controller.approve(id.toString()),
+                                      child: Text('Approve'.tr, style: const TextStyle(color: AppColors.success)),
+                                    ),
+                                    const SizedBox(width: AppSizes.xs),
+                                    TextButton(
+                                      onPressed: () => controller.reject(id.toString()),
+                                      child: Text('Reject'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                    ),
+                                  ],
+                                  if (!canTakeAction) ...[
+                                    const SizedBox(width: AppSizes.xs),
+                                    TextButton(
+                                      onPressed: () =>
+                                          controller.setSuspended(id.toString(), suspended: !isSuspended),
+                                      child: Text(
+                                        isSuspended ? 'Unsuspend'.tr : 'Suspend'.tr,
+                                        style: TextStyle(
+                                          color: isSuspended ? AppColors.success : Colors.redAccent,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
@@ -127,6 +144,97 @@ class ArtisansListView extends StatelessWidget {
         style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
       ),
     );
+  }
+
+  String _resolveStatus(Map<String, dynamic> data) {
+    final approvedFlag = _isTruthy(data['approved']) || _isTruthy(data['isApproved']);
+    final activeFlag = _isTruthy(data['active']) || _isTruthy(data['isActive']);
+    final verifiedFlag = _isTruthy(data['verified']) || _isTruthy(data['isVerified']);
+    final rejectedFlag = _isTruthy(data['rejected']) || _isTruthy(data['isRejected']);
+    final blockedFlag = _isTruthy(data['blocked']) || _isTruthy(data['isBlocked']);
+    final suspendedFlag = _isTruthy(data['suspended']);
+
+    if (suspendedFlag) {
+      return 'Suspended';
+    }
+    if (blockedFlag) {
+      return 'Blocked';
+    }
+    if (approvedFlag || verifiedFlag) {
+      return 'Approved';
+    }
+    if (activeFlag) {
+      return 'Active';
+    }
+    if (rejectedFlag) {
+      return 'Rejected';
+    }
+
+    final fromRaw = _statusFromRaw(data['status']);
+    return fromRaw ?? 'Pending';
+  }
+
+  String? _statusFromRaw(dynamic raw) {
+    if (raw is String) {
+      final trimmed = raw.trim();
+      return trimmed.isEmpty ? null : _normalizeStatus(trimmed);
+    }
+    if (raw is num) {
+      switch (raw.toInt()) {
+        case 1:
+          return 'Approved';
+        case 2:
+          return 'Rejected';
+        case 0:
+          return 'Pending';
+      }
+    }
+    if (raw is bool) {
+      return raw ? 'Approved' : 'Pending';
+    }
+    return null;
+  }
+
+  String _normalizeStatus(String status) {
+    final trimmed = status.trim();
+    final lower = trimmed.toLowerCase();
+    switch (lower) {
+      case 'approved':
+        return 'Approved';
+      case 'active':
+        return 'Active';
+      case 'pending':
+        return 'Pending';
+      case 'rejected':
+        return 'Rejected';
+      case 'suspended':
+        return 'Suspended';
+      case 'blocked':
+        return 'Blocked';
+      case 'inactive':
+        return 'Inactive';
+      default:
+        return trimmed.isEmpty ? 'Pending' : trimmed;
+    }
+  }
+
+  bool _isTruthy(dynamic value) {
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      final normalized = value.trim().toLowerCase();
+      return normalized == 'true' || normalized == '1' || normalized == 'yes';
+    }
+    return false;
+  }
+
+  bool _isPendingStatus(String status) {
+    final value = status.trim().toLowerCase();
+    return value.isEmpty ||
+        value == 'pending' ||
+        value == 'review' ||
+        value == 'in review' ||
+        value == 'new';
   }
 }
 

@@ -37,26 +37,19 @@ class OrdersService {
       return res;
     } catch (_) {
       try {
-        final res = await _client.safe(() => _dio.put('/api/admin/orders/$id/timeline', data: payload));
-        if (_isError(res.statusCode)) throw Exception('timeline put not available');
+        // Fallback to requests timeline endpoint
+        final res = await _client.safe(() => _dio.post('/api/admin/requests/$id/timeline', data: payload));
+        if (_isError(res.statusCode)) throw Exception('requests timeline not available');
         return res;
       } catch (err) {
         try {
-          // Fallback to requests timeline endpoint
-          final res = await _client.safe(() => _dio.post('/api/admin/requests/$id/timeline', data: payload));
-          if (_isError(res.statusCode)) throw Exception('requests timeline not available');
+          final res = await updateStatus(id, status: status, note: note);
+          if (_isError(res.statusCode)) throw Exception('status update failed');
           return res;
         } catch (err2) {
-          try {
-            final res = await updateStatus(id, status: status, note: note);
-            if (_isError(res.statusCode)) throw Exception('status update failed');
-            return res;
-          } catch (err3) {
-            if (err3 is DioException) throw mapDioException(err3);
-            if (err2 is DioException) throw mapDioException(err2);
-            if (err is DioException) throw mapDioException(err);
-            rethrow;
-          }
+          if (err2 is DioException) throw mapDioException(err2);
+          if (err is DioException) throw mapDioException(err);
+          rethrow;
         }
       }
     }
@@ -91,7 +84,7 @@ class OrdersService {
   }
 
   Future<Response> close(String id, {String? note}) async {
-    final payload = {'note': note};
+    final payload = {'status': 'closed', if (note != null) 'note': note};
     try {
       return await _dio.put('/api/admin/orders/$id/close', data: payload);
     } on DioException catch (e) {

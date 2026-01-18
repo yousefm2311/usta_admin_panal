@@ -52,6 +52,9 @@ class ArtisanDetailsView extends StatelessWidget {
             : statsRaw is Map
             ? Map<String, dynamic>.from(statsRaw)
             : <String, dynamic>{};
+        final status = _resolveStatus(data);
+        final canTakeAction = _isPendingStatus(status);
+        final isSuspended = _isTruthy(data['suspended']);
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +121,7 @@ class ArtisanDetailsView extends StatelessWidget {
                               ),
                               const Spacer(),
                               Text(
-                                (data['status'] ?? '').toString().tr,
+                                status.tr,
                                 style: const TextStyle(
                                   color: AppColors.primary,
                                 ),
@@ -150,26 +153,39 @@ class ArtisanDetailsView extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: AppSizes.md),
-                          Row(
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => controller.approve(id),
-                                child: Text('Approve'.tr),
-                              ),
-                              const SizedBox(width: AppSizes.sm),
-                              OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(
-                                    color: AppColors.border,
-                                  ),
-                                  foregroundColor: AppColors.text,
+                          if (canTakeAction) ...[
+                            const SizedBox(height: AppSizes.md),
+                            Row(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () => controller.approve(id),
+                                  child: Text('Approve'.tr),
                                 ),
-                                onPressed: () => controller.reject(id),
-                                child: Text('Reject'.tr),
+                                const SizedBox(width: AppSizes.sm),
+                                OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                      color: AppColors.border,
+                                    ),
+                                    foregroundColor: AppColors.text,
+                                  ),
+                                  onPressed: () => controller.reject(id),
+                                  child: Text('Reject'.tr),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (!canTakeAction) ...[
+                            const SizedBox(height: AppSizes.md),
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: AppColors.border),
+                                foregroundColor: AppColors.text,
                               ),
-                            ],
-                          ),
+                              onPressed: () => controller.setSuspended(id, suspended: !isSuspended),
+                              child: Text(isSuspended ? 'Unsuspend'.tr : 'Suspend'.tr),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -276,5 +292,96 @@ class ArtisanDetailsView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _resolveStatus(Map<String, dynamic> data) {
+    final approvedFlag = _isTruthy(data['approved']) || _isTruthy(data['isApproved']);
+    final activeFlag = _isTruthy(data['active']) || _isTruthy(data['isActive']);
+    final verifiedFlag = _isTruthy(data['verified']) || _isTruthy(data['isVerified']);
+    final rejectedFlag = _isTruthy(data['rejected']) || _isTruthy(data['isRejected']);
+    final blockedFlag = _isTruthy(data['blocked']) || _isTruthy(data['isBlocked']);
+    final suspendedFlag = _isTruthy(data['suspended']);
+
+    if (suspendedFlag) {
+      return 'Suspended';
+    }
+    if (blockedFlag) {
+      return 'Blocked';
+    }
+    if (approvedFlag || verifiedFlag) {
+      return 'Approved';
+    }
+    if (activeFlag) {
+      return 'Active';
+    }
+    if (rejectedFlag) {
+      return 'Rejected';
+    }
+
+    final fromRaw = _statusFromRaw(data['status']);
+    return fromRaw ?? 'Pending';
+  }
+
+  String? _statusFromRaw(dynamic raw) {
+    if (raw is String) {
+      final trimmed = raw.trim();
+      return trimmed.isEmpty ? null : _normalizeStatus(trimmed);
+    }
+    if (raw is num) {
+      switch (raw.toInt()) {
+        case 1:
+          return 'Approved';
+        case 2:
+          return 'Rejected';
+        case 0:
+          return 'Pending';
+      }
+    }
+    if (raw is bool) {
+      return raw ? 'Approved' : 'Pending';
+    }
+    return null;
+  }
+
+  String _normalizeStatus(String status) {
+    final trimmed = status.trim();
+    final lower = trimmed.toLowerCase();
+    switch (lower) {
+      case 'approved':
+        return 'Approved';
+      case 'active':
+        return 'Active';
+      case 'pending':
+        return 'Pending';
+      case 'rejected':
+        return 'Rejected';
+      case 'suspended':
+        return 'Suspended';
+      case 'blocked':
+        return 'Blocked';
+      case 'inactive':
+        return 'Inactive';
+      default:
+        return trimmed.isEmpty ? 'Pending' : trimmed;
+    }
+  }
+
+  bool _isTruthy(dynamic value) {
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      final normalized = value.trim().toLowerCase();
+      return normalized == 'true' || normalized == '1' || normalized == 'yes';
+    }
+    return false;
+  }
+
+  bool _isPendingStatus(String status) {
+    final value = status.trim().toLowerCase();
+    return value.isEmpty ||
+        value == 'pending' ||
+        value == 'review' ||
+        value == 'in review' ||
+        value == 'new';
   }
 }

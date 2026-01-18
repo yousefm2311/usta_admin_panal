@@ -30,8 +30,19 @@ class RequestDetailsController extends GetxController {
         timeline.assignAll(t['timeline'] ?? t['data'] ?? []);
       }
 
-      // Some backends don't expose messages for requests; avoid 404 spam by skipping this call.
-      messages.clear();
+      try {
+        final msgRes = await _service.messages(id);
+        final mData = msgRes.data;
+        if (mData is List) {
+          messages.assignAll(mData);
+        } else if (mData is Map<String, dynamic>) {
+          messages.assignAll(mData['messages'] ?? mData['data'] ?? []);
+        } else {
+          messages.clear();
+        }
+      } catch (_) {
+        messages.clear();
+      }
     } catch (e) {
       final msg = e is ApiException ? e.message : e.toString();
       error.value = msg;
@@ -68,8 +79,13 @@ class RequestDetailsController extends GetxController {
   }
 
   Future<void> sendMessage(String id, String message) async {
-    // Endpoint not available on the current backend; avoid calling it.
-    showError('Messages endpoint not available'.tr);
+    if (message.trim().isEmpty) return;
+    try {
+      await _service.sendMessage(id, message: message.trim());
+      await load(id);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
   }
 
   Future<void> addTimeline(String id, {required String status, String? note}) async {

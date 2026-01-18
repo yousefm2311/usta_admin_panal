@@ -59,6 +59,20 @@ class CustomersController extends GetxController {
     }
   }
 
+  Future<void> deleteCustomer(String id) async {
+    if (id.isEmpty) {
+      showError('Invalid customer'.tr);
+      return;
+    }
+    try {
+      await _service.delete(id);
+      showSuccess('Success'.tr);
+      customers.removeWhere((c) => (c['id'] ?? c['_id'] ?? '').toString() == id);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
+
   void setQuery(String q) {
     query.value = q;
   }

@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -133,7 +131,6 @@ class SettingsGeneralView extends StatelessWidget {
                                 // }
                               final result = await FilePicker.platform
                                     .pickFiles(
-                                      type: FileType.any,
                                       withData: true,
                                     );
                                 if (result != null && result.files.isNotEmpty) {

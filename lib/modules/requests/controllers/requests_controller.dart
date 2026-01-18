@@ -70,4 +70,38 @@ class RequestsController extends GetxController {
         return status.toLowerCase();
     }
   }
+
+  Future<void> deleteRequest(String id) async {
+    if (id.isEmpty) {
+      showError('Invalid request'.tr);
+      return;
+    }
+    try {
+      await _service.delete(id);
+      showSuccess('Success'.tr);
+      requests.removeWhere((r) => (r['id'] ?? r['_id'] ?? '').toString() == id);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
+
+  Future<void> expireStale({int? limit, String? before}) async {
+    try {
+      await _service.expireStale(limit: limit, before: before);
+      showSuccess('Success'.tr);
+      await loadRequests(status: filter.value);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
+
+  Future<void> autoConfirm({int? limit, String? before}) async {
+    try {
+      await _service.autoConfirm(limit: limit, before: before);
+      showSuccess('Success'.tr);
+      await loadRequests(status: filter.value);
+    } catch (e) {
+      showError(e is ApiException ? e.message : e.toString());
+    }
+  }
 }

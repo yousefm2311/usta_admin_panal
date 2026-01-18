@@ -9,7 +9,7 @@ class WithdrawalsService {
   Future<Response> list() => _client.safe(() => _dio.get('/api/admin/withdrawals'));
 
   Future<Response> approve(String id) =>
-      _client.safe(() => _dio.put('/api/admin/withdrawals/approve', data: {'withdrawalId': id}));
+      _client.safe(() => _dio.put('/api/admin/withdrawals/$id/approve'));
 
   Future<Response> reject(String id) =>
       _client.safe(() => _dio.put('/api/admin/withdrawals/$id/reject'));

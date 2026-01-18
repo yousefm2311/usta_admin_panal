@@ -120,16 +120,33 @@ class CategoriesListView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: AppSizes.sm),
-                          OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.text,
-                              side: const BorderSide(color: AppColors.border),
-                            ),
-                            onPressed: () => controller.removeCategory(
-                              (category['_id'] ?? category['id'] ?? '')
-                                  .toString(),
-                            ),
-                            child: Text('Delete'.tr),
+                          Row(
+                            children: [
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.text,
+                                  side: const BorderSide(color: AppColors.border),
+                                ),
+                                onPressed: () => _openEditDialog(
+                                  context,
+                                  controller,
+                                  category,
+                                ),
+                                child: Text('Edit'.tr),
+                              ),
+                              const SizedBox(width: AppSizes.xs),
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.redAccent,
+                                  side: const BorderSide(color: AppColors.border),
+                                ),
+                                onPressed: () => controller.removeCategory(
+                                  (category['_id'] ?? category['id'] ?? '')
+                                      .toString(),
+                                ),
+                                child: Text('Delete'.tr),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -159,5 +176,40 @@ class CategoriesListView extends StatelessWidget {
 
     // fallback: أول حرف
     return title[0].toUpperCase();
+  }
+
+  void _openEditDialog(
+    BuildContext context,
+    CategoriesController controller,
+    Map<String, dynamic> category,
+  ) {
+    final id = (category['_id'] ?? category['id'] ?? '').toString();
+    if (id.isEmpty) return;
+    final nameController = TextEditingController(text: (category['name'] ?? '').toString());
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.card,
+        title: Text('Edit category'.tr, style: const TextStyle(color: AppColors.text)),
+        content: TextField(
+          controller: nameController,
+          style: const TextStyle(color: AppColors.text),
+          decoration: InputDecoration(labelText: 'Category name'.tr),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              controller.updateCategory(id, name: nameController.text.trim());
+            },
+            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
+          ),
+        ],
+      ),
+    );
   }
 }

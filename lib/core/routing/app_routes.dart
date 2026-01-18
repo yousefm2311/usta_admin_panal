@@ -11,9 +11,13 @@ import '../../modules/categories/views/category_form_view.dart';
 import '../../modules/customers/views/customer_details_view.dart';
 import '../../modules/customers/views/customers_list_view.dart';
 import '../../modules/dashboard/views/dashboard_view.dart';
+import '../../modules/reports/views/reports_list_view.dart';
+import '../../modules/reports/views/report_details_view.dart';
 import '../../modules/notifications/views/notifications_center_view.dart';
 import '../../modules/notifications/views/send_notification_view.dart';
 import '../../modules/notifications/views/templates_view.dart';
+import '../../modules/notifications/views/notifications_broadcast_view.dart';
+import '../../modules/notifications/views/notifications_tokens_view.dart';
 import '../../modules/payments/views/payments_list_view.dart';
 import '../../modules/payments/views/transactions_view.dart';
 import '../../modules/payments/views/payout_requests_view.dart';
@@ -24,6 +28,9 @@ import '../../modules/requests/views/requests_list_view.dart';
 import '../../modules/reviews/views/reviews_list_view.dart';
 import '../../modules/settings/views/settings_commission_view.dart';
 import '../../modules/settings/views/settings_general_view.dart';
+import '../../modules/settings/views/settings_features_view.dart';
+import '../../modules/settings/views/settings_security_view.dart';
+import '../../modules/settings/views/change_password_view.dart';
 import '../../modules/withdrawals/views/withdrawals_list_view.dart';
 import '../../modules/orders/views/all_orders_view.dart';
 import '../../modules/orders/views/order_details_view.dart';
@@ -80,10 +87,16 @@ class AppPages {
     // Reviews
     GetPage(name: '/reviews', page: () => const ReviewsListView()),
 
+    // Reports
+    GetPage(name: '/reports', page: () => const ReportsListView()),
+    GetPage(name: '/report/details', page: () => const ReportDetailsView()),
+
     // Notifications
     GetPage(name: '/notifications', page: () => const NotificationsCenterView()),
     GetPage(name: '/notifications/send', page: () => const SendNotificationView()),
     GetPage(name: '/notifications/templates', page: () => const NotificationTemplatesView()),
+    GetPage(name: '/notifications/broadcast', page: () => const NotificationsBroadcastView()),
+    GetPage(name: '/notifications/tokens', page: () => const NotificationsTokensView()),
 
     // Analytics
     GetPage(name: '/analytics', page: () => const AnalyticsOverviewView()),
@@ -91,6 +104,9 @@ class AppPages {
     // Settings
     GetPage(name: '/settings', page: () => const SettingsGeneralView()),
     GetPage(name: '/settings/commission', page: () => const SettingsCommissionView()),
+    GetPage(name: '/settings/features', page: () => const SettingsFeaturesView()),
+    GetPage(name: '/settings/security', page: () => const SettingsSecurityView()),
+    GetPage(name: '/settings/change-password', page: () => const ChangePasswordView()),
 
     // Complaints
     GetPage(name: '/complaints', page: () => const ComplaintsListView()),

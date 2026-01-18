@@ -8,6 +8,9 @@ class ArtisansService {
 
   Future<Response> fetchArtisans() => _client.safe(() => _dio.get('/api/admin/artisans'));
 
+  Future<Response> filterArtisans(Map<String, dynamic> params) =>
+      _client.safe(() => _dio.get('/api/admin/artisans/filter', queryParameters: params));
+
   Future<Response> fetchDetails(String id) => _client.safe(() => _dio.get('/api/admin/artisans/$id'));
 
   Future<Response> approve(String id) async {
@@ -41,4 +44,7 @@ class ArtisansService {
       }
     }
   }
+
+  Future<Response> updateStatus(String id, {required bool suspended}) =>
+      _client.safe(() => _dio.put('/api/admin/artisans/$id/status', data: {'suspended': suspended}));
 }

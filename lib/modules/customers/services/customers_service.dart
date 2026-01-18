@@ -7,9 +7,10 @@ class CustomersService {
   Dio get _dio => _client.dio;
 
   Future<Response> fetchCustomers({String? query}) {
-    return _client.safe(
-      () => _dio.get('/api/admin/customers', queryParameters: query != null ? {'query': query} : null),
-    );
+    if (query != null && query.isNotEmpty) {
+      return search(query);
+    }
+    return _client.safe(() => _dio.get('/api/admin/customers'));
   }
 
   Future<Response> search(String query) {
@@ -19,6 +20,9 @@ class CustomersService {
   Future<Response> fetchDetails(String id) {
     return _client.safe(() => _dio.get('/api/admin/customers/$id'));
   }
+
+  Future<Response> delete(String id) =>
+      _client.safe(() => _dio.delete('/api/admin/customers/$id'));
 
   Future<Response> block(String id, {bool blocked = true}) async {
     final payload = {'customerId': id, 'blocked': blocked};

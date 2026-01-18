@@ -75,12 +75,22 @@ class AuthService {
     }
   }
 
-Future<void> logout() async {
+  Future<void> changePassword({required String currentPassword, required String newPassword}) async {
+    try {
+      await _dio.put('/api/admin/change-password', data: {
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      });
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
+
+  Future<void> logout() async {
     try {
       await _dio.post('/api/admin/logout');
     } on DioException catch (e) {
       throw mapDioException(e);
     } catch (_) {}
   }
-
 }

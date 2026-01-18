@@ -49,29 +49,42 @@ class PayoutRequestsView extends StatelessWidget {
                 ],
                 rows: controller.withdrawals
                     .map(
-                      (p) => DataRow(
-                        cells: [
-                          DataCell(Text((p['artisan'] ?? p['artisanName'] ?? '').toString())),
-                          DataCell(Text((p['amount'] ?? '').toString())),
-                          DataCell(Text((p['iban'] ?? '').toString())),
-                          DataCell(Text((p['status'] ?? '').toString())),
-                          DataCell(
-                            Row(
-                              children: [
-                                TextButton(
-                                  onPressed: () => controller.approve(p['id']?.toString() ?? p['_id']?.toString() ?? ''),
-                                  child: Text('Approve'.tr, style: const TextStyle(color: AppColors.success)),
-                                ),
-                                const SizedBox(width: AppSizes.xs),
-                                TextButton(
-                                  onPressed: controller.loadWithdrawals,
-                                  child: Text('Refresh'.tr),
-                                ),
-                              ],
+                      (p) {
+                        final status = (p['status'] ?? '').toString();
+                        final canTakeAction = _isPendingStatus(status);
+                        return DataRow(
+                          cells: [
+                            DataCell(Text((p['artisan'] ?? p['artisanName'] ?? '').toString())),
+                            DataCell(Text((p['amount'] ?? '').toString())),
+                            DataCell(Text((p['iban'] ?? '').toString())),
+                            DataCell(_statusChip(status)),
+                            DataCell(
+                              Row(
+                                children: [
+                                  if (canTakeAction)
+                                    TextButton(
+                                      onPressed: () =>
+                                          controller.approve(p['id']?.toString() ?? p['_id']?.toString() ?? ''),
+                                      child: Text('Approve'.tr, style: const TextStyle(color: AppColors.success)),
+                                    ),
+                                  if (canTakeAction) const SizedBox(width: AppSizes.xs),
+                                  if (canTakeAction)
+                                    TextButton(
+                                      onPressed: () =>
+                                          controller.reject(p['id']?.toString() ?? p['_id']?.toString() ?? ''),
+                                      child: Text('Reject'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                    ),
+                                  const SizedBox(width: AppSizes.xs),
+                                  TextButton(
+                                    onPressed: controller.loadWithdrawals,
+                                    child: Text('Refresh'.tr),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        );
+                      },
                     )
                     .toList(),
               ),
@@ -80,6 +93,37 @@ class PayoutRequestsView extends StatelessWidget {
         );
       }),
     );
+  }
+
+  Widget _statusChip(String status) {
+    final isApproved = status.toLowerCase() == 'approved';
+    final isRejected = status.toLowerCase() == 'rejected';
+    final color = isApproved
+        ? AppColors.success
+        : isRejected
+        ? Colors.redAccent
+        : AppColors.warning;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Text(
+        status.tr,
+        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+      ),
+    );
+  }
+
+  bool _isPendingStatus(String status) {
+    final value = status.trim().toLowerCase();
+    return value.isEmpty ||
+        value == 'pending' ||
+        value == 'review' ||
+        value == 'in review' ||
+        value == 'new';
   }
 }
 

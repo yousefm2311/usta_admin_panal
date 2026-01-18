@@ -110,6 +110,11 @@ class CustomersListView extends StatelessWidget {
                                       style: TextStyle(color: isBlocked ? AppColors.success : Colors.redAccent),
                                     ),
                                   ),
+                                  const SizedBox(width: AppSizes.xs),
+                                  TextButton(
+                                    onPressed: () => _confirmDelete(context, controller, id.toString()),
+                                    child: Text('Delete'.tr, style: const TextStyle(color: Colors.redAccent)),
+                                  ),
                                 ],
                               ),
                             ),
@@ -171,6 +176,30 @@ class CustomersListView extends StatelessWidget {
       child: Text(
         status.tr,
         style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, CustomersController controller, String id) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.card,
+        title: Text('Delete'.tr, style: const TextStyle(color: AppColors.text)),
+        content: Text('Delete this customer?'.tr, style: const TextStyle(color: AppColors.textMuted)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              controller.deleteCustomer(id);
+            },
+            child: Text('Delete'.tr, style: const TextStyle(color: Colors.redAccent)),
+          ),
+        ],
       ),
     );
   }

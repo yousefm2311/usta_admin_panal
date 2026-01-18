@@ -62,19 +62,10 @@ class RequestsService {
       if (_isError(res.statusCode)) throw Exception('timeline not available');
       return res;
     } catch (_) {
-      try {
-        final res = await _client.safe(
-          () => _dio.put('/api/admin/requests/$id/timeline', data: payload),
-        );
-        if (_isError(res.statusCode))
-          throw Exception('timeline put not available');
-        return res;
-      } catch (_) {
-        // fallback to status endpoint if timeline not found
-        final res = await updateStatus(id, status: status, note: note);
-        if (_isError(res.statusCode)) throw Exception('timeline not available');
-        return res;
-      }
+      // fallback to status endpoint if timeline not found
+      final res = await updateStatus(id, status: status, note: note);
+      if (_isError(res.statusCode)) throw Exception('timeline not available');
+      return res;
     }
   }
 
@@ -101,4 +92,27 @@ class RequestsService {
       data: {'status': status, if (note != null) 'note': note},
     ),
   );
+
+  Future<Response> delete(String id) =>
+      _client.safe(() => _dio.delete('/api/admin/requests/$id'));
+
+  Future<Response> expireStale({int? limit, String? before}) {
+    final payload = <String, dynamic>{
+      if (limit != null) 'limit': limit,
+      if (before != null) 'before': before,
+    };
+    return _client.safe(
+      () => _dio.post('/api/admin/requests/expire-stale', data: payload),
+    );
+  }
+
+  Future<Response> autoConfirm({int? limit, String? before}) {
+    final payload = <String, dynamic>{
+      if (limit != null) 'limit': limit,
+      if (before != null) 'before': before,
+    };
+    return _client.safe(
+      () => _dio.post('/api/admin/requests/auto-confirm', data: payload),
+    );
+  }
 }
