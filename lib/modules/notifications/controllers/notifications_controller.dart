@@ -29,9 +29,9 @@ class NotificationsController extends GetxController {
       final res = await _service.list();
       final data = res.data;
       if (data is List) {
-        history.assignAll(data);
+        _assignHistory(data);
       } else if (data is Map<String, dynamic>) {
-        history.assignAll(data['notifications'] ?? data['data'] ?? []);
+        _assignHistory(data['notifications'] ?? data['data'] ?? []);
       }
       if (history.isNotEmpty) return;
     } on ApiException catch (e) {
@@ -41,9 +41,9 @@ class NotificationsController extends GetxController {
           final res = await _service.history();
           final data = res.data;
           if (data is List) {
-            history.assignAll(data);
+            _assignHistory(data);
           } else if (data is Map<String, dynamic>) {
-            history.assignAll(data['notifications'] ?? data['data'] ?? []);
+            _assignHistory(data['notifications'] ?? data['data'] ?? []);
           }
           return;
         } catch (_) {
@@ -118,6 +118,7 @@ class NotificationsController extends GetxController {
     required String message,
     required String target,
   }) async {
+    if (sending.value) return;
     sending.value = true;
     try {
       await _service.send({
@@ -134,5 +135,25 @@ class NotificationsController extends GetxController {
     } finally {
       sending.value = false;
     }
+  }
+
+  void _assignHistory(List<dynamic> items) {
+    history.assignAll(_dedupeHistory(items));
+  }
+
+  List<dynamic> _dedupeHistory(List<dynamic> items) {
+    final seen = <String, dynamic>{};
+    for (final raw in items) {
+      final n = raw is Map<String, dynamic> ? raw : <String, dynamic>{};
+      final id =
+          (n['_id'] ?? n['id'] ?? '').toString();
+      final title = (n['title'] ?? '').toString();
+      final body = (n['body'] ?? n['message'] ?? '').toString();
+      final date = (n['date'] ?? n['createdAt'] ?? '').toString();
+      final key = id.isNotEmpty ? id : '$title|$body|$date';
+      if (key.isEmpty) continue;
+      seen[key] = raw;
+    }
+    return seen.values.toList();
   }
 }

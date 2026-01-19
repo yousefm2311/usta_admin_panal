@@ -53,6 +53,9 @@ class AnalyticsOverviewView extends StatelessWidget {
             : 0;
         final revenueTotal = _extractNumber(revenue, ['total', 'revenue', 'amount', 'value', 'sum']);
         final activeCount = _extractNumber(activeUsers, ['activeUsers', 'active', 'count', 'total']);
+        final currentRequests = _currentMonthValue(data, 'requests');
+        final currentEarnings = _currentMonthValue(data, 'earnings');
+        final avgRating = controller.avgRating.value;
 
         final chartWidgets = <Widget>[
           _chartCard(
@@ -209,12 +212,12 @@ class AnalyticsOverviewView extends StatelessWidget {
               children: [
                 _statCard(
                   'Requests this month'.tr,
-                  '${maxRequests.toInt()}',
+                  '${(currentRequests ?? maxRequests).toInt()}',
                   Icons.timeline,
                 ),
                 _statCard(
                   'Earnings this month'.tr,
-                  'EG ${maxEarnings.toStringAsFixed(0)}',
+                  'EG ${(currentEarnings ?? maxEarnings).toStringAsFixed(0)}',
                   Icons.trending_up,
                 ),
                 _statCard(
@@ -227,7 +230,11 @@ class AnalyticsOverviewView extends StatelessWidget {
                   activeCount == null ? '-' : activeCount.toStringAsFixed(0),
                   Icons.people_outline,
                 ),
-                _statCard('Avg. rating'.tr, '4.8', Icons.star),
+                _statCard(
+                  'Avg. rating'.tr,
+                  avgRating == null ? '-' : avgRating.toStringAsFixed(1),
+                  Icons.star,
+                ),
               ],
             ),
             const SizedBox(height: AppSizes.lg),
@@ -330,6 +337,32 @@ class AnalyticsOverviewView extends StatelessWidget {
       if (value == null) continue;
       final parsed = double.tryParse(value.toString());
       if (parsed != null) return parsed;
+    }
+    return null;
+  }
+
+  double? _currentMonthValue(List<dynamic> data, String key) {
+    if (data.isEmpty) return null;
+    final now = DateTime.now();
+    Map<String, dynamic>? entry;
+    for (final raw in data) {
+      final item = raw is Map<String, dynamic> ? raw : null;
+      if (item == null) continue;
+      final monthIndex = item['monthIndex'];
+      final year = item['year'];
+      if (monthIndex is int && year is int) {
+        if (monthIndex == now.month && year == now.year) {
+          entry = item;
+          break;
+        }
+      }
+    }
+    if (entry != null && entry[key] != null) {
+      return double.tryParse(entry[key].toString());
+    }
+    final latest = data.last;
+    if (latest is Map<String, dynamic>) {
+      return double.tryParse((latest[key] ?? 0).toString());
     }
     return null;
   }

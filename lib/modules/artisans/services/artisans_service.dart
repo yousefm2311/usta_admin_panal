@@ -13,6 +13,26 @@ class ArtisansService {
 
   Future<Response> fetchDetails(String id) => _client.safe(() => _dio.get('/api/admin/artisans/$id'));
 
+  Future<List<dynamic>> fetchReviews() async {
+    final res = await _client.safe(() => _dio.get('/api/admin/reviews'));
+    final data = res.data;
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      return (data['reviews'] ?? data['data'] ?? []) as List<dynamic>;
+    }
+    return [];
+  }
+
+  Future<List<dynamic>> fetchRequests() async {
+    final res = await _client.safe(() => _dio.get('/api/admin/requests'));
+    final data = res.data;
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      return (data['requests'] ?? data['data'] ?? data['orders'] ?? []) as List<dynamic>;
+    }
+    return [];
+  }
+
   Future<Response> approve(String id) async {
     try {
       // Prefer per-id endpoint to avoid 404 noise

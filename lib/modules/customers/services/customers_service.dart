@@ -21,6 +21,16 @@ class CustomersService {
     return _client.safe(() => _dio.get('/api/admin/customers/$id'));
   }
 
+  Future<List<dynamic>> fetchAllRequests() async {
+    final res = await _client.safe(() => _dio.get('/api/admin/requests'));
+    final data = res.data;
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      return (data['requests'] ?? data['data'] ?? data['orders'] ?? []) as List<dynamic>;
+    }
+    return [];
+  }
+
   Future<Response> delete(String id) =>
       _client.safe(() => _dio.delete('/api/admin/customers/$id'));
 
@@ -36,5 +46,38 @@ class CustomersService {
         return await _client.safe(() => _dio.post('/api/admin/customers/block', data: payload));
       }
     }
+  }
+
+  int _extractRequestsCount(dynamic data) {
+    if (data is List) return data.length;
+    if (data is Map<String, dynamic>) {
+      final direct =
+          data['count'] ??
+          data['total'] ??
+          data['totalRequests'] ??
+          data['requestsCount'] ??
+          data['totalCount'] ??
+          data['total_count'];
+      final directParsed = int.tryParse(direct?.toString() ?? '');
+      if (directParsed != null) return directParsed;
+
+      final inner = data['data'] ?? data['requests'] ?? data['history'] ?? data['orders'];
+      if (inner is List) return inner.length;
+      if (inner is Map<String, dynamic>) {
+        final innerDirect =
+            inner['count'] ??
+            inner['total'] ??
+            inner['totalRequests'] ??
+            inner['requestsCount'] ??
+            inner['totalCount'] ??
+            inner['total_count'];
+        final innerParsed = int.tryParse(innerDirect?.toString() ?? '');
+        if (innerParsed != null) return innerParsed;
+        final innerList =
+            inner['data'] ?? inner['requests'] ?? inner['history'] ?? inner['orders'];
+        if (innerList is List) return innerList.length;
+      }
+    }
+    return 0;
   }
 }

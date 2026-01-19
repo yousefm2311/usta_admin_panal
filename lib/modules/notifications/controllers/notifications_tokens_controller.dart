@@ -25,13 +25,7 @@ class NotificationsTokensController extends GetxController {
     try {
       final res = await _service.listFcmTokens();
       final data = res.data;
-      if (data is List) {
-        tokens.assignAll(data);
-      } else if (data is Map<String, dynamic>) {
-        tokens.assignAll(data['tokens'] ?? data['data'] ?? []);
-      } else {
-        tokens.clear();
-      }
+      tokens.assignAll(_normalizeTokens(data));
     } catch (e) {
       final msg = e is ApiException ? e.message : e.toString();
       error.value = msg;
@@ -39,6 +33,35 @@ class NotificationsTokensController extends GetxController {
     } finally {
       loading.value = false;
     }
+  }
+
+  List<dynamic> _normalizeTokens(dynamic data) {
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      final candidates = [
+        data['tokens'],
+        data['data'],
+        data['items'],
+        data['fcmTokens'],
+        data['fcm_tokens'],
+      ];
+      for (final candidate in candidates) {
+        if (candidate is List) return candidate;
+        if (candidate is Map<String, dynamic>) {
+          final innerCandidates = [
+            candidate['tokens'],
+            candidate['data'],
+            candidate['items'],
+          ];
+          for (final inner in innerCandidates) {
+            if (inner is List) return inner;
+          }
+          return candidate.values.toList();
+        }
+      }
+      return data.values.toList();
+    }
+    return [];
   }
 
   Future<void> subscribe({required String topic, String? deviceId}) async {

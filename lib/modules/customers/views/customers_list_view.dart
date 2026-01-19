@@ -85,15 +85,31 @@ class CustomersListView extends StatelessWidget {
                       (customer) {
                         final status = customer['status'] ?? (customer['blocked'] == true ? 'Blocked' : 'Active');
                         final isBlocked = customer['blocked'] == true;
+                        final id = customer['id'] ?? customer['_id'] ?? '';
                         final count = customer['requestsCount'] ??
+                            customer['totalRequests'] ??
+                            customer['requests_count'] ??
+                            customer['ordersCount'] ??
+                            customer['orders_count'] ??
                             customer['requests'] ??
                             (customer['requests'] is List ? (customer['requests'] as List).length : 0);
-                        final id = customer['id'] ?? customer['_id'] ?? '';
+                        final apiCount =
+                            id.isNotEmpty ? controller.requestCounts[id] : null;
+                        final isCountLoading =
+                            controller.requestsCountLoadingAll.value ||
+                            (id.isNotEmpty &&
+                                controller.requestCountsLoading[id] == true);
                         return DataRow(
                           cells: [
                             DataCell(Text(customer['name']?.toString() ?? '')),
                             DataCell(Text(customer['phone']?.toString() ?? '')),
-                            DataCell(Text(count.toString())),
+                            DataCell(
+                              Text(
+                                isCountLoading
+                                    ? '...'
+                                    : (apiCount ?? count).toString(),
+                              ),
+                            ),
                             DataCell(_statusChip(status.toString())),
                             DataCell(
                               Row(

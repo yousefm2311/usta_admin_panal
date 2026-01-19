@@ -11,6 +11,7 @@ import '../../modules/auth/views/login_view.dart';
 import '../../modules/categories/views/categories_list_view.dart';
 import '../../modules/categories/views/category_form_view.dart';
 import '../../modules/customers/views/customer_details_view.dart';
+import '../../modules/customers/views/customer_orders_view.dart';
 import '../../modules/customers/views/customers_list_view.dart';
 import '../../modules/dashboard/views/dashboard_view.dart';
 import '../../modules/reports/views/reports_list_view.dart';
@@ -66,6 +67,7 @@ class AppPages {
     // Customers
     GetPage(name: '/customers', page: () => const CustomersListView()),
     GetPage(name: '/customer/details', page: () => const CustomerDetailsView()),
+    GetPage(name: '/customer/orders', page: () => const CustomerOrdersView()),
 
     // Artisans
     GetPage(name: '/artisans', page: () => const ArtisansListView()),

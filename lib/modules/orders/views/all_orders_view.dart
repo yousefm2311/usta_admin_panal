@@ -130,36 +130,8 @@ class AllOrdersView extends StatelessWidget {
   }
 
   Widget _statusChip(String status) {
-    Color color;
-    switch (status.toLowerCase()) {
-      case 'completed':
-        color = AppColors.success;
-        break;
-      case 'pending':
-      case 'new':
-        color = AppColors.warning;
-        break;
-      case 'assigned':
-        color = Colors.lightBlueAccent;
-        break;
-      case 'accepted':
-      case 'active':
-        color = Colors.lightBlueAccent;
-        break;
-      case 'in progress':
-      case 'in_progress':
-        color = Colors.amber;
-        break;
-      case 'canceled':
-      case 'cancelled':
-        color = AppColors.danger;
-        break;
-      case 'closed':
-        color = AppColors.textMuted;
-        break;
-      default:
-        color = AppColors.primary;
-    }
+    final key = _normalizeStatusKey(status);
+    final color = _statusColor(key);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 6),
       decoration: BoxDecoration(
@@ -168,10 +140,52 @@ class AllOrdersView extends StatelessWidget {
         border: Border.all(color: color.withOpacity(0.5)),
       ),
       child: Text(
-        status.tr,
+        key.tr,
         style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
       ),
     );
+  }
+
+  String _normalizeStatusKey(String status) {
+    final normalized = status.trim().toLowerCase().replaceAll('-', '_').replaceAll(' ', '_');
+    switch (normalized) {
+      case 'inprogress':
+      case 'in_progress':
+        return 'in_progress';
+      case 'on_the_way':
+        return 'on_the_way';
+      case 'cancelled':
+      case 'canceled':
+        return 'cancelled';
+      default:
+        return normalized;
+    }
+  }
+
+  Color _statusColor(String key) {
+    switch (key) {
+      case 'completed':
+        return AppColors.success;
+      case 'pending':
+      case 'new':
+        return AppColors.warning;
+      case 'assigned':
+      case 'accepted':
+      case 'active':
+      case 'on_the_way':
+        return Colors.lightBlueAccent;
+      case 'in_progress':
+      case 'working':
+        return Colors.amber;
+      case 'rejected':
+      case 'cancelled':
+      case 'canceled':
+        return AppColors.danger;
+      case 'closed':
+        return AppColors.textMuted;
+      default:
+        return AppColors.primary;
+    }
   }
 }
 

@@ -47,6 +47,16 @@ class DashboardService {
     return [];
   }
 
+  Future<List<dynamic>> fetchRequests() async {
+    final res = await _client.safe(() => _dio.get('/api/admin/requests'));
+    final data = res.data;
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      return (data['requests'] ?? data['data'] ?? data['orders'] ?? []) as List<dynamic>;
+    }
+    return [];
+  }
+
   Future<List<dynamic>> fetchTopArtisans() async {
     // Prefer AI top-artisans endpoint which exists on backend
     try {
@@ -77,7 +87,12 @@ class DashboardService {
 
   Future<List<dynamic>> fetchLatestRequests() async {
     try {
-      final res = await _client.safe(() => _dio.get('/api/admin/requests', queryParameters: {'page': 1, 'perPage': 5}));
+      final res = await _client.safe(
+        () => _dio.get(
+          '/api/admin/requests',
+          queryParameters: {'page': 1, 'perPage': 10},
+        ),
+      );
       final data = res.data;
       if (data is List) return data;
       if (data is Map<String, dynamic>) return (data['requests'] ?? data['data'] ?? []) as List<dynamic>;

@@ -51,9 +51,10 @@ class DashboardView extends StatelessWidget {
         // normalize latest requests to avoid mixed data
         final latestRaw =
             (stats['latestRequests'] ?? stats['latest'] ?? []) as List<dynamic>;
-        final latest = controller.latestRequests.isNotEmpty
+        final latestAll = controller.latestRequests.isNotEmpty
             ? controller.latestRequests
             : (latestRaw.isNotEmpty ? latestRaw : controller.activities);
+        final latest = _limitLatestRequests(latestAll, 10);
         final topArtisans = controller.topArtisans;
 
         return Column(
@@ -302,7 +303,16 @@ class DashboardView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _sectionTitle('Latest requests'.tr),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _sectionTitle('Latest requests'.tr),
+              TextButton(
+                onPressed: () => Get.toNamed('/orders'),
+                child: Text('View all'.tr),
+              ),
+            ],
+          ),
           const SizedBox(height: AppSizes.sm),
           if (requests.isEmpty)
             Padding(
@@ -473,6 +483,30 @@ class DashboardView extends StatelessWidget {
     if (parsed == null) return value.toString();
     if (parsed % 1 == 0) return parsed.toInt().toString();
     return parsed.toStringAsFixed(1);
+  }
+
+  List<dynamic> _limitLatestRequests(List<dynamic> requests, int limit) {
+    if (requests.length <= limit) return requests;
+    final enriched = requests.map((raw) {
+      final map = raw is Map<String, dynamic> ? raw : null;
+      final dateValue =
+          map?['createdAt'] ?? map?['created'] ?? map?['date'];
+      final parsed = dateValue == null
+          ? null
+          : DateTime.tryParse(dateValue.toString());
+      return (raw, parsed);
+    }).toList();
+    if (enriched.any((item) => item.$2 != null)) {
+      enriched.sort((a, b) {
+        final ad = a.$2;
+        final bd = b.$2;
+        if (ad == null && bd == null) return 0;
+        if (ad == null) return 1;
+        if (bd == null) return -1;
+        return bd.compareTo(ad);
+      });
+    }
+    return enriched.take(limit).map((item) => item.$1).toList();
   }
 
   Widget _statusChip(String status) {

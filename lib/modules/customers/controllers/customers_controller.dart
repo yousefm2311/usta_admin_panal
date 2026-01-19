@@ -12,6 +12,9 @@ class CustomersController extends GetxController {
   final loading = false.obs;
   final error = RxnString();
   final query = ''.obs;
+  final requestCounts = <String, int>{}.obs;
+  final requestCountsLoading = <String, bool>{}.obs;
+  final requestsCountLoadingAll = false.obs;
 
   @override
   void onInit() {
@@ -23,6 +26,9 @@ class CustomersController extends GetxController {
     loading.value = true;
     error.value = null;
     try {
+      requestCounts.clear();
+      requestCountsLoading.clear();
+      requestsCountLoadingAll.value = false;
       final res = await _service.fetchCustomers(query: search);
       final data = res.data;
       if (data is List) {
@@ -32,6 +38,7 @@ class CustomersController extends GetxController {
       } else {
         customers.clear();
       }
+      _loadRequestCountsForCustomers(customers);
     } catch (e) {
       if (e is ApiException) {
         error.value = e.message;
@@ -42,6 +49,32 @@ class CustomersController extends GetxController {
       }
     } finally {
       loading.value = false;
+    }
+  }
+
+  void _loadRequestCountsForCustomers(List<dynamic> list) {
+    if (list.isEmpty) return;
+    _loadAllRequestCounts();
+  }
+
+  Future<void> _loadAllRequestCounts() async {
+    requestsCountLoadingAll.value = true;
+    try {
+      final requests = await _service.fetchAllRequests();
+      final counts = <String, int>{};
+      for (final raw in requests) {
+        final req = raw is Map<String, dynamic> ? raw : <String, dynamic>{};
+        final customerId =
+            (req['customerId']?['_id'] ?? req['customerId'] ?? req['customer']?['_id'] ?? req['customer'])?.toString() ??
+            '';
+        if (customerId.isEmpty) continue;
+        counts[customerId] = (counts[customerId] ?? 0) + 1;
+      }
+      requestCounts.assignAll(counts);
+    } catch (_) {
+      // Keep fallback counts if endpoint is unavailable.
+    } finally {
+      requestsCountLoadingAll.value = false;
     }
   }
 

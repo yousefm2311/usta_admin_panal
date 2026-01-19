@@ -62,17 +62,19 @@ class ArtisansListView extends StatelessWidget {
                 rows: controller.artisans
                     .map(
                       (artisan) {
-                        final rating = artisan['rating'] ?? artisan['score'] ?? 0;
+                        final id = artisan['id'] ?? artisan['_id'] ?? '';
+                        final reviewRating =
+                            id.isNotEmpty ? controller.artisanRatings[id] : null;
+                        final rating = reviewRating ?? artisan['rating'] ?? artisan['score'] ?? 0;
                         final profession = artisan['category'] ?? artisan['profession'] ?? '';
                         final status = _resolveStatus(artisan);
                         final canTakeAction = _isPendingStatus(status);
                         final isSuspended = _isTruthy(artisan['suspended']);
-                        final id = artisan['id'] ?? artisan['_id'] ?? '';
                         return DataRow(
                           cells: [
                             DataCell(Text(artisan['name']?.toString() ?? '')),
                             DataCell(Text(profession.toString())),
-                            DataCell(Text(rating.toString())),
+                            DataCell(Text(_formatRating(rating))),
                             DataCell(_statusChip(status.toString())),
                             DataCell(
                               Row(
@@ -235,6 +237,13 @@ class ArtisansListView extends StatelessWidget {
         value == 'review' ||
         value == 'in review' ||
         value == 'new';
+  }
+
+  String _formatRating(dynamic rating) {
+    final parsed = double.tryParse(rating.toString());
+    if (parsed == null) return rating.toString();
+    if (parsed % 1 == 0) return parsed.toInt().toString();
+    return parsed.toStringAsFixed(1);
   }
 }
 

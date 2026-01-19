@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -174,7 +175,22 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
               .map(
                 (item) => DataRow(
                   cells: [
-                    DataCell(Text(_shorten(_field(item, ['token', 'fcmToken', 'value'])))),
+                    DataCell(
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _shorten(_field(item, ['token', 'fcmToken', 'value'])),
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: 'Copy'.tr,
+                            icon: const Icon(Icons.copy, size: 16, color: AppColors.textMuted),
+                            onPressed: () => _copyToken(_field(item, ['token', 'fcmToken', 'value'])),
+                          ),
+                        ],
+                      ),
+                    ),
                     DataCell(Text(_field(item, ['deviceId', 'device', 'device_id']))),
                     DataCell(Text(_field(item, ['platform', 'os']))),
                     DataCell(Text(_field(item, ['createdAt', 'created', 'date']))),
@@ -207,6 +223,12 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
   String _shorten(String value) {
     if (value.length <= 18) return value;
     return '${value.substring(0, 10)}...${value.substring(value.length - 6)}';
+  }
+
+  Future<void> _copyToken(String value) async {
+    if (value.isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: value));
+    showSuccess('Copied'.tr);
   }
 
   @override
