@@ -31,6 +31,8 @@ class Sidebar extends StatelessWidget {
       _SidebarItem('FCM Tokens'.tr, Icons.phonelink_ring_outlined, '/notifications/tokens'),
       _SidebarItem('Analytics'.tr, Icons.analytics_outlined, '/analytics'),
       _SidebarItem('AI Tools'.tr, Icons.auto_awesome, '/ai/reviews'),
+      _SidebarItem('Fraud detection'.tr, Icons.gpp_maybe_outlined, '/ai/fraud'),
+      _SidebarItem('Word cloud'.tr, Icons.cloud_outlined, '/ai/word-cloud'),
       _SidebarItem('Settings'.tr, Icons.settings_outlined, '/settings'),
       _SidebarItem('Feature flags'.tr, Icons.tune, '/settings/features'),
       _SidebarItem('Security'.tr, Icons.security_outlined, '/settings/security'),

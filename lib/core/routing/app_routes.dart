@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../../modules/ai/views/ai_reviews_insights_view.dart';
 import '../../modules/ai/views/ai_top_artisans_view.dart';
+import '../../modules/ai/views/ai_fraud_detection_view.dart';
+import '../../modules/ai/views/ai_word_cloud_view.dart';
 import '../../modules/analytics/views/analytics_overview_view.dart';
 import '../../modules/artisans/views/artisan_details_view.dart';
 import '../../modules/artisans/views/artisans_list_view.dart';
@@ -22,6 +24,7 @@ import '../../modules/payments/views/payments_list_view.dart';
 import '../../modules/payments/views/transactions_view.dart';
 import '../../modules/payments/views/payout_requests_view.dart';
 import '../../modules/payments/views/payout_details_view.dart';
+import '../../modules/payments/views/payment_details_view.dart';
 import '../../modules/payments/views/wallet_summary_view.dart';
 import '../../modules/requests/views/request_details_view.dart';
 import '../../modules/requests/views/requests_list_view.dart';
@@ -77,6 +80,7 @@ class AppPages {
     GetPage(name: '/transactions', page: () => const TransactionsView()),
     GetPage(name: '/payouts', page: () => const PayoutRequestsView()),
     GetPage(name: '/payout/details', page: () => const PayoutDetailsView()),
+    GetPage(name: '/payment/details', page: () => const PaymentDetailsView()),
     GetPage(name: '/wallets', page: () => const WalletSummaryView()),
     GetPage(name: '/withdrawals', page: () => const WithdrawalsListView()),
 
@@ -131,6 +135,8 @@ class AppPages {
     // AI
     GetPage(name: '/ai/reviews', page: () => const AIReviewsInsightsView()),
     GetPage(name: '/ai/top-artisans', page: () => const AITopArtisansView()),
+    GetPage(name: '/ai/fraud', page: () => const AIFraudDetectionView()),
+    GetPage(name: '/ai/word-cloud', page: () => const AIWordCloudView()),
 
   ];
 }

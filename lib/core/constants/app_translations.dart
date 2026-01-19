@@ -429,7 +429,25 @@ class AppTranslations extends Translations {
       'id1,id2': 'id1,id2',
       'Edit category': 'Edit category',
       'Invalid category': 'Invalid category',
-'Api Health':'Api Health'
+      'Payment details': 'Payment details',
+      'Filter': 'Filter',
+      'Filters': 'Filters',
+      'Clear filters': 'Clear filters',
+      'Apply filters': 'Apply filters',
+      'From (ISO date)': 'From (ISO date)',
+      'To (ISO date)': 'To (ISO date)',
+      'Min amount': 'Min amount',
+      'Max amount': 'Max amount',
+      'Raw payload': 'Raw payload',
+      'Reference': 'Reference',
+      'Customer': 'Customer',
+      'Total revenue': 'Total revenue',
+      'Active users': 'Active users',
+      'Fraud detection': 'Fraud detection',
+      'Entity': 'Entity',
+      'Score': 'Score',
+      'Reason': 'Reason',
+      'Api Health':'Api Health'
     },
     'ar': {
       // Common
@@ -784,8 +802,30 @@ class AppTranslations extends Translations {
       'id1,id2': 'id1,id2',
       'Edit category': 'Edit category',
       'Invalid category': 'Invalid category',
-'Api Health': 'حالة السيرفر'
+      'Payment details': 'Payment details',
+      'Filter': 'Filter',
+      'Filters': 'Filters',
+      'Clear filters': 'Clear filters',
+      'Apply filters': 'Apply filters',
+      'From (ISO date)': 'From (ISO date)',
+      'To (ISO date)': 'To (ISO date)',
+      'Min amount': 'Min amount',
+      'Max amount': 'Max amount',
+      'Raw payload': 'Raw payload',
+      'Reference': 'Reference',
+      'Customer': 'Customer',
+      'Total revenue': 'Total revenue',
+      'Active users': 'Active users',
+      'Fraud detection': 'Fraud detection',
+      'Entity': 'Entity',
+      'Score': 'Score',
+      'Reason': 'Reason',
+      'Api Health': 'حالة السيرفر'
     },
   };
 }
+
+
+
+
 

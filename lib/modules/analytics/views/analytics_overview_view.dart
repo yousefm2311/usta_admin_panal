@@ -43,12 +43,16 @@ class AnalyticsOverviewView extends StatelessWidget {
         }
 
         final data = controller.daily;
+        final revenue = controller.revenue.value;
+        final activeUsers = controller.activeUsers.value;
         final maxRequests = data.isNotEmpty
             ? data.map((e) => (e['requests'] ?? 0) as num).reduce(max)
             : 0;
         final maxEarnings = data.isNotEmpty
             ? data.map((e) => (e['earnings'] ?? 0) as num).reduce(max)
             : 0;
+        final revenueTotal = _extractNumber(revenue, ['total', 'revenue', 'amount', 'value', 'sum']);
+        final activeCount = _extractNumber(activeUsers, ['activeUsers', 'active', 'count', 'total']);
 
         final chartWidgets = <Widget>[
           _chartCard(
@@ -213,6 +217,16 @@ class AnalyticsOverviewView extends StatelessWidget {
                   'EG ${maxEarnings.toStringAsFixed(0)}',
                   Icons.trending_up,
                 ),
+                _statCard(
+                  'Total revenue'.tr,
+                  revenueTotal == null ? '-' : 'EG ${revenueTotal.toStringAsFixed(0)}',
+                  Icons.account_balance_wallet_outlined,
+                ),
+                _statCard(
+                  'Active users'.tr,
+                  activeCount == null ? '-' : activeCount.toStringAsFixed(0),
+                  Icons.people_outline,
+                ),
                 _statCard('Avg. rating'.tr, '4.8', Icons.star),
               ],
             ),
@@ -307,5 +321,16 @@ class AnalyticsOverviewView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  double? _extractNumber(Map<String, dynamic>? data, List<String> keys) {
+    if (data == null) return null;
+    for (final key in keys) {
+      final value = data[key];
+      if (value == null) continue;
+      final parsed = double.tryParse(value.toString());
+      if (parsed != null) return parsed;
+    }
+    return null;
   }
 }
