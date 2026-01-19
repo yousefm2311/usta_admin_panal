@@ -376,25 +376,6 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
     };
   }
 
-  List<dynamic> _latestFromRequests(List<dynamic> requests, int limit) {
-    if (requests.isEmpty) return const [];
-    final sorted = requests.map((raw) {
-      final r = raw is Map<String, dynamic> ? raw : <String, dynamic>{};
-      final dateValue = r['createdAt'] ?? r['created'] ?? r['date'];
-      final parsed = DateTime.tryParse(dateValue?.toString() ?? '');
-      return (raw, parsed);
-    }).toList();
-    sorted.sort((a, b) {
-      final ad = a.$2;
-      final bd = b.$2;
-      if (ad == null && bd == null) return 0;
-      if (ad == null) return 1;
-      if (bd == null) return -1;
-      return bd.compareTo(ad);
-    });
-    return sorted.take(limit).map((e) => e.$1).toList();
-  }
-
   String _formatDate(dynamic value) {
     if (value is DateTime) return '${value.day}/${value.month}/${value.year}';
     if (value is String) {
