@@ -105,7 +105,7 @@ class TopBar extends StatelessWidget {
                     IconButton(
                       onPressed: onOpenSettings,
                       icon: Icon(
-                        Icons.tune_rounded,
+                        Icons.settings,
                         color: AppColors.textMuted,
                       ),
                       tooltip: 'Settings'.tr,
