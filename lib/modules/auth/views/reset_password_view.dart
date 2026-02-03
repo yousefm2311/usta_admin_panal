@@ -6,13 +6,24 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../layout/admin_layout.dart';
 import '../../../widgets/primary_button.dart';
 
-class ResetPasswordView extends StatelessWidget {
+class ResetPasswordView extends StatefulWidget {
   const ResetPasswordView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final emailCtrl = TextEditingController();
+  State<ResetPasswordView> createState() => _ResetPasswordViewState();
+}
 
+class _ResetPasswordViewState extends State<ResetPasswordView> {
+  final TextEditingController emailCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    emailCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AdminLayout(
       title: 'Reset Password'.tr,
       child: Center(
@@ -23,19 +34,25 @@ class ResetPasswordView extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              border: Border.fromBorderSide(
+                BorderSide(color: AppColors.border),
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   'Reset Password'.tr,
-                  style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
                 const SizedBox(height: AppSizes.md),
                 TextField(
                   controller: emailCtrl,
-                  style:  TextStyle(color: AppColors.text),
+                  style: TextStyle(color: AppColors.text),
                   decoration: InputDecoration(labelText: 'Email address'.tr),
                 ),
                 const SizedBox(height: AppSizes.lg),

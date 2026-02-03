@@ -18,6 +18,7 @@ class LoadingOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Stack(
       children: [
         child,
@@ -26,36 +27,89 @@ class LoadingOverlay extends StatelessWidget {
             child: AbsorbPointer(
               absorbing: true,
               child: Container(
-                color: AppColors.background.withOpacity(0.05),
+                color: AppColors.background.withOpacity(isDark ? 0.2 : 0.08),
               ),
             ),
           ),
         Positioned(
-          top: 0,
+          top: AppSizes.sm,
           left: 0,
           right: 0,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 160),
-            child: isLoading
-                ? SafeArea(
-                    bottom: false,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(999),
-                        child: LinearProgressIndicator(
-                          minHeight: 3,
-                          backgroundColor: AppColors.border.withOpacity(0.35),
-                          valueColor:
-                              AlwaysStoppedAnimation(AppColors.primary),
-                        ),
-                      ),
+          child: IgnorePointer(
+            ignoring: true,
+            child: SafeArea(
+              bottom: false,
+              child: Center(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, anim) => FadeTransition(
+                    opacity: anim,
+                    child: ScaleTransition(
+                      scale: Tween<double>(begin: 0.98, end: 1.0).animate(anim),
+                      child: child,
                     ),
-                  )
-                : const SizedBox.shrink(),
+                  ),
+                  child: isLoading
+                      ? _LoadingPill(isDark: isDark)
+                      : const SizedBox.shrink(),
+                ),
+              ),
+            ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _LoadingPill extends StatelessWidget {
+  final bool isDark;
+
+  const _LoadingPill({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final spinnerColor = AppColors.primary;
+    return Container(
+      key: const ValueKey('loading-pill'),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(spinnerColor),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            'Loading...'.tr,
+            style: TextStyle(
+              color: AppColors.text,
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

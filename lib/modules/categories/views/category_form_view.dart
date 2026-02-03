@@ -77,16 +77,16 @@ class _CategoryFormViewState extends State<CategoryFormView> {
                   final saving = controller.saving.value;
                   return PrimaryButton(
                     expand: true,
-                    label: saving ? 'Loading'.tr : 'Save category'.tr,
+                    label: 'Save category'.tr,
+                    loadingLabel: 'Loading'.tr,
+                    isLoading: saving,
                     icon: Icons.save_outlined,
-                    onPressed: saving
-                        ? null
-                        : () {
-                            controller.addCategory(
-                              name: _nameController.text.trim(),
-                              icon: selectedIcon,
-                            );
-                          },
+                    onPressed: () {
+                      controller.addCategory(
+                        name: _nameController.text.trim(),
+                        icon: selectedIcon,
+                      );
+                    },
                   );
                 }),
               ],

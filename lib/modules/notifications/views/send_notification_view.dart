@@ -87,19 +87,19 @@ class _SendNotificationViewState extends State<SendNotificationView> {
                   Obx(
                     () => PrimaryButton(
                       expand: true,
-                      label: controller.sending.value ? 'Loading'.tr : 'Send notification'.tr,
+                      label: 'Send notification'.tr,
+                      loadingLabel: 'Loading'.tr,
+                      isLoading: controller.sending.value,
                       icon: Icons.send,
-                      onPressed: controller.sending.value
-                          ? null
-                          : () {
-                              if (_formKey.currentState?.validate() ?? false) {
-                                controller.send(
-                                  title: _titleController.text.trim(),
-                                  message: _messageController.text.trim(),
-                                  target: target,
-                                );
-                              }
-                            },
+                      onPressed: () {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          controller.send(
+                            title: _titleController.text.trim(),
+                            message: _messageController.text.trim(),
+                            target: target,
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],

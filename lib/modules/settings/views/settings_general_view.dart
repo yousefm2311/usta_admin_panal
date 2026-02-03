@@ -11,25 +11,53 @@ import '../../../widgets/primary_button.dart';
 import '../../../widgets/shimmer_widgets.dart';
 import '../controllers/settings_general_controller.dart';
 
-class SettingsGeneralView extends StatelessWidget {
+class SettingsGeneralView extends StatefulWidget {
   const SettingsGeneralView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(SettingsGeneralController());
-    final appNameController = TextEditingController();
-    final emailController = TextEditingController();
-    final aboutController = TextEditingController();
+  State<SettingsGeneralView> createState() => _SettingsGeneralViewState();
+}
 
+class _SettingsGeneralViewState extends State<SettingsGeneralView> {
+  late final SettingsGeneralController controller;
+  final TextEditingController appNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController aboutController = TextEditingController();
+  bool _formHydrated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(SettingsGeneralController());
+  }
+
+  @override
+  void dispose() {
+    appNameController.dispose();
+    emailController.dispose();
+    aboutController.dispose();
+    super.dispose();
+  }
+
+  void _hydrateFormOnce() {
+    if (_formHydrated) return;
+    appNameController.text = controller.form['appName']?.value ?? '';
+    emailController.text = controller.form['supportEmail']?.value ?? '';
+    aboutController.text = controller.form['about']?.value ?? '';
+    _formHydrated = true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AdminLayout(
       title: '',
       child: Obx(() {
         if (controller.loading.value) {
+          _formHydrated = false;
           return const CardLoading(height: 260, lines: 6);
         }
-        appNameController.text = controller.form['appName']?.value ?? '';
-        emailController.text = controller.form['supportEmail']?.value ?? '';
-        aboutController.text = controller.form['about']?.value ?? '';
+
+        _hydrateFormOnce();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,13 +66,13 @@ class SettingsGeneralView extends StatelessWidget {
               children: [
                 Text(
                   'General settings'.tr,
-                  style:  TextStyle(
+                  style: TextStyle(
                     color: AppColors.text,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 ElevatedButton.icon(
                   onPressed: () => Get.toNamed('/logs/health'),
                   icon: const Icon(Icons.health_and_safety_rounded),
@@ -52,14 +80,22 @@ class SettingsGeneralView extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: AppSizes.md),
+            if (controller.error.value != null) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSizes.md),
+                child: Text(
+                  controller.error.value!,
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
+              ),
+            ],
             Container(
               padding: const EdgeInsets.all(AppSizes.lg),
               decoration: BoxDecoration(
                 color: AppColors.card,
                 borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                border:  Border.fromBorderSide(
+                border: Border.fromBorderSide(
                   BorderSide(color: AppColors.border),
                 ),
               ),
@@ -68,7 +104,7 @@ class SettingsGeneralView extends StatelessWidget {
                 children: [
                   Text(
                     'App logo'.tr,
-                    style:  TextStyle(color: AppColors.textMuted),
+                    style: TextStyle(color: AppColors.textMuted),
                   ),
                   const SizedBox(height: AppSizes.sm),
                   Row(
@@ -95,11 +131,10 @@ class SettingsGeneralView extends StatelessWidget {
                               );
                             }(),
                           ),
-                          child:
-                              controller.form['logoUrl']?.value.isNotEmpty ==
+                          child: controller.form['logoUrl']?.value.isNotEmpty ==
                                   true
                               ? null
-                              :  Icon(
+                              : Icon(
                                   Icons.image_outlined,
                                   color: AppColors.textMuted,
                                 ),
@@ -109,29 +144,17 @@ class SettingsGeneralView extends StatelessWidget {
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.text,
-                          side:  BorderSide(color: AppColors.border),
+                          side: BorderSide(color: AppColors.border),
                         ),
                         onPressed: controller.uploadingLogo.value
                             ? null
                             : () async {
-                                // final result = await FilePicker.platform
-                                //     .pickFiles(
-                                //       type: FileType.image,
-                                //       withData: true,
-                                //     );
-                                // if (result != null && result.files.isNotEmpty) {
-                                //   final file = result.files.first;
-                                //   await controller.uploadLogo(
-                                //     fileName: file.name,
-                                //     bytes: file.bytes,
-                                //     path: file.path,
-                                //   );
-                                // }
-                              final result = await FilePicker.platform
-                                    .pickFiles(
-                                      withData: true,
-                                    );
-                                if (result != null && result.files.isNotEmpty) {
+                                final result =
+                                    await FilePicker.platform.pickFiles(
+                                  withData: true,
+                                );
+                                if (result != null &&
+                                    result.files.isNotEmpty) {
                                   final file = result.files.first;
                                   Uint8List bytes;
 
@@ -148,10 +171,13 @@ class SettingsGeneralView extends StatelessWidget {
                                     bytes: bytes,
                                   );
                                 }
-
                               },
                         icon: controller.uploadingLogo.value
-                            ? const ShimmerBox(height: 16, width: 16, radius: 6)
+                            ? const ShimmerBox(
+                                height: 16,
+                                width: 16,
+                                radius: 6,
+                              )
                             : const Icon(Icons.upload),
                         label: Text('Upload logo'.tr),
                       ),
@@ -161,7 +187,7 @@ class SettingsGeneralView extends StatelessWidget {
                   TextField(
                     controller: appNameController,
                     onChanged: (v) => controller.form['appName']?.value = v,
-                    style:  TextStyle(color: AppColors.text),
+                    style: TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'App Name'),
                   ),
                   const SizedBox(height: AppSizes.md),
@@ -169,14 +195,14 @@ class SettingsGeneralView extends StatelessWidget {
                     controller: emailController,
                     onChanged: (v) =>
                         controller.form['supportEmail']?.value = v,
-                    style:  TextStyle(color: AppColors.text),
+                    style: TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'Support email'.tr),
                   ),
                   const SizedBox(height: AppSizes.md),
                   TextField(
                     controller: aboutController,
                     onChanged: (v) => controller.form['about']?.value = v,
-                    style:  TextStyle(color: AppColors.text),
+                    style: TextStyle(color: AppColors.text),
                     maxLines: 4,
                     decoration: InputDecoration(
                       labelText: 'About info'.tr,
@@ -187,13 +213,11 @@ class SettingsGeneralView extends StatelessWidget {
                   Obx(
                     () => PrimaryButton(
                       expand: true,
-                      label: controller.saving.value
-                          ? 'Loading'.tr
-                          : 'Save changes'.tr,
+                      label: 'Save changes'.tr,
+                      loadingLabel: 'Loading'.tr,
                       icon: Icons.save_outlined,
-                      onPressed: controller.saving.value
-                          ? null
-                          : controller.save,
+                      isLoading: controller.saving.value,
+                      onPressed: controller.save,
                     ),
                   ),
                 ],

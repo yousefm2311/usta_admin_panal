@@ -1,8 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:usta_admin_panal/core/services/formate_date.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_config.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/utils/notify.dart';
 import '../../../layout/admin_layout.dart';
@@ -116,6 +119,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
         final customerPhone = (order['customer']?['phone'] ?? '').toString();
 
         final messages = controller.messages;
+        final images = _extractImages(order);
 
         return SingleChildScrollView(
           child: Column(
@@ -303,6 +307,30 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                         );
                       },
                     ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppSizes.md),
+
+              // Images
+              _card(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle('Images'.tr),
+                    const SizedBox(height: AppSizes.sm),
+                    if (images.isEmpty)
+                      Text(
+                        'No data'.tr,
+                        style: TextStyle(color: AppColors.textMuted),
+                      )
+                    else
+                      Wrap(
+                        spacing: AppSizes.sm,
+                        runSpacing: AppSizes.sm,
+                        children: images.map(_imageTile).toList(),
+                      ),
                   ],
                 ),
               ),
@@ -733,6 +761,132 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
         ),
       ),
     );
+  }
+
+  Widget _imageTile(String url) {
+    final resolved = _normalizeImageUrl(url);
+    final widget = resolved.startsWith('data:')
+        ? _buildDataImage(resolved)
+        : Image.network(
+            resolved,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _imageFallback(),
+          );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+      child: Container(
+        width: 160,
+        height: 110,
+        decoration: BoxDecoration(
+          color: AppColors.overlay,
+          border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        ),
+        child: widget,
+      ),
+    );
+  }
+
+  Widget _buildDataImage(String dataUri) {
+    final bytes = _dataUriToBytes(dataUri);
+    if (bytes == null) return _imageFallback();
+    return Image.memory(bytes, fit: BoxFit.cover);
+  }
+
+  Widget _imageFallback() {
+    return Center(
+      child: Text(
+        'Image'.tr,
+        style: TextStyle(color: AppColors.textMuted),
+      ),
+    );
+  }
+
+  Uint8List? _dataUriToBytes(String dataUri) {
+    try {
+      final uri = Uri.parse(dataUri);
+      return uri.data?.contentAsBytes();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  List<String> _extractImages(Map<String, dynamic> order) {
+    final List<String> output = [];
+    final sources = <dynamic>[
+      order['images'],
+      order['image'],
+      order['photos'],
+      order['attachments'],
+      order['media'],
+      order['files'],
+      order['gallery'],
+      (order['request'] is Map) ? (order['request'] as Map)['images'] : null,
+      (order['request'] is Map) ? (order['request'] as Map)['photos'] : null,
+    ];
+
+    for (final src in sources) {
+      _collectImages(src, output);
+    }
+
+    final uniq = <String>{};
+    for (final item in output) {
+      final trimmed = item.trim();
+      if (trimmed.isNotEmpty) {
+        uniq.add(trimmed);
+      }
+    }
+    return uniq.toList();
+  }
+
+  void _collectImages(dynamic source, List<String> output) {
+    if (source == null) return;
+
+    if (source is String || source is num) {
+      output.add(source.toString());
+      return;
+    }
+
+    if (source is Map) {
+      const keys = [
+        'url',
+        'image',
+        'path',
+        'src',
+        'file',
+        'thumbnail',
+        'preview',
+        'location',
+        'link',
+      ];
+      for (final key in keys) {
+        final value = source[key];
+        if (value is String || value is num) {
+          output.add(value.toString());
+        }
+      }
+
+      const nestedKeys = ['images', 'photos', 'files', 'attachments', 'media'];
+      for (final key in nestedKeys) {
+        _collectImages(source[key], output);
+      }
+      return;
+    }
+
+    if (source is List) {
+      for (final item in source) {
+        _collectImages(item, output);
+      }
+    }
+  }
+
+  String _normalizeImageUrl(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty) return value;
+    if (value.startsWith('http') || value.startsWith('data:')) return value;
+    return value.startsWith('/')
+        ? '${AppConfig.baseUrl}$value'
+        : '${AppConfig.baseUrl}/$value';
   }
 
   String _normalizeStatusKey(String status) {

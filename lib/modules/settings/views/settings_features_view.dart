@@ -83,14 +83,14 @@ class _SettingsFeaturesViewState extends State<SettingsFeaturesView> {
                   Obx(
                     () => PrimaryButton(
                       expand: true,
-                      label: controller.saving.value ? 'Loading'.tr : 'Save changes'.tr,
+                      label: 'Save changes'.tr,
+                      loadingLabel: 'Loading'.tr,
+                      isLoading: controller.saving.value,
                       icon: Icons.save_outlined,
-                      onPressed: controller.saving.value
-                          ? null
-                          : () {
-                              if (!(_formKey.currentState?.validate() ?? false)) return;
-                              controller.save(_jsonController.text);
-                            },
+                      onPressed: () {
+                        if (!(_formKey.currentState?.validate() ?? false)) return;
+                        controller.save(_jsonController.text);
+                      },
                     ),
                   ),
                 ],

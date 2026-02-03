@@ -131,34 +131,34 @@ class _NotificationsBroadcastViewState extends State<NotificationsBroadcastView>
                   Obx(
                     () => PrimaryButton(
                       expand: true,
-                      label: controller.sending.value ? 'Loading'.tr : 'Send notification'.tr,
+                      label: 'Send notification'.tr,
+                      loadingLabel: 'Loading'.tr,
+                      isLoading: controller.sending.value,
                       icon: Icons.campaign_outlined,
-                      onPressed: controller.sending.value
-                          ? null
-                          : () async {
-                              if (!(_formKey.currentState?.validate() ?? false)) return;
-                              if (isSegment && _topicController.text.trim().isEmpty) {
-                                showError('Segment topic required'.tr);
-                                return;
-                              }
-                              if (isSegment && !_topicController.text.trim().startsWith('seg_')) {
-                                showError('Segment topic must start with seg_'.tr);
-                                return;
-                              }
-                              if (isSelected && !_hasAnyIds()) {
-                                showError('Please enter at least one ID'.tr);
-                                return;
-                              }
-                              await controller.broadcast(
-                                audience: _audience,
-                                title: _titleController.text.trim(),
-                                body: _bodyController.text.trim(),
-                                topic: isSegment ? _topicController.text.trim() : null,
-                                customerIds: _splitIds(_customerIdsController.text),
-                                artisanIds: _splitIds(_artisanIdsController.text),
-                                adminIds: _splitIds(_adminIdsController.text),
-                              );
-                            },
+                      onPressed: () async {
+                        if (!(_formKey.currentState?.validate() ?? false)) return;
+                        if (isSegment && _topicController.text.trim().isEmpty) {
+                          showError('Segment topic required'.tr);
+                          return;
+                        }
+                        if (isSegment && !_topicController.text.trim().startsWith('seg_')) {
+                          showError('Segment topic must start with seg_'.tr);
+                          return;
+                        }
+                        if (isSelected && !_hasAnyIds()) {
+                          showError('Please enter at least one ID'.tr);
+                          return;
+                        }
+                        await controller.broadcast(
+                          audience: _audience,
+                          title: _titleController.text.trim(),
+                          body: _bodyController.text.trim(),
+                          topic: isSegment ? _topicController.text.trim() : null,
+                          customerIds: _splitIds(_customerIdsController.text),
+                          artisanIds: _splitIds(_artisanIdsController.text),
+                          adminIds: _splitIds(_adminIdsController.text),
+                        );
+                      },
                     ),
                   ),
                 ],

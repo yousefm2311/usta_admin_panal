@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_config.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/utils/notify.dart';
 import '../../../layout/admin_layout.dart';
@@ -88,11 +91,11 @@ class _RequestDetailsViewState extends State<RequestDetailsView> {
         final price =
             double.tryParse((req['price'] ?? req['amount'] ?? 0).toString()) ??
             0;
-        final images = (req['images'] is List)
-            ? (req['images'] as List).cast<dynamic>()
-            : <dynamic>[];
+        final images = _extractImages(req);
 
         final statusKey = _normalizeStatusKey(req['status']);
+        final isFinalStatus =
+            statusKey == 'closed' || statusKey == 'cancelled';
         final steps = controller.timeline;
 
         return SingleChildScrollView(
@@ -217,18 +220,32 @@ class _RequestDetailsViewState extends State<RequestDetailsView> {
                           ),
                         ),
                         const SizedBox(width: AppSizes.sm),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (requestId.isEmpty) return;
-                            await controller.addTimeline(
-                              requestId,
-                              status: timelineStatus.value,
-                              note: timelineNote.text.trim(),
-                            );
-                            timelineNote.clear();
-                          },
-                          child: Text('Add'.tr),
-                        ),
+                        Obx(() {
+                          final isBusy = controller.addingTimeline.value;
+                          return ElevatedButton.icon(
+                            onPressed: isBusy || requestId.isEmpty
+                                ? null
+                                : () async {
+                                    if (requestId.isEmpty) return;
+                                    await controller.addTimeline(
+                                      requestId,
+                                      status: timelineStatus.value,
+                                      note: timelineNote.text.trim(),
+                                    );
+                                    timelineNote.clear();
+                                  },
+                            icon: isBusy
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.add),
+                            label: Text(isBusy ? 'Adding...'.tr : 'Add'.tr),
+                          );
+                        }),
                       ],
                     ),
                   ],
@@ -253,46 +270,7 @@ class _RequestDetailsViewState extends State<RequestDetailsView> {
                       Wrap(
                         spacing: AppSizes.sm,
                         runSpacing: AppSizes.sm,
-                        children: images.map((img) {
-                          final url = img.toString();
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              AppSizes.inputRadius,
-                            ),
-                            child: Container(
-                              width: 160,
-                              height: 110,
-                              decoration: BoxDecoration(
-                                color: AppColors.overlay,
-                                border: Border.fromBorderSide(
-                                  BorderSide(color: AppColors.border),
-                                ),
-                              ),
-                              child: url.startsWith('http')
-                                  ? Image.network(
-                                      url,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Center(
-                                        child: Text(
-                                          'Image'.tr,
-                                          style: TextStyle(
-                                            color: AppColors.textMuted,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : Center(
-                                      child: Text(
-                                        url,
-                                        style: TextStyle(
-                                          color: AppColors.textMuted,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                            ),
-                          );
-                        }).toList(),
+                        children: images.map(_imageTile).toList(),
                       ),
                   ],
                 ),
@@ -357,6 +335,7 @@ class _RequestDetailsViewState extends State<RequestDetailsView> {
                     TextField(
                       controller: msgController,
                       style: TextStyle(color: AppColors.text),
+                      enabled: !controller.sendingMessage.value,
                       decoration: InputDecoration(
                         hintText: 'Type notification message'.tr,
                       ),
@@ -405,37 +384,63 @@ class _RequestDetailsViewState extends State<RequestDetailsView> {
               const SizedBox(height: AppSizes.md),
 
               // Actions
-              Row(
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () => controller.close(
-                      requestId,
-                      status: 'closed',
-                      note: actionNote.text.trim().isEmpty
+              Obx(() {
+                final isClosing = controller.closing.value;
+                final isCancelling = controller.cancelling.value;
+                final disableActions = requestId.isEmpty ||
+                    isFinalStatus ||
+                    isClosing ||
+                    isCancelling;
+
+                return Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: disableActions
                           ? null
-                          : actionNote.text.trim(),
+                          : () => controller.close(
+                                requestId,
+                                status: 'closed',
+                                note: actionNote.text.trim().isEmpty
+                                    ? null
+                                    : actionNote.text.trim(),
+                              ),
+                      icon: isClosing
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.check_circle_outline),
+                      label: Text(isClosing ? 'Closing...'.tr : 'Close'.tr),
                     ),
-                    icon: const Icon(Icons.check_circle_outline),
-                    label: Text('Close'.tr),
-                  ),
-                  const SizedBox(width: AppSizes.sm),
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.border),
-                      foregroundColor: AppColors.text,
-                    ),
-                    onPressed: () => controller.cancel(
-                      requestId,
-                      reason: 'Canceled by admin',
-                      note: actionNote.text.trim().isEmpty
+                    const SizedBox(width: AppSizes.sm),
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColors.border),
+                        foregroundColor: AppColors.text,
+                      ),
+                      onPressed: disableActions
                           ? null
-                          : actionNote.text.trim(),
+                          : () => controller.cancel(
+                                requestId,
+                                reason: 'Canceled by admin',
+                                note: actionNote.text.trim().isEmpty
+                                    ? null
+                                    : actionNote.text.trim(),
+                              ),
+                      icon: isCancelling
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.cancel_outlined),
+                      label:
+                          Text(isCancelling ? 'Canceling...'.tr : 'Cancel'.tr),
                     ),
-                    icon: const Icon(Icons.cancel_outlined),
-                    label: Text('Cancel'.tr),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
               const SizedBox(height: AppSizes.sm),
               TextField(
                 controller: actionNote,
@@ -617,5 +622,131 @@ class _RequestDetailsViewState extends State<RequestDetailsView> {
       default:
         return AppColors.primary;
     }
+  }
+
+  Widget _imageTile(String url) {
+    final resolved = _normalizeImageUrl(url);
+    final widget = resolved.startsWith('data:')
+        ? _buildDataImage(resolved)
+        : Image.network(
+            resolved,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _imageFallback(),
+          );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+      child: Container(
+        width: 160,
+        height: 110,
+        decoration: BoxDecoration(
+          color: AppColors.overlay,
+          border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        ),
+        child: widget,
+      ),
+    );
+  }
+
+  Widget _buildDataImage(String dataUri) {
+    final bytes = _dataUriToBytes(dataUri);
+    if (bytes == null) return _imageFallback();
+    return Image.memory(bytes, fit: BoxFit.cover);
+  }
+
+  Widget _imageFallback() {
+    return Center(
+      child: Text(
+        'Image'.tr,
+        style: TextStyle(color: AppColors.textMuted),
+      ),
+    );
+  }
+
+  Uint8List? _dataUriToBytes(String dataUri) {
+    try {
+      final uri = Uri.parse(dataUri);
+      return uri.data?.contentAsBytes();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  List<String> _extractImages(Map<String, dynamic> request) {
+    final List<String> output = [];
+    final sources = <dynamic>[
+      request['images'],
+      request['image'],
+      request['photos'],
+      request['attachments'],
+      request['media'],
+      request['files'],
+      request['gallery'],
+      (request['request'] is Map) ? (request['request'] as Map)['images'] : null,
+      (request['request'] is Map) ? (request['request'] as Map)['photos'] : null,
+    ];
+
+    for (final src in sources) {
+      _collectImages(src, output);
+    }
+
+    final uniq = <String>{};
+    for (final item in output) {
+      final trimmed = item.trim();
+      if (trimmed.isNotEmpty) {
+        uniq.add(trimmed);
+      }
+    }
+    return uniq.toList();
+  }
+
+  void _collectImages(dynamic source, List<String> output) {
+    if (source == null) return;
+
+    if (source is String || source is num) {
+      output.add(source.toString());
+      return;
+    }
+
+    if (source is Map) {
+      const keys = [
+        'url',
+        'image',
+        'path',
+        'src',
+        'file',
+        'thumbnail',
+        'preview',
+        'location',
+        'link',
+      ];
+      for (final key in keys) {
+        final value = source[key];
+        if (value is String || value is num) {
+          output.add(value.toString());
+        }
+      }
+
+      const nestedKeys = ['images', 'photos', 'files', 'attachments', 'media'];
+      for (final key in nestedKeys) {
+        _collectImages(source[key], output);
+      }
+      return;
+    }
+
+    if (source is List) {
+      for (final item in source) {
+        _collectImages(item, output);
+      }
+    }
+  }
+
+  String _normalizeImageUrl(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty) return value;
+    if (value.startsWith('http') || value.startsWith('data:')) return value;
+    return value.startsWith('/')
+        ? '${AppConfig.baseUrl}$value'
+        : '${AppConfig.baseUrl}/$value';
   }
 }

@@ -9,23 +9,33 @@ import '../../../layout/admin_layout.dart';
 import '../../../widgets/shimmer_widgets.dart';
 import '../controllers/categories_controller.dart';
 
-class CategoriesListView extends StatelessWidget {
+class CategoriesListView extends StatefulWidget {
   const CategoriesListView({super.key});
 
   @override
+  State<CategoriesListView> createState() => _CategoriesListViewState();
+}
+
+class _CategoriesListViewState extends State<CategoriesListView> {
+  late final CategoriesController controller;
+  final RxString search = ''.obs;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(CategoriesController());
+  }
+
+  int _columnsForWidth(double w) {
+    if (w >= 1200) return 4;
+    if (w >= 900) return 3;
+    if (w >= 650) return 2;
+    return 1;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CategoriesController());
     final isMobile = Responsive.isMobile(context);
-
-    // local search
-    final search = ''.obs;
-
-    int _columnsForWidth(double w) {
-      if (w >= 1200) return 4;
-      if (w >= 900) return 3;
-      if (w >= 650) return 2;
-      return 1;
-    }
 
     return AdminLayout(
       title: 'Service categories'.tr,
@@ -73,11 +83,7 @@ class CategoriesListView extends StatelessWidget {
                     vertical: 12,
                   ),
                 ),
-                onPressed: () {
-                  // لو عندك load() في الكنترولر استخدمه بدل ده
-                  // controller.loadCategories();
-                  controller.onInit(); // fallback لو مفيش load
-                },
+                onPressed: controller.loadCategories,
                 icon: const Icon(Icons.refresh_rounded, size: 18),
                 label: Text('Refresh'.tr),
               ),

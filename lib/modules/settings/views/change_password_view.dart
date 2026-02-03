@@ -101,22 +101,22 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
                   Obx(
                     () => PrimaryButton(
                       expand: true,
-                      label: controller.saving.value ? 'Loading'.tr : 'Save changes'.tr,
+                      label: 'Save changes'.tr,
+                      loadingLabel: 'Loading'.tr,
+                      isLoading: controller.saving.value,
                       icon: Icons.lock_reset,
-                      onPressed: controller.saving.value
-                          ? null
-                          : () async {
-                              if (!(_formKey.currentState?.validate() ?? false)) return;
-                              final ok = await controller.changePassword(
-                                currentPassword: _currentController.text.trim(),
-                                newPassword: _newController.text.trim(),
-                              );
-                              if (ok) {
-                                _currentController.clear();
-                                _newController.clear();
-                                _confirmController.clear();
-                              }
-                            },
+                      onPressed: () async {
+                        if (!(_formKey.currentState?.validate() ?? false)) return;
+                        final ok = await controller.changePassword(
+                          currentPassword: _currentController.text.trim(),
+                          newPassword: _newController.text.trim(),
+                        );
+                        if (ok) {
+                          _currentController.clear();
+                          _newController.clear();
+                          _confirmController.clear();
+                        }
+                      },
                     ),
                   ),
                 ],
