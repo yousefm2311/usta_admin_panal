@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../../modules/ai/views/ai_reviews_insights_view.dart';
@@ -51,94 +52,99 @@ import '../../modules/logs/views/system_health_view.dart';
 import '../../modules/profile/views/admin_profile_view.dart';
 import '../../modules/auth/views/reset_password_view.dart';
 import '../../modules/auth/views/choose_role_view.dart';
+import '../../widgets/theme_rebuild.dart';
 
 class AppPages {
+  static GetPage _themed(String name, WidgetBuilder builder) {
+    return GetPage(name: name, page: () => ThemeRebuild(builder: builder));
+  }
+
   static final pages = <GetPage>[
-    GetPage(name: '/login', page: () => const LoginView()),
-    GetPage(name: '/reset', page: () => const ResetPasswordView()),
-    GetPage(name: '/choose-role', page: () => const ChooseRoleView()),
-    GetPage(name: '/dashboard', page: () => const DashboardView()),
+    _themed('/login', (_) => LoginView()),
+    _themed('/reset', (_) => ResetPasswordView()),
+    _themed('/choose-role', (_) => ChooseRoleView()),
+    _themed('/dashboard', (_) => DashboardView()),
 
     // Orders
-    GetPage(name: '/orders', page: () => const AllOrdersView()),
-    GetPage(name: '/order/details', page: () => const OrderDetailsView()),
-    GetPage(name: '/order/timeline', page: () => const OrderTimelineView()),
+    _themed('/orders', (_) => AllOrdersView()),
+    _themed('/order/details', (_) => OrderDetailsView()),
+    _themed('/order/timeline', (_) => OrderTimelineView()),
 
     // Customers
-    GetPage(name: '/customers', page: () => const CustomersListView()),
-    GetPage(name: '/customer/details', page: () => const CustomerDetailsView()),
-    GetPage(name: '/customer/orders', page: () => const CustomerOrdersView()),
+    _themed('/customers', (_) => CustomersListView()),
+    _themed('/customer/details', (_) => CustomerDetailsView()),
+    _themed('/customer/orders', (_) => CustomerOrdersView()),
 
     // Artisans
-    GetPage(name: '/artisans', page: () => const ArtisansListView()),
-    GetPage(name: '/artisan/details', page: () => const ArtisanDetailsView()),
+    _themed('/artisans', (_) => ArtisansListView()),
+    _themed('/artisan/details', (_) => ArtisanDetailsView()),
 
     // Requests
-    GetPage(name: '/requests', page: () => const RequestsListView()),
-    GetPage(name: '/request/details', page: () => const RequestDetailsView()),
+    _themed('/requests', (_) => RequestsListView()),
+    _themed('/request/details', (_) => RequestDetailsView()),
 
     // Payments & Withdrawals
-    GetPage(name: '/payments', page: () => const PaymentsListView()),
-    GetPage(name: '/transactions', page: () => const TransactionsView()),
-    GetPage(name: '/payouts', page: () => const PayoutRequestsView()),
-    GetPage(name: '/payout/details', page: () => const PayoutDetailsView()),
-    GetPage(name: '/payment/details', page: () => const PaymentDetailsView()),
-    GetPage(name: '/wallets', page: () => const WalletSummaryView()),
-    GetPage(name: '/withdrawals', page: () => const WithdrawalsListView()),
+    _themed('/payments', (_) => PaymentsListView()),
+    _themed('/transactions', (_) => TransactionsView()),
+    _themed('/payouts', (_) => PayoutRequestsView()),
+    _themed('/payout/details', (_) => PayoutDetailsView()),
+    _themed('/payment/details', (_) => PaymentDetailsView()),
+    _themed('/wallets', (_) => WalletSummaryView()),
+    _themed('/withdrawals', (_) => WithdrawalsListView()),
 
     // Categories
-    GetPage(name: '/categories', page: () => const CategoriesListView()),
-    GetPage(name: '/category/add', page: () => const CategoryFormView()),
+    _themed('/categories', (_) => CategoriesListView()),
+    _themed('/category/add', (_) => CategoryFormView()),
 
     // Reviews
-    GetPage(name: '/reviews', page: () => const ReviewsListView()),
+    _themed('/reviews', (_) => ReviewsListView()),
 
     // Reports
-    GetPage(name: '/reports', page: () => const ReportsListView()),
-    GetPage(name: '/report/details', page: () => const ReportDetailsView()),
+    _themed('/reports', (_) => ReportsListView()),
+    _themed('/report/details', (_) => ReportDetailsView()),
 
     // Notifications
-    GetPage(name: '/notifications', page: () => const NotificationsCenterView()),
-    GetPage(name: '/notifications/send', page: () => const SendNotificationView()),
-    GetPage(name: '/notifications/templates', page: () => const NotificationTemplatesView()),
-    GetPage(name: '/notifications/broadcast', page: () => const NotificationsBroadcastView()),
-    GetPage(name: '/notifications/tokens', page: () => const NotificationsTokensView()),
+    _themed('/notifications', (_) => NotificationsCenterView()),
+    _themed('/notifications/send', (_) => SendNotificationView()),
+    _themed('/notifications/templates', (_) => NotificationTemplatesView()),
+    _themed('/notifications/broadcast', (_) => NotificationsBroadcastView()),
+    _themed('/notifications/tokens', (_) => NotificationsTokensView()),
 
     // Analytics
-    GetPage(name: '/analytics', page: () => const AnalyticsOverviewView()),
+    _themed('/analytics', (_) => AnalyticsOverviewView()),
 
     // Settings
-    GetPage(name: '/settings', page: () => const SettingsGeneralView()),
-    GetPage(name: '/settings/commission', page: () => const SettingsCommissionView()),
-    GetPage(name: '/settings/features', page: () => const SettingsFeaturesView()),
-    GetPage(name: '/settings/security', page: () => const SettingsSecurityView()),
-    GetPage(name: '/settings/change-password', page: () => const ChangePasswordView()),
+    _themed('/settings', (_) => SettingsGeneralView()),
+    _themed('/settings/commission', (_) => SettingsCommissionView()),
+    _themed('/settings/features', (_) => SettingsFeaturesView()),
+    _themed('/settings/security', (_) => SettingsSecurityView()),
+    _themed('/settings/change-password', (_) => ChangePasswordView()),
 
     // Complaints
-    GetPage(name: '/complaints', page: () => const ComplaintsListView()),
-    GetPage(name: '/complaint/details', page: () => const ComplaintDetailsView()),
+    _themed('/complaints', (_) => ComplaintsListView()),
+    _themed('/complaint/details', (_) => ComplaintDetailsView()),
 
     // Marketing
-    GetPage(name: '/marketing/coupons', page: () => const CouponsView()),
-    GetPage(name: '/marketing/referral', page: () => const ReferralView()),
-    GetPage(name: '/marketing/rewards', page: () => const RewardsView()),
+    _themed('/marketing/coupons', (_) => CouponsView()),
+    _themed('/marketing/referral', (_) => ReferralView()),
+    _themed('/marketing/rewards', (_) => RewardsView()),
 
     // Roles
-    GetPage(name: '/roles', page: () => const RolesListView()),
-    GetPage(name: '/roles/permissions', page: () => const RolePermissionsView()),
+    _themed('/roles', (_) => RolesListView()),
+    _themed('/roles/permissions', (_) => RolePermissionsView()),
 
     // Logs
-    GetPage(name: '/logs/activity', page: () =>  ActivityLogsView()),
-    GetPage(name: '/logs/health', page: () => const SystemHealthView()),
+    _themed('/logs/activity', (_) => ActivityLogsView()),
+    _themed('/logs/health', (_) => SystemHealthView()),
 
     // Profile
-    GetPage(name: '/profile', page: () => const AdminProfileView()),
+    _themed('/profile', (_) => AdminProfileView()),
 
     // AI
-    GetPage(name: '/ai/reviews', page: () => const AIReviewsInsightsView()),
-    GetPage(name: '/ai/top-artisans', page: () => const AITopArtisansView()),
-    GetPage(name: '/ai/fraud', page: () => const AIFraudDetectionView()),
-    GetPage(name: '/ai/word-cloud', page: () => const AIWordCloudView()),
+    _themed('/ai/reviews', (_) => AIReviewsInsightsView()),
+    _themed('/ai/top-artisans', (_) => AITopArtisansView()),
+    _themed('/ai/fraud', (_) => AIFraudDetectionView()),
+    _themed('/ai/word-cloud', (_) => AIWordCloudView()),
 
   ];
 }

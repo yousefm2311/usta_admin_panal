@@ -7,17 +7,48 @@ import '../../../layout/admin_layout.dart';
 import '../../../widgets/shimmer_widgets.dart';
 import '../controllers/complaint_details_controller.dart';
 
-class ComplaintDetailsView extends StatelessWidget {
+class ComplaintDetailsView extends StatefulWidget {
   const ComplaintDetailsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<ComplaintDetailsView> createState() => _ComplaintDetailsViewState();
+}
+
+class _ComplaintDetailsViewState extends State<ComplaintDetailsView> {
+  late final ComplaintDetailsController controller;
+  final TextEditingController agentController = TextEditingController();
+  final TextEditingController noteController = TextEditingController();
+  String complaintId = '';
+  bool loadedOnce = false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(ComplaintDetailsController());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (loadedOnce) return;
+
     final args = Get.arguments as Map<String, dynamic>?;
-    final id = (args?['_id'] ?? args?['id'] ?? '').toString();
-    final controller = Get.put(ComplaintDetailsController());
-    if (id.isNotEmpty) {
-      controller.load(id);
+    complaintId = (args?['_id'] ?? args?['id'] ?? '').toString();
+    if (complaintId.isNotEmpty) {
+      controller.load(complaintId);
+      loadedOnce = true;
     }
+  }
+
+  @override
+  void dispose() {
+    agentController.dispose();
+    noteController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return AdminLayout(
       title: ''.tr,
@@ -45,8 +76,6 @@ class ComplaintDetailsView extends StatelessWidget {
           );
         }
         final thread = (data['messages'] ?? data['thread'] ?? []) as List<dynamic>;
-        final agentController = TextEditingController();
-        final noteController = TextEditingController();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -116,7 +145,7 @@ class ComplaintDetailsView extends StatelessWidget {
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: () => controller.updateStatus(id, 'assigned'),
+                  onPressed: () => controller.updateStatus(complaintId, 'assigned'),
                   child: Text('Assign to support'.tr),
                 ),
                 const SizedBox(width: AppSizes.sm),
@@ -125,7 +154,7 @@ class ComplaintDetailsView extends StatelessWidget {
                     side:  BorderSide(color: AppColors.border),
                     foregroundColor: AppColors.text,
                   ),
-                  onPressed: () => controller.updateStatus(id, 'closed'),
+                  onPressed: () => controller.updateStatus(complaintId, 'closed'),
                   child: Text('close'.tr),
                 ),
               ],
@@ -150,7 +179,7 @@ class ComplaintDetailsView extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSizes.sm),
                       ElevatedButton(
-                        onPressed: () => controller.assignAgent(id, agentController.text),
+                        onPressed: () => controller.assignAgent(complaintId, agentController.text),
                         child: Text('Assign'.tr),
                       ),
                     ],
@@ -171,7 +200,7 @@ class ComplaintDetailsView extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSizes.sm),
                       ElevatedButton(
-                        onPressed: () => controller.addNote(id, noteController.text),
+                        onPressed: () => controller.addNote(complaintId, noteController.text),
                         child: Text('Save'.tr),
                       ),
                     ],
@@ -188,7 +217,7 @@ class ComplaintDetailsView extends StatelessWidget {
               style:  TextStyle(color: AppColors.text),
               onSubmitted: (v) {
                 if (v.trim().isNotEmpty) {
-                  controller.addMessage(id, v.trim());
+                  controller.addMessage(complaintId, v.trim());
                 }
               },
             ),

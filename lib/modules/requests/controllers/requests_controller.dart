@@ -58,9 +58,10 @@ class RequestsController extends GetxController {
         return 'accepted';
       case 'assigned':
         return 'assigned';
+      case 'in_progress':
       case 'in progress':
       case 'in-progress':
-        return 'in-progress';
+        return 'in_progress';
       case 'completed':
         return 'completed';
       case 'cancelled':

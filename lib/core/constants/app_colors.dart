@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../services/theme_controller.dart';
+
 class AppPalette {
   final Color background;
   final Color card;
@@ -54,7 +56,22 @@ class AppColors {
     overlay: Color(0xFFF1F5F9),
   );
 
-  static AppPalette get current => Get.isDarkMode ? dark : light;
+  static AppPalette get current {
+    if (Get.isRegistered<ThemeController>()) {
+      final mode = Get.find<ThemeController>().themeMode.value;
+      switch (mode) {
+        case ThemeMode.light:
+          return light;
+        case ThemeMode.dark:
+          return dark;
+        case ThemeMode.system:
+          final brightness =
+              WidgetsBinding.instance.platformDispatcher.platformBrightness;
+          return brightness == Brightness.dark ? dark : light;
+      }
+    }
+    return Get.isDarkMode ? dark : light;
+  }
 
   static Color get background => current.background;
   static Color get card => current.card;

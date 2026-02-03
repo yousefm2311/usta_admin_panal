@@ -3,8 +3,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:usta_admin_panal/modules/logs/views/system_health_view.dart';
-
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_config.dart';
 import '../../../core/constants/app_sizes.dart';
@@ -48,7 +46,7 @@ class SettingsGeneralView extends StatelessWidget {
                 ),
                 Spacer(),
                 ElevatedButton.icon(
-                  onPressed: () =>  Get.to(()=>SystemHealthView()),
+                  onPressed: () => Get.toNamed('/logs/health'),
                   icon: const Icon(Icons.health_and_safety_rounded),
                   label: Text('Api Health'.tr),
                 ),

@@ -20,7 +20,7 @@ class DashboardView extends StatelessWidget {
     final isMobile = Responsive.isMobile(context);
 
     return AdminLayout(
-      title: '',
+      title: 'Dashboard'.tr,
       child: Obx(() {
         if (controller.loading.value) {
           return Column(

@@ -1,21 +1,36 @@
 import 'package:dio/dio.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/services/api_exceptions.dart';
 
 class RequestsService {
   final ApiClient _client = ApiClient();
   Dio get _dio => _client.dio;
 
   Future<Response> fetchRequests({String? status}) {
-    if (status != null && status.isNotEmpty) {
-      return _client.safe(
-        () => _dio.get(
-          '/api/admin/requests/filter',
-          queryParameters: {'status': status},
-        ),
-      );
+    if (status == null || status.isEmpty) {
+      return _client.safe(() => _dio.get('/api/admin/requests'));
     }
-    return _client.safe(() => _dio.get('/api/admin/requests'));
+
+    return _client
+        .safe(
+          () => _dio.get(
+            '/api/admin/requests',
+            queryParameters: {'status': status},
+          ),
+        )
+        .catchError((error) {
+      if (error is ApiException &&
+          (error.statusCode == 404 || error.statusCode == 400)) {
+        return _client.safe(
+          () => _dio.get(
+            '/api/admin/requests/filter',
+            queryParameters: {'status': status},
+          ),
+        );
+      }
+      throw error;
+    });
   }
 
   Future<Response> fetchDetails(String id) =>

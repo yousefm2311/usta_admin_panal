@@ -8,17 +8,46 @@ import '../../../layout/admin_layout.dart';
 import '../../../widgets/shimmer_widgets.dart';
 import '../controllers/report_details_controller.dart';
 
-class ReportDetailsView extends StatelessWidget {
+class ReportDetailsView extends StatefulWidget {
   const ReportDetailsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final args = Get.arguments as Map<String, dynamic>?;
-    final id = (args?['_id'] ?? args?['id'] ?? '').toString();
-    final controller = Get.put(ReportDetailsController());
-    if (id.isNotEmpty) controller.load(id);
+  State<ReportDetailsView> createState() => _ReportDetailsViewState();
+}
 
-    final replyController = TextEditingController();
+class _ReportDetailsViewState extends State<ReportDetailsView> {
+  late final ReportDetailsController controller;
+  final TextEditingController replyController = TextEditingController();
+  String reportId = '';
+  bool loadedOnce = false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(ReportDetailsController());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (loadedOnce) return;
+
+    final args = Get.arguments as Map<String, dynamic>?;
+    reportId = (args?['_id'] ?? args?['id'] ?? '').toString();
+    if (reportId.isNotEmpty) {
+      controller.load(reportId);
+      loadedOnce = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    replyController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return AdminLayout(
       title: '',
@@ -131,7 +160,7 @@ class ReportDetailsView extends StatelessWidget {
                   Row(
                     children: [
                       ElevatedButton.icon(
-                        onPressed: () => controller.reply(id, replyController.text),
+                        onPressed: () => controller.reply(reportId, replyController.text),
                         icon: const Icon(Icons.send),
                         label: Text('Send reply'.tr),
                       ),
@@ -141,7 +170,7 @@ class ReportDetailsView extends StatelessWidget {
                           side:  BorderSide(color: AppColors.border),
                           foregroundColor: AppColors.text,
                         ),
-                        onPressed: () => controller.close(id),
+                        onPressed: () => controller.close(reportId),
                         icon: const Icon(Icons.check_circle_outline),
                         label: Text('Close report'.tr),
                       ),

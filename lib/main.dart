@@ -13,14 +13,17 @@ import 'package:usta_admin_panal/core/services/api_exceptions.dart';
 
 import 'core/constants/app_config.dart';
 import 'core/services/locale_service.dart';
+import 'core/services/loading_service.dart';
 import 'core/services/theme_controller.dart';
 import 'core/services/token_storage.dart';
 import 'core/theme/app_theme.dart';
+import 'widgets/loading_overlay.dart';
 import 'modules/auth/services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  Get.put(LoadingService(), permanent: true);
   Get.put(ThemeController(), permanent: true);
   final tokenStorage = Get.put(TokenStorage());
   final initialRoute = await _resolveInitialRoute(tokenStorage);
@@ -108,10 +111,17 @@ class UstaAdminApp extends StatelessWidget {
           getPages: AppPages.pages,
           builder: (context, child) {
             final mediaQuery = MediaQuery.of(context);
-            return MediaQuery(
-              data: mediaQuery.copyWith(textScaleFactor: controller.textScale.value),
-              child: child ?? const SizedBox.shrink(),
-            );
+            return Obx(() {
+              final isLoading = Get.find<LoadingService>().isLoading;
+              return LoadingOverlay(
+                isLoading: isLoading,
+                child: MediaQuery(
+                  data:
+                      mediaQuery.copyWith(textScaleFactor: controller.textScale.value),
+                  child: child ?? const SizedBox.shrink(),
+                ),
+              );
+            });
           },
           scrollBehavior: const MaterialScrollBehavior().copyWith(
             dragDevices: {

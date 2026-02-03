@@ -8,7 +8,7 @@ class PaymentsController extends GetxController {
   final PaymentsService _service;
   PaymentsController({PaymentsService? service}) : _service = service ?? PaymentsService();
 
-  final transactions = <dynamic>[].obs;
+  final transactions = <Map<String, dynamic>>[].obs;
   final loading = false.obs;
   final error = RxnString();
   final filter = <String, dynamic>{}.obs;
@@ -32,15 +32,11 @@ class PaymentsController extends GetxController {
           ..addAll(params);
       }
       final query = filter.isEmpty ? null : Map<String, dynamic>.from(filter);
-      final res = query == null ? await _service.transactions() : await _service.filter(query);
+      final res =
+          query == null ? await _service.transactions() : await _service.filter(query);
       final data = res.data;
-      if (data is List) {
-        transactions.assignAll(data);
-      } else if (data is Map<String, dynamic>) {
-        transactions.assignAll(data['payments'] ?? data['data'] ?? []);
-      } else {
-        transactions.clear();
-      }
+      final normalized = _normalizeList(_unwrapData(data));
+      transactions.assignAll(normalized);
     } catch (e) {
       final msg = e is ApiException ? e.message : e.toString();
       error.value = msg;
@@ -48,6 +44,31 @@ class PaymentsController extends GetxController {
     } finally {
       loading.value = false;
     }
+  }
+
+  dynamic _unwrapData(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      return data['payments'] ??
+          data['transactions'] ??
+          data['items'] ??
+          data['results'] ??
+          data['data'] ??
+          data;
+    }
+    return data;
+  }
+
+  List<Map<String, dynamic>> _normalizeList(dynamic data) {
+    if (data is List) {
+      return data
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
+    }
+    if (data is Map) {
+      return [Map<String, dynamic>.from(data)];
+    }
+    return <Map<String, dynamic>>[];
   }
 
   Future<void> applyFilter(Map<String, dynamic> params) async {

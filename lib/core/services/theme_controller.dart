@@ -24,17 +24,17 @@ class ThemeController extends GetxController {
   }
 
   void setTheme(ThemeMode mode) {
+    if (themeMode.value == mode) return;
     themeMode.value = mode;
     Get.changeThemeMode(mode);
     _box.write(_themeKey, mode.name);
-    Get.forceAppUpdate();
   }
 
   void setTextScale(double scale) {
     final normalized = scale.clamp(0.85, 1.35).toDouble();
+    if (textScale.value == normalized) return;
     textScale.value = normalized;
     _box.write(_textScaleKey, normalized);
-    Get.forceAppUpdate();
   }
 
   void _loadTheme() {

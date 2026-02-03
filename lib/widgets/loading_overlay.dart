@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,11 +6,13 @@ import '../core/constants/app_sizes.dart';
 
 class LoadingOverlay extends StatelessWidget {
   final bool isLoading;
+  final bool blockUI;
   final Widget child;
 
   const LoadingOverlay({
     super.key,
     required this.isLoading,
+    this.blockUI = false,
     required this.child,
   });
 
@@ -21,64 +21,40 @@ class LoadingOverlay extends StatelessWidget {
     return Stack(
       children: [
         child,
-        if (isLoading)
+        if (isLoading && blockUI)
           Positioned.fill(
-            child: Stack(
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.background.withOpacity(0.55),
-                  ),
-                ),
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                  child: const SizedBox.expand(),
-                ),
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.lg,
-                      vertical: AppSizes.md,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.card,
-                      borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                      border: Border.all(color: AppColors.border),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25),
-                          blurRadius: 18,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          height: 36,
-                          width: 36,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
-                            valueColor:
-                                AlwaysStoppedAnimation(AppColors.primary),
-                          ),
-                        ),
-                        const SizedBox(height: AppSizes.sm),
-                        Text(
-                          'Loading'.tr,
-                          style: TextStyle(
-                            color: AppColors.text,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            child: AbsorbPointer(
+              absorbing: true,
+              child: Container(
+                color: AppColors.background.withOpacity(0.05),
+              ),
             ),
           ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 160),
+            child: isLoading
+                ? SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(999),
+                        child: LinearProgressIndicator(
+                          minHeight: 3,
+                          backgroundColor: AppColors.border.withOpacity(0.35),
+                          valueColor:
+                              AlwaysStoppedAnimation(AppColors.primary),
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ),
       ],
     );
   }

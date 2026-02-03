@@ -9,30 +9,72 @@ import '../../../layout/admin_layout.dart';
 import '../../../widgets/shimmer_widgets.dart';
 import '../controllers/order_details_controller.dart';
 
-class OrderDetailsView extends StatelessWidget {
+class OrderDetailsView extends StatefulWidget {
   const OrderDetailsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final args = Get.arguments as Map<String, dynamic>?;
-    final id = (args?['_id'] ?? args?['id'] ?? '').toString();
-    final controller = Get.put(OrderDetailsController());
-    if (id.isNotEmpty) controller.load(id);
+  State<OrderDetailsView> createState() => _OrderDetailsViewState();
+}
 
+class _OrderDetailsViewState extends State<OrderDetailsView> {
+  late final OrderDetailsController controller;
+
+  String orderId = '';
+
+  // Keep these out of build()
+  final RxString timelineStatus = 'in_progress'.obs;
+  final TextEditingController timelineNoteCtrl = TextEditingController();
+  final TextEditingController actionNoteCtrl = TextEditingController();
+  final TextEditingController msgCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(OrderDetailsController());
+
+    // Delay reading arguments until after first frame (safe)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = Get.arguments as Map<String, dynamic>?;
+      orderId = (args?['_id'] ?? args?['id'] ?? '').toString();
+
+      if (orderId.isNotEmpty) {
+        controller.load(orderId);
+      } else {
+        controller.error.value = 'No ID'.tr;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    timelineNoteCtrl.dispose();
+    actionNoteCtrl.dispose();
+    msgCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AdminLayout(
       title: ''.tr,
       child: Obx(() {
         if (controller.loading.value) {
           return Column(
-            children: [
-              const CardLoading(lines: 6),
-              const CardLoading(lines: 10),
-              const CardLoading(lines: 6),
-              const ListLoading(rows: 2,),
-              const CardLoading(lines: 8,),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              CardLoading(lines: 6),
+              SizedBox(height: AppSizes.md),
+              CardLoading(lines: 10),
+              SizedBox(height: AppSizes.md),
+              CardLoading(lines: 6),
+              SizedBox(height: AppSizes.md),
+              ListLoading(rows: 2),
+              SizedBox(height: AppSizes.md),
+              CardLoading(lines: 8),
             ],
           );
         }
+
         if (controller.error.value != null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
@@ -42,348 +84,567 @@ class OrderDetailsView extends StatelessWidget {
             ),
           );
         }
+
         final order = controller.order.value;
         if (order == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
             child: Text(
               'No data'.tr,
-              style:  TextStyle(color: AppColors.textMuted),
+              style: TextStyle(color: AppColors.textMuted),
             ),
           );
         }
+
         final price =
             double.tryParse(
               (order['amount'] ?? order['price'] ?? 0).toString(),
             ) ??
             0;
+
+        final serviceName = (order['serviceType'] ?? order['service'] ?? '')
+            .toString();
+        final status = (order['status'] ?? '').toString();
+        final statusKey = _normalizeStatusKey(status);
+        final createdAt = formatDateString(order['createdAt']);
+
+        final artisanName = (order['artisan']?['name'] ?? 'No artisan')
+            .toString();
+        final artisanPhone = (order['artisan']?['phone'] ?? '').toString();
+
+        final customerName = (order['customer']?['name'] ?? '').toString();
+        final customerPhone = (order['customer']?['phone'] ?? '').toString();
+
         final messages = controller.messages;
-        final timelineStatus = 'in_progress'.obs;
-        final timelineNote = TextEditingController();
-        final actionNote = TextEditingController();
-        final msgController = TextEditingController();
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Order Details'.tr,
-              style:  TextStyle(
-                color: AppColors.text,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: AppSizes.sm),
-            _card(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.10),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child:  Icon(
-                      Icons.build_rounded,
-                      color: AppColors.primary,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // اسم الخدمة
-                        Text(
-                          (order['serviceType'] ?? order['service'] ?? '')
-                              .toString(),
-                          style:  TextStyle(
-                            color: AppColors.text,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                            height: 1.3,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Text(
-                            //   '${order['customer']?['name'] ?? 'Unknown'}',
-                            //   style:  TextStyle(
-                            //     color: AppColors.textMuted,
-                            //     fontSize: 13,
-                            //     height: 1.3,
-                            //   ),
-                            //   overflow: TextOverflow.ellipsis,
-                            // ),
 
-                            const SizedBox(height: 4),
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _pageTitle('Order Details'.tr),
+              const SizedBox(height: AppSizes.sm),
 
-                            // الحرفي
-                            Text(
-                              '${order['artisan']?['name'] ?? 'No artisan'} (${order['artisan']?['phone'] ?? ''})',
-                              style:  TextStyle(
-                                color: AppColors.textMuted,
-                                fontSize: 13,
-                                height: 1.3,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+              // Header summary card
+              _card(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _iconBadge(Icons.build_rounded, AppColors.primary),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            serviceName,
+                            style: TextStyle(
+                              color: AppColors.text,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              height: 1.3,
                             ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 6),
-                        Text(
-                          '${"created".tr}: ${formatDateString(order['createdAt'])}',
-                          style:  TextStyle(
-                            color: AppColors.textMuted,
-                            fontSize: 12,
                           ),
-                        ),
+                          const SizedBox(height: 8),
+
+                          Wrap(
+                            runSpacing: 6,
+                            spacing: 10,
+                            children: [
+                              if (customerName.isNotEmpty)
+                                _miniInfo(
+                                  icon: Icons.person_outline,
+                                  text: customerPhone.isNotEmpty
+                                      ? '$customerName ($customerPhone)'
+                                      : customerName,
+                                ),
+                              _miniInfo(
+                                icon: Icons.handyman_outlined,
+                                text: artisanPhone.isNotEmpty
+                                    ? '$artisanName ($artisanPhone)'
+                                    : artisanName,
+                              ),
+                              _miniInfo(
+                                icon: Icons.calendar_month_outlined,
+                                text: '${"created".tr}: $createdAt',
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    _statusChip(status),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppSizes.md),
+
+              // Timeline card
+              _card(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle('Status timeline'.tr),
+                    const SizedBox(height: AppSizes.sm),
+
+                    Wrap(
+                      spacing: AppSizes.xs,
+                      runSpacing: AppSizes.xs,
+                      children: controller.timeline
+                          .map(
+                            (step) =>
+                                _statusChip((step['status'] ?? '').toString()),
+                          )
+                          .toList(),
+                    ),
+
+                    const SizedBox(height: AppSizes.md),
+                    _divider(),
+
+                    const SizedBox(height: AppSizes.sm),
+                    Text(
+                      'Add timeline step'.tr,
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: AppSizes.sm),
+
+                    LayoutBuilder(
+                      builder: (ctx, c) {
+                        final isNarrow = c.maxWidth < 520;
+                        final dropdown = Obx(
+                          () => DropdownButtonFormField<String>(
+                            value: timelineStatus.value,
+                            dropdownColor: AppColors.card,
+                            decoration: InputDecoration(labelText: 'Status'.tr),
+                            items:
+                                [
+                                  'pending',
+                                  'accepted',
+                                  'assigned',
+                                  'in_progress',
+                                  'completed',
+                                  'cancelled',
+                                  'closed',
+                                ].map((v) {
+                                  return DropdownMenuItem(
+                                    value: v,
+                                    child: Text(v.tr),
+                                  );
+                                }).toList(),
+                            onChanged: (v) {
+                              if (v != null) timelineStatus.value = v;
+                            },
+                          ),
+                        );
+
+                        final note = TextField(
+                          controller: timelineNoteCtrl,
+                          style: TextStyle(color: AppColors.text),
+                          decoration: InputDecoration(
+                            labelText: 'Note'.tr,
+                            hintText: 'Optional'.tr,
+                          ),
+                        );
+
+                        final btn = Obx(() {
+                          final isBusy = controller.addingTimeline.value;
+                          return ElevatedButton.icon(
+                            onPressed: isBusy || orderId.isEmpty
+                                ? null
+                                : () {
+                                    controller.addTimeline(
+                                      orderId,
+                                      status: timelineStatus.value,
+                                      note: timelineNoteCtrl.text.trim(),
+                                    );
+                                    timelineNoteCtrl.clear();
+                                  },
+                            icon: isBusy
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.add),
+                            label: Text(isBusy ? 'Adding...'.tr : 'Add'.tr),
+                          );
+                        });
+
+                        if (isNarrow) {
+                          return Column(
+                            children: [
+                              dropdown,
+                              const SizedBox(height: AppSizes.sm),
+                              note,
+                              const SizedBox(height: AppSizes.sm),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: btn,
+                              ),
+                            ],
+                          );
+                        }
+
+                        return Row(
+                          children: [
+                            SizedBox(width: 220, child: dropdown),
+                            const SizedBox(width: AppSizes.sm),
+                            Expanded(child: note),
+                            const SizedBox(width: AppSizes.sm),
+                            btn,
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppSizes.md),
+
+              // Payment info
+              _card(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle('Payment info'.tr),
+                    const SizedBox(height: AppSizes.sm),
+                    _priceRow(
+                      'Service total'.tr,
+                      'EG ${price.toStringAsFixed(0)}',
+                    ),
+                    _priceRow(
+                      'Platform fee'.tr,
+                      'EG ${(price * 0.1).toStringAsFixed(2)}',
+                    ),
+                    _divider(),
+                    _priceRow(
+                      'Total'.tr,
+                      'EG ${(price * 1.1).toStringAsFixed(2)}',
+                      bold: true,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppSizes.md),
+
+              // Actions
+              _card(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle('Actions'.tr),
+                    const SizedBox(height: AppSizes.sm),
+                    TextField(
+                      controller: actionNoteCtrl,
+                      style: TextStyle(color: AppColors.text),
+                      decoration: InputDecoration(
+                        labelText: 'Note'.tr,
+                        hintText: 'Optional'.tr,
+                      ),
+                    ),
+                    const SizedBox(height: AppSizes.md),
+                    Wrap(
+                      spacing: AppSizes.sm,
+                      runSpacing: AppSizes.sm,
+                      children: [
+                        Obx(() {
+                          final isBusy = controller.cancelling.value;
+                          final disabled = _isCancelDisabled(statusKey) ||
+                              controller.closing.value;
+                          return ElevatedButton.icon(
+                            onPressed: disabled || isBusy || orderId.isEmpty
+                                ? null
+                                : () => controller.cancel(
+                                      orderId,
+                                      note: actionNoteCtrl.text.trim().isEmpty
+                                          ? null
+                                          : actionNoteCtrl.text.trim(),
+                                      reason: 'Canceled by admin',
+                                    ),
+                            icon: isBusy
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.cancel_outlined),
+                            label: Text(
+                              isBusy ? 'Cancelling...'.tr : 'Cancel'.tr,
+                            ),
+                          );
+                        }),
+                        Obx(() {
+                          final isBusy = controller.closing.value;
+                          final disabled =
+                              _isCloseDisabled(statusKey) ||
+                                  controller.cancelling.value;
+                          return OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: AppColors.border),
+                              foregroundColor: AppColors.text,
+                            ),
+                            onPressed: disabled || isBusy || orderId.isEmpty
+                                ? null
+                                : () => controller.close(
+                                      orderId,
+                                      note: actionNoteCtrl.text.trim().isEmpty
+                                          ? null
+                                          : actionNoteCtrl.text.trim(),
+                                    ),
+                            icon: isBusy
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.check_circle_outline),
+                            label: Text(
+                              isBusy ? 'Closing...'.tr : 'Close order'.tr,
+                            ),
+                          );
+                        }),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  _statusChip((order['status'] ?? '').toString()),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: AppSizes.md),
-            _card(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Status timeline'.tr,
-                    style:  TextStyle(
-                      color: AppColors.text,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSizes.sm),
-                  Wrap(
-                    spacing: AppSizes.xs,
-                    children: controller.timeline
-                        .map(
-                          (step) =>
-                              _statusChip((step['status'] ?? '').toString()),
-                        )
-                        .toList(),
-                  ),
-                  const SizedBox(height: AppSizes.sm),
-                  Row(
-                    children: [
-                      Obx(
-                        () => DropdownButton<String>(
-                          value: timelineStatus.value,
-                          dropdownColor: AppColors.card,
-                          items:  [
-                            DropdownMenuItem(
-                              value: 'pending',
-                              child: Text('pending'.tr),
-                            ),
-                            DropdownMenuItem(
-                              value: 'accepted',
-                              child: Text('accepted'.tr),
-                            ),
-                            DropdownMenuItem(
-                              value: 'assigned',
-                              child: Text('assigned'.tr),
-                            ),
-                            DropdownMenuItem(
-                              value: 'in_progress',
-                              child: Text('in_progress'.tr),
-                            ),
-                            DropdownMenuItem(
-                              value: 'completed',
-                              child: Text('completed'.tr),
-                            ),
-                            DropdownMenuItem(
-                              value: 'canceled',
-                              child: Text('cancelled'.tr),
-                            ),
-                            DropdownMenuItem(
-                              value: 'closed',
-                              child: Text('closed'.tr),
-                            ),
-                          ],
-                          onChanged: (v) =>
-                              timelineStatus.value = v ?? timelineStatus.value,
-                        ),
-                      ),
-                      const SizedBox(width: AppSizes.sm),
-                      Expanded(
-                        child: TextField(
-                          controller: timelineNote,
-                          style:  TextStyle(color: AppColors.text),
-                          decoration: InputDecoration(hintText: 'Note'.tr),
-                        ),
-                      ),
-                      const SizedBox(width: AppSizes.sm),
-                      ElevatedButton(
-                        onPressed: () => controller.addTimeline(
-                          id,
-                          status: timelineStatus.value,
-                          note: timelineNote.text,
-                        ),
-                        child: Text('Add'.tr),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSizes.md),
-            _card(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Payment info'.tr,
-                    style:  TextStyle(
-                      color: AppColors.text,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSizes.sm),
-                  _priceRow(
-                    'Service total'.tr,
-                    'EG ${price.toStringAsFixed(0)}',
-                  ),
-                  _priceRow(
-                    'Platform fee'.tr,
-                    'EG ${(price * 0.1).toStringAsFixed(2)}',
-                  ),
-                   Divider(color: AppColors.border),
-                  _priceRow(
-                    'Total'.tr,
-                    'EG ${(price * 1.1).toStringAsFixed(2)}',
-                    bold: true,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSizes.md),
-            Row(
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () => controller.cancel(
-                    id,
-                    note: actionNote.text.trim().isEmpty
-                        ? null
-                        : actionNote.text.trim(),
-                    reason: 'Canceled by admin',
-                  ),
-                  icon: const Icon(Icons.cancel_outlined),
-                  label: Text('Cancel'.tr),
-                ),
-                const SizedBox(width: AppSizes.sm),
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    side:  BorderSide(color: AppColors.border),
-                    foregroundColor: AppColors.text,
-                  ),
-                  onPressed: () => controller.close(
-                    id,
-                    note: actionNote.text.trim().isEmpty
-                        ? null
-                        : actionNote.text.trim(),
-                  ),
-                  icon: const Icon(Icons.check_circle_outline),
-                  label: Text('Close order'.tr),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSizes.sm),
-            TextField(
-              controller: actionNote,
-              style:  TextStyle(color: AppColors.text),
-              decoration: InputDecoration(hintText: 'Note'.tr),
-            ),
-            const SizedBox(height: AppSizes.md),
-            _card(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Chat (view only)'.tr,
-                    style:  TextStyle(
-                      color: AppColors.text,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSizes.sm),
-                  Container(
-                    height: 160,
-                    decoration: BoxDecoration(
-                      color: AppColors.overlay,
-                      borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-                    ),
-                    child: messages.isNotEmpty
-                        ? ListView(
-                            padding: const EdgeInsets.all(AppSizes.sm),
-                            children: messages
-                                .map<Widget>(
-                                  (m) => Padding(
-                                    padding: const EdgeInsets.only(
-                                      bottom: AppSizes.sm,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          (m['sender'] ?? '').toString(),
-                                          style:  TextStyle(
-                                            color: AppColors.textMuted,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        Text(
-                                          (m['message'] ?? '').toString(),
-                                          style:  TextStyle(
-                                            color: AppColors.text,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          )
-                        :  Center(
-                            child: Text(
-                              'Conversation history placeholder',
-                              style: TextStyle(color: AppColors.textMuted),
+                    const SizedBox(height: AppSizes.sm),
+                    Obx(() {
+                      final isBusy =
+                          controller.cancelling.value || controller.closing.value;
+                      if (!isBusy) {
+                        return const SizedBox.shrink();
+                      }
+                      return Row(
+                        children: [
+                          const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            controller.cancelling.value
+                                ? 'Cancelling...'.tr
+                                : 'Closing...'.tr,
+                            style: TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                  ),
-                  const SizedBox(height: AppSizes.sm),
-                  TextField(
-                    controller: msgController,
-                    style:  TextStyle(color: AppColors.text),
-                    decoration: InputDecoration(
-                      hintText: 'Type notification message'.tr,
-                    ),
-                    onSubmitted: (v) {
-                      if (id.isEmpty) {
-                        showError('No ID');
-                        return;
-                      }
-                      controller.sendMessage(id, v);
-                      msgController.clear();
-                    },
-                  ),
-                ],
+                        ],
+                      );
+                    }),
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: AppSizes.md),
+
+              // Chat
+              _card(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle('Chat (view only)'.tr),
+                    const SizedBox(height: AppSizes.sm),
+
+                    Container(
+                      height: 220,
+                      decoration: BoxDecoration(
+                        color: AppColors.overlay,
+                        borderRadius: BorderRadius.circular(
+                          AppSizes.inputRadius,
+                        ),
+                        border: Border.all(
+                          color: AppColors.border.withOpacity(0.6),
+                        ),
+                      ),
+                      child: messages.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No messages'.tr,
+                                style: TextStyle(color: AppColors.textMuted),
+                              ),
+                            )
+                          : ListView.separated(
+                              padding: const EdgeInsets.all(AppSizes.sm),
+                              itemCount: messages.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 10),
+                              itemBuilder: (ctx, i) {
+                                final m =
+                                    messages[i] as Map<String, dynamic>? ?? {};
+                                final sender = (m['sender'] ?? '').toString();
+                                final text = (m['message'] ?? '').toString();
+                                final ts = m['createdAt'] ?? m['time'];
+
+                                return _chatBubble(
+                                  sender: sender,
+                                  message: text,
+                                  time: ts == null ? '' : formatDateString(ts),
+                                );
+                              },
+                            ),
+                    ),
+
+                    const SizedBox(height: AppSizes.sm),
+
+                    // send notification message
+                    Obx(
+                      () {
+                        final isBusy = controller.sendingMessage.value;
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: msgCtrl,
+                                style: TextStyle(color: AppColors.text),
+                                decoration: InputDecoration(
+                                  hintText: 'Type notification message'.tr,
+                                ),
+                                onSubmitted: (_) {
+                                  if (!isBusy) _sendMsg();
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: AppSizes.sm),
+                            ElevatedButton(
+                              onPressed: isBusy ? null : _sendMsg,
+                              child: isBusy
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text('Send'.tr),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       }),
+    );
+  }
+
+  void _sendMsg() {
+    final text = msgCtrl.text.trim();
+    if (orderId.isEmpty) {
+      showError('No ID'.tr);
+      return;
+    }
+    if (text.isEmpty) return;
+    controller.sendMessage(orderId, text);
+    msgCtrl.clear();
+  }
+
+  // ---------- UI helpers ----------
+
+  Widget _pageTitle(String text) => Text(
+    text,
+    style: TextStyle(
+      color: AppColors.text,
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    ),
+  );
+
+  Widget _sectionTitle(String text) => Text(
+    text,
+    style: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
+  );
+
+  Widget _divider() => Divider(color: AppColors.border);
+
+  Widget _iconBadge(IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(icon, color: color, size: 22),
+    );
+  }
+
+  Widget _miniInfo({required IconData icon, required String text}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: AppColors.textMuted),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            color: AppColors.textMuted,
+            fontSize: 12,
+            height: 1.2,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _chatBubble({
+    required String sender,
+    required String message,
+    required String time,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.card.withOpacity(0.55),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (sender.isNotEmpty)
+            Row(
+              children: [
+                Text(
+                  sender,
+                  style: TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Spacer(),
+                if (time.isNotEmpty)
+                  Text(
+                    time,
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                  ),
+              ],
+            ),
+          if (sender.isNotEmpty) const SizedBox(height: 6),
+          Text(
+            message.isEmpty ? '-' : message,
+            style: TextStyle(color: AppColors.text),
+          ),
+        ],
+      ),
     );
   }
 
@@ -419,9 +680,7 @@ class OrderDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border:  Border.fromBorderSide(
-          BorderSide(color: AppColors.border),
-        ),
+        border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
       child: child,
     );
@@ -429,18 +688,17 @@ class OrderDetailsView extends StatelessWidget {
 
   Widget _statusChip(String status) {
     Color color;
-    switch (status.toLowerCase()) {
+    switch (status.toLowerCase().trim()) {
       case 'completed':
         color = AppColors.success;
         break;
       case 'assigned':
+      case 'accepted':
         color = Colors.lightBlueAccent;
         break;
       case 'pending':
+      case 'new':
         color = AppColors.warning;
-        break;
-      case 'accepted':
-        color = Colors.lightBlueAccent;
         break;
       case 'in progress':
       case 'in_progress':
@@ -448,6 +706,7 @@ class OrderDetailsView extends StatelessWidget {
         break;
       case 'canceled':
       case 'cancelled':
+      case 'canceled_by_admin':
         color = AppColors.danger;
         break;
       case 'closed':
@@ -456,9 +715,10 @@ class OrderDetailsView extends StatelessWidget {
       default:
         color = AppColors.primary;
     }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 6),
-      margin: EdgeInsets.all(5),
+      margin: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         color: color.withOpacity(0.16),
         borderRadius: BorderRadius.circular(999),
@@ -473,5 +733,33 @@ class OrderDetailsView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _normalizeStatusKey(String status) {
+    final normalized = status
+        .trim()
+        .toLowerCase()
+        .replaceAll('-', '_')
+        .replaceAll(' ', '_');
+    switch (normalized) {
+      case 'inprogress':
+      case 'in_progress':
+        return 'in_progress';
+      case 'canceled':
+      case 'cancelled':
+      case 'canceled_by_admin':
+      case 'cancelled_by_admin':
+        return 'cancelled';
+      default:
+        return normalized;
+    }
+  }
+
+  bool _isCancelDisabled(String statusKey) {
+    return statusKey == 'cancelled' || statusKey == 'closed';
+  }
+
+  bool _isCloseDisabled(String statusKey) {
+    return statusKey == 'closed' || statusKey == 'cancelled';
   }
 }

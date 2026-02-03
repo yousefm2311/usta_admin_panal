@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +10,7 @@ import '../../modules/auth/services/auth_service.dart';
 import '../constants/app_config.dart';
 import 'api_exceptions.dart';
 import 'auth_interceptor.dart';
+import 'loading_service.dart';
 import 'token_storage.dart';
 
 class HttpClient {
@@ -38,8 +41,9 @@ class HttpClient {
             ),
           ),
         ) {
-  dio.interceptors.add(AuthInterceptor(dio, _tokenStorage, _authService));
-  dio.interceptors.add(_LoggingInterceptor());
+    dio.interceptors.add(_LoadingInterceptor());
+    dio.interceptors.add(AuthInterceptor(dio, _tokenStorage, _authService));
+    dio.interceptors.add(_LoggingInterceptor());
   }
 
   Future<Response<T>> get<T>(String path, {Map<String, dynamic>? query}) async {
@@ -140,6 +144,55 @@ class _LoggingInterceptor extends Interceptor {
       debugPrint(err.message);
     }
     super.onError(err, handler);
+  }
+}
+
+class _LoadingInterceptor extends Interceptor {
+  static const _timerKey = '__loader_timer__';
+  static const _delay = Duration(milliseconds: 160);
+
+  bool _shouldTrack(RequestOptions options) {
+    if (options.extra['skipLoader'] == true) return false;
+    return true;
+  }
+
+  LoadingService? _service() {
+    if (!Get.isRegistered<LoadingService>()) return null;
+    return Get.find<LoadingService>();
+  }
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    if (_shouldTrack(options)) {
+      final timer = Timer(_delay, () {
+        _service()?.show();
+      });
+      options.extra[_timerKey] = timer;
+    }
+    super.onRequest(options, handler);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    _clearTimer(response.requestOptions);
+    super.onResponse(response, handler);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    _clearTimer(err.requestOptions);
+    super.onError(err, handler);
+  }
+
+  void _clearTimer(RequestOptions options) {
+    if (!_shouldTrack(options)) return;
+    final timer = options.extra.remove(_timerKey) as Timer?;
+    if (timer == null) return;
+    if (timer.isActive) {
+      timer.cancel();
+      return;
+    }
+    _service()?.hide();
   }
 }
 
