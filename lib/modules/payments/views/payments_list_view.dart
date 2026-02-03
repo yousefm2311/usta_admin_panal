@@ -24,13 +24,13 @@ class PaymentsListView extends StatelessWidget {
             children: [
               Text(
                 'Payments'.tr,
-                style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+                style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const Spacer(),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.text,
-                  side: const BorderSide(color: AppColors.border),
+                  side:  BorderSide(color: AppColors.border),
                 ),
                 onPressed: () => _openFilterDialog(context, controller),
                 icon: const Icon(Icons.filter_list, size: 18),
@@ -41,7 +41,7 @@ class PaymentsListView extends StatelessWidget {
                 () => OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.text,
-                    side: const BorderSide(color: AppColors.border),
+                    side:  BorderSide(color: AppColors.border),
                   ),
                   onPressed: controller.filter.isEmpty ? null : controller.clearFilter,
                   icon: const Icon(Icons.clear, size: 18),
@@ -50,7 +50,7 @@ class PaymentsListView extends StatelessWidget {
               ),
               IconButton(
                 onPressed: controller.loadTransactions,
-                icon: const Icon(Icons.refresh, color: AppColors.textMuted),
+                icon:  Icon(Icons.refresh, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -68,7 +68,7 @@ class PaymentsListView extends StatelessWidget {
             if (controller.transactions.isEmpty) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
               );
             }
             return TableWrapper(
@@ -100,11 +100,11 @@ class PaymentsListView extends StatelessWidget {
                       ),
                     )
                     .toList(),
-                headingTextStyle: const TextStyle(
+                headingTextStyle:  TextStyle(
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w600,
                 ),
-                dataTextStyle: const TextStyle(color: AppColors.text),
+                dataTextStyle:  TextStyle(color: AppColors.text),
               ),
             );
           }),
@@ -137,50 +137,50 @@ class PaymentsListView extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text('Filters'.tr, style: const TextStyle(color: AppColors.text)),
+        title: Text('Filters'.tr, style:  TextStyle(color: AppColors.text)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: statusCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style:  TextStyle(color: AppColors.text),
                 decoration: InputDecoration(labelText: 'Status'.tr),
               ),
               TextField(
                 controller: methodCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style:  TextStyle(color: AppColors.text),
                 decoration: InputDecoration(labelText: 'Method'.tr),
               ),
               TextField(
                 controller: customerCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style:  TextStyle(color: AppColors.text),
                 decoration: InputDecoration(labelText: 'Customer ID'.tr),
               ),
               TextField(
                 controller: artisanCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style:  TextStyle(color: AppColors.text),
                 decoration: InputDecoration(labelText: 'Artisan ID'.tr),
               ),
               TextField(
                 controller: fromCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style:  TextStyle(color: AppColors.text),
                 decoration: InputDecoration(labelText: 'From (ISO date)'.tr),
               ),
               TextField(
                 controller: toCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style:  TextStyle(color: AppColors.text),
                 decoration: InputDecoration(labelText: 'To (ISO date)'.tr),
               ),
               TextField(
                 controller: minCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style:  TextStyle(color: AppColors.text),
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Min amount'.tr),
               ),
               TextField(
                 controller: maxCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style:  TextStyle(color: AppColors.text),
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Max amount'.tr),
               ),
@@ -190,7 +190,7 @@ class PaymentsListView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('Cancel'.tr, style:  TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () {
@@ -208,7 +208,7 @@ class PaymentsListView extends StatelessWidget {
               if (maxVal != null) params['max'] = maxVal;
               controller.applyFilter(params);
             },
-            child: Text('Apply filters'.tr, style: const TextStyle(color: AppColors.primary)),
+            child: Text('Apply filters'.tr, style:  TextStyle(color: AppColors.primary)),
           ),
         ],
       ),

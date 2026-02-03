@@ -22,12 +22,12 @@ class NotificationTemplatesView extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text('Templates'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Templates'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
               const Spacer(),
               TextButton.icon(
                 onPressed: () => _openTemplateDialog(controller),
-                icon: const Icon(Icons.add, color: AppColors.primary),
-                label: Text('Add', style: const TextStyle(color: AppColors.primary)),
+                icon:  Icon(Icons.add, color: AppColors.primary),
+                label: Text('Add', style:  TextStyle(color: AppColors.primary)),
               ),
             ],
           ),
@@ -39,7 +39,7 @@ class NotificationTemplatesView extends StatelessWidget {
             if (controller.templates.isEmpty) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
               );
             }
             return TableWrapper(
@@ -90,19 +90,19 @@ class NotificationTemplatesView extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text(template == null ? 'Add' : 'Edit', style: const TextStyle(color: AppColors.text)),
+        title: Text(template == null ? 'Add' : 'Edit', style:  TextStyle(color: AppColors.text)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: name,
               decoration: const InputDecoration(labelText: 'Name'),
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
             ),
             const SizedBox(height: AppSizes.sm),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('Target', style: const TextStyle(color: AppColors.textMuted)),
+              child: Text('Target', style:  TextStyle(color: AppColors.textMuted)),
             ),
             Obx(
               () => Wrap(
@@ -124,12 +124,12 @@ class NotificationTemplatesView extends StatelessWidget {
             TextField(
               controller: title,
               decoration: const InputDecoration(labelText: 'Title'),
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
             ),
             TextField(
               controller: message,
               decoration: const InputDecoration(labelText: 'Message'),
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               maxLines: 3,
             ),
           ],
@@ -137,7 +137,7 @@ class NotificationTemplatesView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: Get.back,
-            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('Cancel'.tr, style:  TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () {
@@ -158,7 +158,7 @@ class NotificationTemplatesView extends StatelessWidget {
               }
               Get.back();
             },
-            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
+            child: Text('Save'.tr, style:  TextStyle(color: AppColors.primary)),
           ),
         ],
       ),

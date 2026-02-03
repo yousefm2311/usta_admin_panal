@@ -40,7 +40,7 @@ class SettingsGeneralView extends StatelessWidget {
               children: [
                 Text(
                   'General settings'.tr,
-                  style: const TextStyle(
+                  style:  TextStyle(
                     color: AppColors.text,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -61,7 +61,7 @@ class SettingsGeneralView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.card,
                 borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                border: const Border.fromBorderSide(
+                border:  Border.fromBorderSide(
                   BorderSide(color: AppColors.border),
                 ),
               ),
@@ -70,7 +70,7 @@ class SettingsGeneralView extends StatelessWidget {
                 children: [
                   Text(
                     'App logo'.tr,
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style:  TextStyle(color: AppColors.textMuted),
                   ),
                   const SizedBox(height: AppSizes.sm),
                   Row(
@@ -101,7 +101,7 @@ class SettingsGeneralView extends StatelessWidget {
                               controller.form['logoUrl']?.value.isNotEmpty ==
                                   true
                               ? null
-                              : const Icon(
+                              :  Icon(
                                   Icons.image_outlined,
                                   color: AppColors.textMuted,
                                 ),
@@ -111,7 +111,7 @@ class SettingsGeneralView extends StatelessWidget {
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.text,
-                          side: const BorderSide(color: AppColors.border),
+                          side:  BorderSide(color: AppColors.border),
                         ),
                         onPressed: controller.uploadingLogo.value
                             ? null
@@ -163,7 +163,7 @@ class SettingsGeneralView extends StatelessWidget {
                   TextField(
                     controller: appNameController,
                     onChanged: (v) => controller.form['appName']?.value = v,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'App Name'),
                   ),
                   const SizedBox(height: AppSizes.md),
@@ -171,14 +171,14 @@ class SettingsGeneralView extends StatelessWidget {
                     controller: emailController,
                     onChanged: (v) =>
                         controller.form['supportEmail']?.value = v,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'Support email'.tr),
                   ),
                   const SizedBox(height: AppSizes.md),
                   TextField(
                     controller: aboutController,
                     onChanged: (v) => controller.form['about']?.value = v,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     maxLines: 4,
                     decoration: InputDecoration(
                       labelText: 'About info'.tr,

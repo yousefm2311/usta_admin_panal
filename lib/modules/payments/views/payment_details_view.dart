@@ -33,7 +33,7 @@ class PaymentDetailsView extends StatelessWidget {
         if (payment == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
 
@@ -42,7 +42,7 @@ class PaymentDetailsView extends StatelessWidget {
           children: [
             Text(
               'Payment details'.tr,
-              style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+              style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: AppSizes.md),
             _card(
@@ -66,12 +66,12 @@ class PaymentDetailsView extends StatelessWidget {
                 children: [
                   Text(
                     'Raw payload'.tr,
-                    style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
+                    style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: AppSizes.sm),
                   SelectableText(
                     payment.toString(),
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style:  TextStyle(color: AppColors.textMuted),
                   ),
                 ],
               ),
@@ -89,7 +89,7 @@ class PaymentDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
       child: child,
     );
@@ -103,10 +103,10 @@ class PaymentDetailsView extends StatelessWidget {
         children: [
           SizedBox(
             width: 140,
-            child: Text(label, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text(label, style:  TextStyle(color: AppColors.textMuted)),
           ),
           Expanded(
-            child: Text(value.isEmpty ? '-' : value, style: const TextStyle(color: AppColors.text)),
+            child: Text(value.isEmpty ? '-' : value, style:  TextStyle(color: AppColors.text)),
           ),
         ],
       ),

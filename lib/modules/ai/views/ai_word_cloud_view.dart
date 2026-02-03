@@ -23,7 +23,7 @@ class AIWordCloudView extends StatelessWidget {
         if (controller.wordCloud.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
         return Column(
@@ -31,7 +31,7 @@ class AIWordCloudView extends StatelessWidget {
           children: [
             Text(
               'Word cloud'.tr,
-              style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+              style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: AppSizes.md),
             Container(
@@ -40,7 +40,7 @@ class AIWordCloudView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.card,
                 borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
               ),
               child: Wrap(
                 spacing: AppSizes.sm,

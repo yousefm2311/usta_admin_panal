@@ -25,13 +25,13 @@ class RequestsListView extends StatelessWidget {
             children: [
               Text(
                 'Requests'.tr,
-                style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+                style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const Spacer(),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.text,
-                  side: const BorderSide(color: AppColors.border),
+                  side:  BorderSide(color: AppColors.border),
                 ),
                 onPressed: () => _openMaintenanceDialog(context, controller, isExpire: true),
                 icon: const Icon(Icons.timelapse, size: 18),
@@ -41,7 +41,7 @@ class RequestsListView extends StatelessWidget {
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.text,
-                  side: const BorderSide(color: AppColors.border),
+                  side:  BorderSide(color: AppColors.border),
                 ),
                 onPressed: () => _openMaintenanceDialog(context, controller, isExpire: false),
                 icon: const Icon(Icons.check_circle_outline, size: 18),
@@ -86,7 +86,7 @@ class RequestsListView extends StatelessWidget {
             if (controller.requests.isEmpty) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
               );
             }
             return TableWrapper(
@@ -128,11 +128,11 @@ class RequestsListView extends StatelessWidget {
                       ),
                     )
                     .toList(),
-                headingTextStyle: const TextStyle(
+                headingTextStyle:  TextStyle(
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w600,
                 ),
-                dataTextStyle: const TextStyle(color: AppColors.text),
+                dataTextStyle:  TextStyle(color: AppColors.text),
               ),
             );
           }),
@@ -193,12 +193,12 @@ class RequestsListView extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text('Delete'.tr, style: const TextStyle(color: AppColors.text)),
-        content: Text('Delete this request?'.tr, style: const TextStyle(color: AppColors.textMuted)),
+        title: Text('Delete'.tr, style:  TextStyle(color: AppColors.text)),
+        content: Text('Delete this request?'.tr, style:  TextStyle(color: AppColors.textMuted)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('Cancel'.tr, style:  TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () {
@@ -221,7 +221,7 @@ class RequestsListView extends StatelessWidget {
         backgroundColor: AppColors.card,
         title: Text(
           isExpire ? 'Expire stale requests'.tr : 'Auto confirm requests'.tr,
-          style: const TextStyle(color: AppColors.text),
+          style:  TextStyle(color: AppColors.text),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -229,7 +229,7 @@ class RequestsListView extends StatelessWidget {
             TextField(
               controller: limitController,
               keyboardType: TextInputType.number,
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               decoration: InputDecoration(
                 labelText: 'Limit'.tr,
                 hintText: 'Optional'.tr,
@@ -238,7 +238,7 @@ class RequestsListView extends StatelessWidget {
             const SizedBox(height: AppSizes.sm),
             TextField(
               controller: beforeController,
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               decoration: InputDecoration(
                 labelText: 'Before (ISO date)'.tr,
                 hintText: '2024-01-01T00:00:00Z',
@@ -249,7 +249,7 @@ class RequestsListView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('Cancel'.tr, style:  TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () async {
@@ -262,7 +262,7 @@ class RequestsListView extends StatelessWidget {
                 await controller.autoConfirm(limit: limit, before: before);
               }
             },
-            child: Text('Run'.tr, style: const TextStyle(color: AppColors.primary)),
+            child: Text('Run'.tr, style:  TextStyle(color: AppColors.primary)),
           ),
         ],
       ),

@@ -31,7 +31,7 @@ class _SettingsFeaturesViewState extends State<SettingsFeaturesView> {
         children: [
           Text(
             'Feature flags'.tr,
-            style: const TextStyle(
+            style:  TextStyle(
               color: AppColors.text,
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -43,7 +43,7 @@ class _SettingsFeaturesViewState extends State<SettingsFeaturesView> {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
             ),
             child: Form(
               key: _formKey,
@@ -52,12 +52,12 @@ class _SettingsFeaturesViewState extends State<SettingsFeaturesView> {
                 children: [
                   Text(
                     'Paste features JSON object'.tr,
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style:  TextStyle(color: AppColors.textMuted),
                   ),
                   const SizedBox(height: AppSizes.sm),
                   TextFormField(
                     controller: _jsonController,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     maxLines: 10,
                     decoration: InputDecoration(
                       hintText: '{ "enableFeature": true }',

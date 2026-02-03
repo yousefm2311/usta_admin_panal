@@ -24,7 +24,7 @@ class AllOrdersView extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Orders'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Orders'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: AppSizes.sm),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -64,7 +64,7 @@ class AllOrdersView extends StatelessWidget {
             if (controller.orders.isEmpty) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
               );
             }
             return TableWrapper(

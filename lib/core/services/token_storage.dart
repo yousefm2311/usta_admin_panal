@@ -37,7 +37,7 @@ class TokenStorage {
     await _box.write(_logoutKey, true);
   }
 
-    Future<void> markLoggedOut() async {
-    await _box.write("loggedOut", true);
+  Future<void> markLoggedOut() async {
+    await _box.write(_logoutKey, true);
   }
 }

@@ -35,13 +35,16 @@ class AuthInterceptor extends Interceptor {
     if (status != 401) {
       return super.onError(err, handler);
     }
-    if (options.path.contains('/refresh-token') || options.path.contains('/login')) {
-      await _handleRefreshFailure(err);
+    final isAuthEndpoint = options.path.contains('/refresh-token') ||
+        options.path.contains('/login') ||
+        options.path.contains('/logout');
+    if (isAuthEndpoint) {
+      await _handleRefreshFailure(err, callLogoutApi: false);
       return handler.reject(err);
     }
     final refreshToken = tokenStorage.refreshToken;
     if (refreshToken == null || refreshToken.isEmpty) {
-      await _handleRefreshFailure(err);
+      await _handleRefreshFailure(err, callLogoutApi: false);
       return handler.reject(err);
     }
     if (_isRefreshing) {
@@ -69,7 +72,7 @@ class AuthInterceptor extends Interceptor {
       final retryResp = await _retryRequest(options);
       return handler.resolve(retryResp);
     } catch (e) {
-      await _handleRefreshFailure(err);
+      await _handleRefreshFailure(err, callLogoutApi: false);
       for (final w in _refreshWaiters) {
         if (!w.isCompleted) w.completeError(e);
       }
@@ -98,10 +101,10 @@ class AuthInterceptor extends Interceptor {
     return cloned;
   }
 
-  Future<void> _handleRefreshFailure(DioException err) async {
+  Future<void> _handleRefreshFailure(DioException err, {bool callLogoutApi = true}) async {
     try {
       if (Get.isRegistered<AuthController>()) {
-        await Get.find<AuthController>().logout();
+        await Get.find<AuthController>().logout(callApi: callLogoutApi);
       } else {
         await tokenStorage.clear();
         if (Get.isRegistered<GetInterface>()) Get.offAllNamed('/login');

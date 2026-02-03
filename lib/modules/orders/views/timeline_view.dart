@@ -34,7 +34,7 @@ class OrderTimelineView extends StatelessWidget {
         if (steps.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
         final status = 'pending'.obs;
@@ -44,12 +44,12 @@ class OrderTimelineView extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.card,
             borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-            border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+            border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Timeline'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Timeline'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: AppSizes.md),
               ...steps.asMap().entries.map(
                 (e) => Row(
@@ -58,7 +58,7 @@ class OrderTimelineView extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           backgroundColor: AppColors.primary.withOpacity(0.12),
-                          child: const Icon(Icons.check, color: AppColors.primary),
+                          child:  Icon(Icons.check, color: AppColors.primary),
                         ),
                         if (e.key != steps.length - 1)
                           Container(
@@ -74,11 +74,11 @@ class OrderTimelineView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text((e.value['status'] ?? '').toString().tr,
-                              style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600)),
+                              style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.w600)),
                           const SizedBox(height: 4),
                           Text(
                             (e.value['note'] ?? formatDateString(e.value['createdAt']) ?? '').toString(),
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                            style:  TextStyle(color: AppColors.textMuted, fontSize: 12),
                           ),
                         ],
                       ),
@@ -109,7 +109,7 @@ class OrderTimelineView extends StatelessWidget {
                       width: 160,
                       child: TextField(
                         controller: noteCtrl,
-                        style: const TextStyle(color: AppColors.text),
+                        style:  TextStyle(color: AppColors.text),
                         decoration: InputDecoration(hintText: 'Note'.tr),
                       ),
                     ),
@@ -120,7 +120,7 @@ class OrderTimelineView extends StatelessWidget {
                     ),
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.border),
+                        side:  BorderSide(color: AppColors.border),
                         foregroundColor: AppColors.text,
                       ),
                       onPressed: () => controller.load(id),

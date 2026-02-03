@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_sizes.dart';
+import 'widgets/control_center.dart';
 import 'widgets/sidebar.dart';
 import 'widgets/top_bar.dart';
 
@@ -44,6 +45,7 @@ class _AdminLayoutState extends State<AdminLayout> {
                   onNavigate: _navigateFromDrawer,
                 )
               : null,
+          endDrawer: const ControlCenter(),
           body: SafeArea(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,6 +62,7 @@ class _AdminLayoutState extends State<AdminLayout> {
                         title: widget.title,
                         onMenuTap: isMobile ? () => _scaffoldKey.currentState?.openDrawer() : null,
                         onToggleSidebar: isDesktop ? null : _toggleSidebar,
+                        onOpenSettings: () => _scaffoldKey.currentState?.openEndDrawer(),
                         actions: widget.actions,
                       ),
                       const SizedBox(height: AppSizes.md),

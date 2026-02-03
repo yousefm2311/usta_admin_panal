@@ -30,7 +30,7 @@ class SettingsCommissionView extends StatelessWidget {
           children: [
             Text(
               'Commission settings'.tr,
-              style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+              style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: AppSizes.md),
             Container(
@@ -38,17 +38,17 @@ class SettingsCommissionView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.card,
                 borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Text('Commission percentage'.tr, style: const TextStyle(color: AppColors.text)),
+                      Text('Commission percentage'.tr, style:  TextStyle(color: AppColors.text)),
                       const Spacer(),
                       Text('${controller.commission.value.toStringAsFixed(0)}%',
-                          style: const TextStyle(color: AppColors.primary)),
+                          style:  TextStyle(color: AppColors.primary)),
                     ],
                   ),
                   Slider(
@@ -64,7 +64,7 @@ class SettingsCommissionView extends StatelessWidget {
                   const SizedBox(height: AppSizes.md),
                   Text(
                     'This slider updates the service commission applied to every completed request.'.tr,
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style:  TextStyle(color: AppColors.textMuted),
                   ),
                 ],
               ),

@@ -28,7 +28,7 @@ class AIReviewsInsightsView extends StatelessWidget {
             children: [
               Text(
                 'AI sentiment overview'.tr,
-                style: const TextStyle(
+                style:  TextStyle(
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -49,7 +49,7 @@ class AIReviewsInsightsView extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(
+              border:  Border.fromBorderSide(
                 BorderSide(color: AppColors.border),
               ),
             ),
@@ -60,7 +60,7 @@ class AIReviewsInsightsView extends StatelessWidget {
               if (controller.sentiment.isEmpty) {
                 return Text(
                   'No data'.tr,
-                  style: const TextStyle(color: AppColors.textMuted),
+                  style:  TextStyle(color: AppColors.textMuted),
                 );
               }
               final total = controller.sentiment.values.fold<double>(
@@ -100,7 +100,7 @@ class AIReviewsInsightsView extends StatelessWidget {
                       children: [
                         Text(
                           'Sentiment breakdown'.tr,
-                          style: const TextStyle(color: AppColors.text),
+                          style:  TextStyle(color: AppColors.text),
                         ),
                         const SizedBox(height: AppSizes.sm),
                         ...controller.sentiment.entries.map(
@@ -120,7 +120,7 @@ class AIReviewsInsightsView extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     entry.key,
-                                    style: const TextStyle(
+                                    style:  TextStyle(
                                       color: AppColors.text,
                                     ),
                                   ),
@@ -129,7 +129,7 @@ class AIReviewsInsightsView extends StatelessWidget {
                                   total == 0
                                       ? '0%'
                                       : '${(entry.value / total * 100).toStringAsFixed(1)}%',
-                                  style: const TextStyle(
+                                  style:  TextStyle(
                                     color: AppColors.textMuted,
                                   ),
                                 ),
@@ -147,7 +147,7 @@ class AIReviewsInsightsView extends StatelessWidget {
           const SizedBox(height: AppSizes.lg),
           Text(
             'Word cloud'.tr,
-            style: const TextStyle(
+            style:  TextStyle(
               color: AppColors.text,
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -169,13 +169,13 @@ class AIReviewsInsightsView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.card,
                   borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                  border: const Border.fromBorderSide(
+                  border:  Border.fromBorderSide(
                     BorderSide(color: AppColors.border),
                   ),
                 ),
                 child: Text(
                   'No data'.tr,
-                  style: const TextStyle(color: AppColors.textMuted),
+                  style:  TextStyle(color: AppColors.textMuted),
                 ),
               );
             }
@@ -185,7 +185,7 @@ class AIReviewsInsightsView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.card,
                 borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                border: const Border.fromBorderSide(
+                border:  Border.fromBorderSide(
                   BorderSide(color: AppColors.border),
                 ),
               ),

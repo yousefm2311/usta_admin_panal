@@ -24,7 +24,7 @@ class ComplaintsListView extends StatelessWidget {
             children: [
               Text(
                 'Complaints'.tr,
-                style: const TextStyle(
+                style:  TextStyle(
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -46,7 +46,7 @@ class ComplaintsListView extends StatelessWidget {
               ),
               IconButton(
                 onPressed: controller.loadComplaints,
-                icon: const Icon(Icons.refresh, color: AppColors.textMuted),
+                icon:  Icon(Icons.refresh, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -69,7 +69,7 @@ class ComplaintsListView extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSizes.md),
                 child: Text(
                   'No data'.tr,
-                  style: const TextStyle(color: AppColors.textMuted),
+                  style:  TextStyle(color: AppColors.textMuted),
                 ),
               );
             }

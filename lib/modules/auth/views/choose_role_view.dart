@@ -29,19 +29,19 @@ class ChooseRoleView extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.card,
                       borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                      border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                      border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.shield, color: AppColors.primary, size: 32),
+                         Icon(Icons.shield, color: AppColors.primary, size: 32),
                         const SizedBox(height: AppSizes.sm),
                         Text(
                           r.tr,
-                          style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
+                          style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
-                        Text('Proceed as $r'.tr, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                        Text('Proceed as $r'.tr, style:  TextStyle(color: AppColors.textMuted, fontSize: 12)),
                       ],
                     ),
                   ),

@@ -4,37 +4,40 @@ import '../constants/app_colors.dart';
 import '../constants/app_sizes.dart';
 
 class AppTheme {
-  static ThemeData get dark {
-    final base = ThemeData.dark();
+  static ThemeData get dark => _buildTheme(AppColors.dark, Brightness.dark);
+
+  static ThemeData get light => _buildTheme(AppColors.light, Brightness.light);
+
+  static ThemeData _buildTheme(AppPalette palette, Brightness brightness) {
+    final base = brightness == Brightness.dark ? ThemeData.dark() : ThemeData.light();
     return base.copyWith(
-      scaffoldBackgroundColor: AppColors.background,
-      primaryColor: AppColors.primary,
-      cardColor: AppColors.card,
-      // fontFamily: 'Cairo',
+      scaffoldBackgroundColor: palette.background,
+      primaryColor: palette.primary,
+      cardColor: palette.card,
       colorScheme: base.colorScheme.copyWith(
-        brightness: Brightness.dark,
-        primary: AppColors.primary,
-        secondary: AppColors.primary,
-        surface: AppColors.card,
-        background: AppColors.background,
+        brightness: brightness,
+        primary: palette.primary,
+        secondary: palette.primary,
+        surface: palette.card,
+        background: palette.background,
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.background,
+      appBarTheme: AppBarTheme(
+        backgroundColor: palette.background,
         elevation: 0,
-        foregroundColor: AppColors.text,
+        foregroundColor: palette.text,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.card,
-        labelStyle: const TextStyle(color: AppColors.textMuted),
-        hintStyle: const TextStyle(color: AppColors.textMuted),
+        fillColor: palette.card,
+        labelStyle: TextStyle(color: palette.textMuted),
+        hintStyle: TextStyle(color: palette.textMuted),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: palette.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(color: palette.primary),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSizes.inputRadius),
@@ -42,7 +45,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: palette.primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
           shape: RoundedRectangleBorder(
@@ -52,12 +55,9 @@ class AppTheme {
       ),
       textTheme: base.textTheme.apply(
         fontFamily: 'Cairo',
-        bodyColor: AppColors.text,
-        displayColor: AppColors.text,
+        bodyColor: palette.text,
+        displayColor: palette.text,
       ),
     );
   }
-
-  // A light variant is kept for completeness; the admin panel forces ThemeMode.dark.
-  static ThemeData get light => dark.copyWith(brightness: Brightness.light);
 }

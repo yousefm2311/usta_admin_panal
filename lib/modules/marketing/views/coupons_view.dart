@@ -25,7 +25,7 @@ class CouponsView extends StatelessWidget {
             children: [
               Text(
                 'Coupons manager'.tr,
-                style: const TextStyle(
+                style:  TextStyle(
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -34,10 +34,10 @@ class CouponsView extends StatelessWidget {
               const Spacer(),
               TextButton.icon(
                 onPressed: () => _openDialog(controller),
-                icon: const Icon(Icons.add, color: AppColors.primary),
+                icon:  Icon(Icons.add, color: AppColors.primary),
                 label: Text(
                   'Add'.tr,
-                  style: const TextStyle(color: AppColors.primary),
+                  style:  TextStyle(color: AppColors.primary),
                 ),
               ),
             ],
@@ -61,7 +61,7 @@ class CouponsView extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSizes.md),
                 child: Text(
                   'No data'.tr,
-                  style: const TextStyle(color: AppColors.textMuted),
+                  style:  TextStyle(color: AppColors.textMuted),
                 ),
               );
             }
@@ -172,7 +172,7 @@ class CouponsView extends StatelessWidget {
         backgroundColor: AppColors.card,
         title: Text(
           coupon == null ? 'Add coupon'.tr : 'Edit coupon'.tr,
-          style: const TextStyle(color: AppColors.text),
+          style:  TextStyle(color: AppColors.text),
         ),
         content: StatefulBuilder(
           builder: (context, setState) {
@@ -182,24 +182,24 @@ class CouponsView extends StatelessWidget {
                 TextField(
                   controller: code,
                   decoration: InputDecoration(labelText: 'Code'.tr),
-                  style: const TextStyle(color: AppColors.text),
+                  style:  TextStyle(color: AppColors.text),
                 ),
                 TextField(
                   controller: value,
                   decoration: InputDecoration(labelText: 'Value'.tr),
-                  style: const TextStyle(color: AppColors.text),
+                  style:  TextStyle(color: AppColors.text),
                 ),
                 TextField(
                   controller: discountType,
                   decoration: InputDecoration(
                     labelText: 'Discount type (percent/fixed)'.tr,
                   ),
-                  style: const TextStyle(color: AppColors.text),
+                  style:  TextStyle(color: AppColors.text),
                 ),
                 TextField(
                   controller: minOrder,
                   decoration: InputDecoration(labelText: 'Min order'.tr),
-                  style: const TextStyle(color: AppColors.text),
+                  style:  TextStyle(color: AppColors.text),
                 ),
                 const SizedBox(height: AppSizes.sm),
                 Row(
@@ -209,7 +209,7 @@ class CouponsView extends StatelessWidget {
                         expiryDate != null
                             ? formatDate(expiryDate!)
                             : 'No expiry selected'.tr,
-                        style: const TextStyle(color: AppColors.textMuted),
+                        style:  TextStyle(color: AppColors.textMuted),
                       ),
                     ),
                     TextButton(
@@ -250,7 +250,7 @@ class CouponsView extends StatelessWidget {
             onPressed: Get.back,
             child: Text(
               'Cancel'.tr,
-              style: const TextStyle(color: AppColors.textMuted),
+              style:  TextStyle(color: AppColors.textMuted),
             ),
           ),
           TextButton(
@@ -280,7 +280,7 @@ class CouponsView extends StatelessWidget {
             },
             child: Text(
               'Save'.tr,
-              style: const TextStyle(color: AppColors.primary),
+              style:  TextStyle(color: AppColors.primary),
             ),
           ),
         ],

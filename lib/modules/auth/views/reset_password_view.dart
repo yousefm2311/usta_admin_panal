@@ -23,19 +23,19 @@ class ResetPasswordView extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   'Reset Password'.tr,
-                  style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 18),
+                  style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 const SizedBox(height: AppSizes.md),
                 TextField(
                   controller: emailCtrl,
-                  style: const TextStyle(color: AppColors.text),
+                  style:  TextStyle(color: AppColors.text),
                   decoration: InputDecoration(labelText: 'Email address'.tr),
                 ),
                 const SizedBox(height: AppSizes.lg),

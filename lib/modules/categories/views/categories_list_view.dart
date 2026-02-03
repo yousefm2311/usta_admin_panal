@@ -28,7 +28,7 @@ class CategoriesListView extends StatelessWidget {
             children: [
               Text(
                 'Service categories'.tr,
-                style: const TextStyle(
+                style:  TextStyle(
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -66,7 +66,7 @@ class CategoriesListView extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSizes.md),
                 child: Text(
                   'No data'.tr,
-                  style: const TextStyle(color: AppColors.textMuted),
+                  style:  TextStyle(color: AppColors.textMuted),
                 ),
               );
             }
@@ -83,7 +83,7 @@ class CategoriesListView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(
                           AppSizes.cardRadius,
                         ),
-                        border: const Border.fromBorderSide(
+                        border:  Border.fromBorderSide(
                           BorderSide(color: AppColors.border),
                         ),
                       ),
@@ -96,7 +96,7 @@ class CategoriesListView extends StatelessWidget {
                             ),
                             child: Text(
                               getCategoryIcon(category['name']),
-                              style: const TextStyle(
+                              style:  TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -106,7 +106,7 @@ class CategoriesListView extends StatelessWidget {
                           const SizedBox(height: AppSizes.sm),
                           Text(
                             (category['name'] ?? '').toString(),
-                            style: const TextStyle(
+                            style:  TextStyle(
                               color: AppColors.text,
                               fontWeight: FontWeight.bold,
                             ),
@@ -114,7 +114,7 @@ class CategoriesListView extends StatelessWidget {
                           const SizedBox(height: AppSizes.xs),
                           Text(
                             'Icon preview'.tr,
-                            style: const TextStyle(
+                            style:  TextStyle(
                               color: AppColors.textMuted,
                               fontSize: 12,
                             ),
@@ -125,7 +125,7 @@ class CategoriesListView extends StatelessWidget {
                               OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: AppColors.text,
-                                  side: const BorderSide(color: AppColors.border),
+                                  side:  BorderSide(color: AppColors.border),
                                 ),
                                 onPressed: () => _openEditDialog(
                                   context,
@@ -138,7 +138,7 @@ class CategoriesListView extends StatelessWidget {
                               OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: Colors.redAccent,
-                                  side: const BorderSide(color: AppColors.border),
+                                  side:  BorderSide(color: AppColors.border),
                                 ),
                                 onPressed: () => controller.removeCategory(
                                   (category['_id'] ?? category['id'] ?? '')
@@ -190,23 +190,23 @@ class CategoriesListView extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text('Edit category'.tr, style: const TextStyle(color: AppColors.text)),
+        title: Text('Edit category'.tr, style:  TextStyle(color: AppColors.text)),
         content: TextField(
           controller: nameController,
-          style: const TextStyle(color: AppColors.text),
+          style:  TextStyle(color: AppColors.text),
           decoration: InputDecoration(labelText: 'Category name'.tr),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('Cancel'.tr, style:  TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
               controller.updateCategory(id, name: nameController.text.trim());
             },
-            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
+            child: Text('Save'.tr, style:  TextStyle(color: AppColors.primary)),
           ),
         ],
       ),

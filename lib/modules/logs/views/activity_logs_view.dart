@@ -37,7 +37,7 @@ class ActivityLogsView extends StatelessWidget {
             padding: const EdgeInsets.all(AppSizes.md),
             child: Text(
               'No data'.tr,
-              style: const TextStyle(color: AppColors.textMuted),
+              style:  TextStyle(color: AppColors.textMuted),
             ),
           );
         }
@@ -47,7 +47,7 @@ class ActivityLogsView extends StatelessWidget {
           children: [
             Text(
               'Activity logs'.tr,
-              style: const TextStyle(
+              style:  TextStyle(
                 color: AppColors.text,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,

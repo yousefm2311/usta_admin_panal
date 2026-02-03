@@ -29,7 +29,7 @@ class WalletSummaryView extends StatelessWidget {
         if (controller.wallets.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
         return Container(
@@ -37,12 +37,12 @@ class WalletSummaryView extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.card,
             borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-            border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+            border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Wallet balances'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+              Text('Wallet balances'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
               const SizedBox(height: AppSizes.sm),
               ...controller.wallets.map(
                 (w) => Padding(
@@ -52,12 +52,12 @@ class WalletSummaryView extends StatelessWidget {
                       Expanded(
                         child: Text(
                           (w['owner'] ?? w['name'] ?? w['user'] ?? '').toString(),
-                          style: const TextStyle(color: AppColors.text),
+                          style:  TextStyle(color: AppColors.text),
                         ),
                       ),
                       Text(
                         (w['balance'] ?? w['amount'] ?? '').toString(),
-                        style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
+                        style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),

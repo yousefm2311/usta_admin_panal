@@ -22,7 +22,7 @@ class EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(
+        border:  Border.fromBorderSide(
           BorderSide(color: AppColors.border),
         ),
       ),
@@ -33,7 +33,7 @@ class EmptyState extends StatelessWidget {
           const SizedBox(height: AppSizes.sm),
           Text(
             title,
-            style: const TextStyle(
+            style:  TextStyle(
               color: AppColors.text,
               fontWeight: FontWeight.bold,
             ),
@@ -41,7 +41,7 @@ class EmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             subtitle,
-            style: const TextStyle(color: AppColors.textMuted),
+            style:  TextStyle(color: AppColors.textMuted),
             textAlign: TextAlign.center,
           ),
         ],

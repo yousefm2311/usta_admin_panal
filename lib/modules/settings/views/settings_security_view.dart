@@ -32,7 +32,7 @@ class SettingsSecurityView extends StatelessWidget {
         if (data == null || data.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
         return Column(
@@ -40,7 +40,7 @@ class SettingsSecurityView extends StatelessWidget {
           children: [
             Text(
               'Security settings'.tr,
-              style: const TextStyle(
+              style:  TextStyle(
                 color: AppColors.text,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -53,7 +53,7 @@ class SettingsSecurityView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.card,
                 borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +66,7 @@ class SettingsSecurityView extends StatelessWidget {
                           children: [
                             Text(
                               entry.key,
-                              style: const TextStyle(
+                              style:  TextStyle(
                                 color: AppColors.text,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -74,7 +74,7 @@ class SettingsSecurityView extends StatelessWidget {
                             const SizedBox(height: 6),
                             SelectableText(
                               _formatValue(entry.value),
-                              style: const TextStyle(color: AppColors.textMuted),
+                              style:  TextStyle(color: AppColors.textMuted),
                             ),
                           ],
                         ),

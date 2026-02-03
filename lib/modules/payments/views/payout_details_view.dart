@@ -33,7 +33,7 @@ class PayoutDetailsView extends StatelessWidget {
         if (payout == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
         return Column(
@@ -44,15 +44,15 @@ class PayoutDetailsView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text((payout['artisan'] ?? payout['name'] ?? '').toString(),
-                      style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                      style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 6),
                   Text('IBAN: ${(payout['iban'] ?? '').toString()}',
-                      style: const TextStyle(color: AppColors.textMuted)),
+                      style:  TextStyle(color: AppColors.textMuted)),
                   const SizedBox(height: 6),
-                  Text('Amount: ${(payout['amount'] ?? '').toString()}', style: const TextStyle(color: AppColors.text)),
+                  Text('Amount: ${(payout['amount'] ?? '').toString()}', style:  TextStyle(color: AppColors.text)),
                   const SizedBox(height: 6),
                   Text('Status: ${(payout['status'] ?? '').toString()}',
-                      style: const TextStyle(color: AppColors.text)),
+                      style:  TextStyle(color: AppColors.text)),
                 ],
               ),
             ),
@@ -67,7 +67,7 @@ class PayoutDetailsView extends StatelessWidget {
                 const SizedBox(width: AppSizes.sm),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.border),
+                    side:  BorderSide(color: AppColors.border),
                     foregroundColor: AppColors.text,
                   ),
                   onPressed: () => controller.updateStatus(id, 'rejected'),
@@ -88,7 +88,7 @@ class PayoutDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
       child: child,
     );

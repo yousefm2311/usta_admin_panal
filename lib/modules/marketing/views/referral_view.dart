@@ -31,12 +31,12 @@ class ReferralView extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.card,
             borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-            border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+            border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Referral'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+              Text('Referral'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
               const SizedBox(height: AppSizes.sm),
               if (data != null)
                 ...[
@@ -50,7 +50,7 @@ class ReferralView extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: AppSizes.md),
-                  Text('Top referrers'.tr, style: const TextStyle(color: AppColors.text)),
+                  Text('Top referrers'.tr, style:  TextStyle(color: AppColors.text)),
                   const SizedBox(height: AppSizes.xs),
                   ...(data['top'] ?? data['topReferrers'] ?? <dynamic>[])
                       .map<Widget>(
@@ -61,11 +61,11 @@ class ReferralView extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   (item['name'] ?? item['user'] ?? '').toString(),
-                                  style: const TextStyle(color: AppColors.text),
+                                  style:  TextStyle(color: AppColors.text),
                                 ),
                               ),
                               Text((item['count'] ?? item['referrals'] ?? '').toString(),
-                                  style: const TextStyle(color: AppColors.textMuted)),
+                                  style:  TextStyle(color: AppColors.textMuted)),
                             ],
                           ),
                         ),
@@ -73,7 +73,7 @@ class ReferralView extends StatelessWidget {
                       .toList(),
                 ]
               else
-                Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
             ],
           ),
         );
@@ -91,9 +91,9 @@ class ReferralView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          Text(label, style:  TextStyle(color: AppColors.textMuted, fontSize: 12)),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w700)),
+          Text(value, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.w700)),
         ],
       ),
     );

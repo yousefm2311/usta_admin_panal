@@ -20,7 +20,7 @@ class TableWrapper extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(
+        border:  Border.fromBorderSide(
           BorderSide(color: AppColors.border),
         ),
       ),

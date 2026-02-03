@@ -28,7 +28,7 @@ class AITopArtisansView extends StatelessWidget {
         children: [
           Text(
             'Leaderboard'.tr,
-            style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+            style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: AppSizes.md),
           Container(
@@ -37,14 +37,14 @@ class AITopArtisansView extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
             ),
             child: Obx(() {
               if (controller.loadingTop.value) {
                 return const ListLoading(rows: 5, itemHeight: 72);
               }
               if (controller.topArtisans.isEmpty) {
-                return Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted));
+                return Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted));
               }
               return Column(
                 children: controller.topArtisans.asMap().entries.map((entry) {
@@ -70,7 +70,7 @@ class AITopArtisansView extends StatelessWidget {
                           backgroundColor: AppColors.primary.withOpacity(0.12),
                           child: Text(
                             '$rank',
-                            style: const TextStyle(color: AppColors.text),
+                            style:  TextStyle(color: AppColors.text),
                           ),
                         ),
                         const SizedBox(width: AppSizes.md),
@@ -80,14 +80,14 @@ class AITopArtisansView extends StatelessWidget {
                             children: [
                               Text(
                                 name,
-                                style: const TextStyle(
+                                style:  TextStyle(
                                   color: AppColors.text,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               Text(
                                 category,
-                                style: const TextStyle(
+                                style:  TextStyle(
                                   color: AppColors.textMuted,
                                   fontSize: 12,
                                 ),
@@ -104,7 +104,7 @@ class AITopArtisansView extends StatelessWidget {
                             ),
                             Text(
                               rating.toStringAsFixed(1),
-                              style: const TextStyle(color: AppColors.text),
+                              style:  TextStyle(color: AppColors.text),
                             ),
                           ],
                         ),
@@ -120,7 +120,7 @@ class AITopArtisansView extends StatelessWidget {
                           ),
                           child: Text(
                             '$completed completed',
-                            style: const TextStyle(
+                            style:  TextStyle(
                               color: AppColors.success,
                               fontWeight: FontWeight.bold,
                               fontSize: 12,

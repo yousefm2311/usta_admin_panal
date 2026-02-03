@@ -41,7 +41,7 @@ class ComplaintDetailsView extends StatelessWidget {
         if (data == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
         final thread = (data['messages'] ?? data['thread'] ?? []) as List<dynamic>;
@@ -52,7 +52,7 @@ class ComplaintDetailsView extends StatelessWidget {
           children: [
                         Text(
               'Complaint Details'.tr,
-              style: const TextStyle(
+              style:  TextStyle(
                 color: AppColors.text,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -65,12 +65,12 @@ class ComplaintDetailsView extends StatelessWidget {
                 children: [
                   Text(
                     (data['issue'] ?? data['title'] ?? '').toString(),
-                    style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
+                    style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     '${"Complainant".tr} - ${(data['messages'][0]['senderType'] ?? '')}',
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style:  TextStyle(color: AppColors.textMuted),
                   ),
                 ],
               ),
@@ -80,7 +80,7 @@ class ComplaintDetailsView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Thread'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  Text('Thread'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
                   const SizedBox(height: AppSizes.sm),
                   ...thread.map(
                     (m) => Padding(
@@ -97,12 +97,12 @@ class ComplaintDetailsView extends StatelessWidget {
                           children: [
                             Text(
                               (m['senderType'] ?? '').toString(),
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                              style:  TextStyle(color: AppColors.textMuted, fontSize: 12),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               (m['message'] ?? m['text'] ?? '').toString(),
-                              style: const TextStyle(color: AppColors.text),
+                              style:  TextStyle(color: AppColors.text),
                             ),
                           ],
                         ),
@@ -122,7 +122,7 @@ class ComplaintDetailsView extends StatelessWidget {
                 const SizedBox(width: AppSizes.sm),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.border),
+                    side:  BorderSide(color: AppColors.border),
                     foregroundColor: AppColors.text,
                   ),
                   onPressed: () => controller.updateStatus(id, 'closed'),
@@ -135,14 +135,14 @@ class ComplaintDetailsView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Assign agent'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  Text('Assign agent'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
                   const SizedBox(height: AppSizes.sm),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: agentController,
-                          style: const TextStyle(color: AppColors.text),
+                          style:  TextStyle(color: AppColors.text),
                           decoration: InputDecoration(
                             hintText: 'Agent ID'.tr,
                           ),
@@ -156,14 +156,14 @@ class ComplaintDetailsView extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: AppSizes.md),
-                  Text('Internal note'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  Text('Internal note'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
                   const SizedBox(height: AppSizes.sm),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: noteController,
-                          style: const TextStyle(color: AppColors.text),
+                          style:  TextStyle(color: AppColors.text),
                           decoration: InputDecoration(
                             hintText: 'Add note'.tr,
                           ),
@@ -185,7 +185,7 @@ class ComplaintDetailsView extends StatelessWidget {
                 hintText: 'Type notification message'.tr,
                 filled: true,
               ),
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               onSubmitted: (v) {
                 if (v.trim().isNotEmpty) {
                   controller.addMessage(id, v.trim());
@@ -205,7 +205,7 @@ class ComplaintDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
       child: child,
     );

@@ -30,7 +30,7 @@ class AIFraudDetectionView extends StatelessWidget {
         if (controller.cases.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
 
@@ -39,7 +39,7 @@ class AIFraudDetectionView extends StatelessWidget {
           children: [
             Text(
               'Fraud detection'.tr,
-              style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+              style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: AppSizes.md),
             TableWrapper(
@@ -64,11 +64,11 @@ class AIFraudDetectionView extends StatelessWidget {
                       ),
                     )
                     .toList(),
-                headingTextStyle: const TextStyle(
+                headingTextStyle:  TextStyle(
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w600,
                 ),
-                dataTextStyle: const TextStyle(color: AppColors.text),
+                dataTextStyle:  TextStyle(color: AppColors.text),
               ),
             ),
           ],

@@ -24,12 +24,12 @@ class WithdrawalsListView extends StatelessWidget {
             children: [
               Text(
                 'Withdrawals'.tr,
-                style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+                style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const Spacer(),
               IconButton(
                 onPressed: controller.loadWithdrawals,
-                icon: const Icon(Icons.refresh, color: AppColors.textMuted),
+                icon:  Icon(Icons.refresh, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -47,7 +47,7 @@ class WithdrawalsListView extends StatelessWidget {
             if (controller.withdrawals.isEmpty) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
               );
             }
             return TableWrapper(
@@ -82,7 +82,7 @@ class WithdrawalsListView extends StatelessWidget {
                                   if (canApprove)
                                     OutlinedButton(
                                       style: OutlinedButton.styleFrom(
-                                        side: const BorderSide(color: AppColors.border),
+                                        side:  BorderSide(color: AppColors.border),
                                         foregroundColor: AppColors.text,
                                       ),
                                       onPressed: () => controller.reject(w['id']?.toString() ?? ''),
@@ -96,11 +96,11 @@ class WithdrawalsListView extends StatelessWidget {
                       },
                     )
                     .toList(),
-                headingTextStyle: const TextStyle(
+                headingTextStyle:  TextStyle(
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w600,
                 ),
-                dataTextStyle: const TextStyle(color: AppColors.text),
+                dataTextStyle:  TextStyle(color: AppColors.text),
               ),
             );
           }),

@@ -31,12 +31,12 @@ class RewardsView extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.card,
             borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-            border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+            border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Rewards'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+              Text('Rewards'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
               const SizedBox(height: AppSizes.sm),
               if (data != null) ...[
                 Row(
@@ -48,7 +48,7 @@ class RewardsView extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSizes.md),
                 if (data['levels'] is List && (data['levels'] as List).isNotEmpty) ...[
-                  Text('Levels'.tr, style: const TextStyle(color: AppColors.text)),
+                  Text('Levels'.tr, style:  TextStyle(color: AppColors.text)),
                   const SizedBox(height: AppSizes.xs),
                   ...(data['levels'] as List)
                       .map<Widget>(
@@ -58,10 +58,10 @@ class RewardsView extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text((lvl['name'] ?? '').toString(),
-                                    style: const TextStyle(color: AppColors.text)),
+                                    style:  TextStyle(color: AppColors.text)),
                               ),
                               Text((lvl['threshold'] ?? lvl['points'] ?? '').toString(),
-                                  style: const TextStyle(color: AppColors.textMuted)),
+                                  style:  TextStyle(color: AppColors.textMuted)),
                             ],
                           ),
                         ),
@@ -70,7 +70,7 @@ class RewardsView extends StatelessWidget {
                 ],
                 const SizedBox(height: AppSizes.sm),
                 if (data['history'] is List && (data['history'] as List).isNotEmpty) ...[
-                  Text('Redeem history'.tr, style: const TextStyle(color: AppColors.text)),
+                  Text('Redeem history'.tr, style:  TextStyle(color: AppColors.text)),
                   const SizedBox(height: AppSizes.xs),
                   ...(data['history'] as List)
                       .map<Widget>(
@@ -80,10 +80,10 @@ class RewardsView extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text((h['title'] ?? h['reward'] ?? '').toString(),
-                                    style: const TextStyle(color: AppColors.text)),
+                                    style:  TextStyle(color: AppColors.text)),
                               ),
                               Text((h['points'] ?? h['amount'] ?? '').toString(),
-                                  style: const TextStyle(color: AppColors.textMuted)),
+                                  style:  TextStyle(color: AppColors.textMuted)),
                             ],
                           ),
                         ),
@@ -91,7 +91,7 @@ class RewardsView extends StatelessWidget {
                       .toList(),
                 ],
               ] else ...[
-                Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
               ],
             ],
           ),
@@ -110,9 +110,9 @@ class RewardsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          Text(label, style:  TextStyle(color: AppColors.textMuted, fontSize: 12)),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w700)),
+          Text(value, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.w700)),
         ],
       ),
     );

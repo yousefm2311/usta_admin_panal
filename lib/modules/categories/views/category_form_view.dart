@@ -28,7 +28,7 @@ class _CategoryFormViewState extends State<CategoryFormView> {
         children: [
           Text(
             'Create a new category'.tr,
-            style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+            style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: AppSizes.md),
           Container(
@@ -36,13 +36,13 @@ class _CategoryFormViewState extends State<CategoryFormView> {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
             ),
             child: Column(
               children: [
                 TextField(
                   controller: _nameController,
-                  style: const TextStyle(color: AppColors.text),
+                  style:  TextStyle(color: AppColors.text),
                   decoration: InputDecoration(
                     labelText: 'Category name'.tr,
                     hintText: 'Cleaning'.tr,
@@ -54,7 +54,7 @@ class _CategoryFormViewState extends State<CategoryFormView> {
                     Expanded(
                       child: Text(
                         'Icon picker'.tr,
-                        style: const TextStyle(color: AppColors.textMuted),
+                        style:  TextStyle(color: AppColors.textMuted),
                       ),
                     ),
                     const SizedBox(width: AppSizes.sm),

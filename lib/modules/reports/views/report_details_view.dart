@@ -36,7 +36,7 @@ class ReportDetailsView extends StatelessWidget {
         if (report == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
 
@@ -48,7 +48,7 @@ class ReportDetailsView extends StatelessWidget {
           children: [
             Text(
               'Report details'.tr,
-              style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+              style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: AppSizes.md),
             _card(
@@ -57,25 +57,25 @@ class ReportDetailsView extends StatelessWidget {
                 children: [
                   Text(
                     _subject(report),
-                    style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
+                    style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: AppSizes.sm),
                   Text(
                     '${'Reporter'.tr}: ${_reporterName(report)}',
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style:  TextStyle(color: AppColors.textMuted),
                   ),
                   Text(
                     '${'Status'.tr}: ${status.tr}',
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style:  TextStyle(color: AppColors.textMuted),
                   ),
                   Text(
                     '${'Date'.tr}: ${formatDateString(report['createdAt'] ?? report['date'])}',
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style:  TextStyle(color: AppColors.textMuted),
                   ),
                   const SizedBox(height: AppSizes.sm),
                   Text(
                     (report['description'] ?? report['message'] ?? report['details'] ?? '').toString(),
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                   ),
                 ],
               ),
@@ -87,11 +87,11 @@ class ReportDetailsView extends StatelessWidget {
                 children: [
                   Text(
                     'Thread'.tr,
-                    style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
+                    style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: AppSizes.sm),
                   if (thread.isEmpty)
-                    Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted))
+                    Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted))
                   else
                     ...thread.map(
                       (m) => Padding(
@@ -101,11 +101,11 @@ class ReportDetailsView extends StatelessWidget {
                           children: [
                             Text(
                               (m['sender'] ?? m['senderType'] ?? '').toString(),
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                              style:  TextStyle(color: AppColors.textMuted, fontSize: 12),
                             ),
                             Text(
                               (m['message'] ?? m['text'] ?? '').toString(),
-                              style: const TextStyle(color: AppColors.text),
+                              style:  TextStyle(color: AppColors.text),
                             ),
                           ],
                         ),
@@ -119,11 +119,11 @@ class ReportDetailsView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Reply'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  Text('Reply'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
                   const SizedBox(height: AppSizes.sm),
                   TextField(
                     controller: replyController,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     maxLines: 3,
                     decoration: InputDecoration(hintText: 'Type notification message'.tr),
                   ),
@@ -138,7 +138,7 @@ class ReportDetailsView extends StatelessWidget {
                       const SizedBox(width: AppSizes.sm),
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.border),
+                          side:  BorderSide(color: AppColors.border),
                           foregroundColor: AppColors.text,
                         ),
                         onPressed: () => controller.close(id),
@@ -175,7 +175,7 @@ class ReportDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
       child: child,
     );

@@ -38,10 +38,12 @@ class AuthController extends GetxController {
     }
   }
 
-Future<void> logout() async {
-    try {
-      await _authService.logout();
-    } catch (_) {}
+  Future<void> logout({bool callApi = true}) async {
+    if (callApi && isLoggedIn) {
+      try {
+        await _authService.logout();
+      } catch (_) {}
+    }
 
     await _tokenStorage.markLoggedOut();
     await _tokenStorage.clear();

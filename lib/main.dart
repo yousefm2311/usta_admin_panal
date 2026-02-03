@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -14,6 +13,7 @@ import 'package:usta_admin_panal/core/services/api_exceptions.dart';
 
 import 'core/constants/app_config.dart';
 import 'core/services/locale_service.dart';
+import 'core/services/theme_controller.dart';
 import 'core/services/token_storage.dart';
 import 'core/theme/app_theme.dart';
 import 'modules/auth/services/auth_service.dart';
@@ -21,6 +21,7 @@ import 'modules/auth/services/auth_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  Get.put(ThemeController(), permanent: true);
   final tokenStorage = Get.put(TokenStorage());
   final initialRoute = await _resolveInitialRoute(tokenStorage);
   runApp(UstaAdminApp(initialRoute: initialRoute));
@@ -34,21 +35,6 @@ Future<String> _resolveInitialRoute(TokenStorage storage) async {
   if (storage.loggedOut == true) {
     await storage.clear();
     return '/login';
-  }
-
-  Future<bool> _probeToken(String token) async {
-    try {
-      final dio = Dio(
-        BaseOptions(
-          baseUrl: AppConfig.baseUrl,
-          headers: {'Authorization': 'Bearer $token'},
-        ),
-      );
-      await dio.get('/api/admin/me');
-      return true;
-    } catch (_) {
-      return false;
-    }
   }
 
   bool _isTokenValid(String? token) {
@@ -69,13 +55,10 @@ Future<String> _resolveInitialRoute(TokenStorage storage) async {
     return false;
   }
 
-  // If we have a valid access token, also probe the server to ensure it's still accepted
+  // If we have a valid access token, trust it and move fast.
   if (_isTokenValid(access) && access != null) {
-    final ok = await _probeToken(access);
-    if (ok) {
-      ApiClient().dio.options.headers['Authorization'] = "Bearer $access";
-      return '/dashboard';
-    }
+    ApiClient().dio.options.headers['Authorization'] = "Bearer $access";
+    return '/dashboard';
   }
 
   // If access token expired but refresh exists, try to refresh silently
@@ -83,8 +66,7 @@ Future<String> _resolveInitialRoute(TokenStorage storage) async {
     try {
       final tokens = await authService.refresh(refresh);
       await storage.saveTokens(tokens.token, refreshToken: tokens.refreshToken);
-      final ok = await _probeToken(tokens.token);
-      if (ok) return '/dashboard';
+      return '/dashboard';
       await storage.clear();
       return '/login';
     } on ApiException {
@@ -105,29 +87,41 @@ class UstaAdminApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokenStorage = Get.find<TokenStorage>();
+    final themeController = Get.find<ThemeController>();
     final localeService = LocaleService();
-    return GetMaterialApp(
-      title: 'USTA Admin',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.dark,
-      translations: AppTranslations(),
-      locale: localeService.storedLocale,
-      fallbackLocale: const Locale('en'),
-      supportedLocales: const [Locale('en'), Locale('ar')],
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      initialBinding: AppBinding(),
-      initialRoute: initialRoute,
-      getPages: AppPages.pages,
-      scrollBehavior: const MaterialScrollBehavior().copyWith(
-        dragDevices: {
-          PointerDeviceKind.mouse,
-          PointerDeviceKind.touch,
-          PointerDeviceKind.trackpad,
-        },
-      ),
+    return GetX<ThemeController>(
+      init: themeController,
+      builder: (controller) {
+        return GetMaterialApp(
+          title: 'USTA Admin',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: controller.themeMode.value,
+          translations: AppTranslations(),
+          locale: localeService.storedLocale,
+          fallbackLocale: const Locale('en'),
+          supportedLocales: const [Locale('en'), Locale('ar')],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          initialBinding: AppBinding(),
+          initialRoute: initialRoute,
+          getPages: AppPages.pages,
+          builder: (context, child) {
+            final mediaQuery = MediaQuery.of(context);
+            return MediaQuery(
+              data: mediaQuery.copyWith(textScaleFactor: controller.textScale.value),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
+          scrollBehavior: const MaterialScrollBehavior().copyWith(
+            dragDevices: {
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.touch,
+              PointerDeviceKind.trackpad,
+            },
+          ),
+        );
+      },
     );
   }
 }

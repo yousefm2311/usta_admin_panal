@@ -56,7 +56,7 @@ class SystemHealthView extends StatelessWidget {
             const SizedBox(height: AppSizes.md),
             Text(
               'System Health'.tr,
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: AppColors.text,
@@ -124,7 +124,7 @@ class _HealthCard extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             item.title,
-            style: const TextStyle(
+            style:  TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
               color: AppColors.text,

@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 
 import '../services/token_storage.dart';
 import '../services/http_client.dart';
-
 class AppBinding extends Bindings {
   @override
   void dependencies() {

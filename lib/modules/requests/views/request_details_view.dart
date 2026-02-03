@@ -34,7 +34,7 @@ class RequestDetailsView extends StatelessWidget {
         if (req == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
 
@@ -57,15 +57,15 @@ class RequestDetailsView extends StatelessWidget {
                         _sectionTitle('Service'.tr),
                         const SizedBox(height: 4),
                         Text((req['serviceType'] ?? req['service'] ?? '').toString(),
-                            style: const TextStyle(color: AppColors.text, fontSize: 16)),
+                            style:  TextStyle(color: AppColors.text, fontSize: 16)),
                         const SizedBox(height: AppSizes.sm),
                         Text(
                           'Customer: ${(req['customer'] ?? req['customerName'] ?? '').toString()}',
-                          style: const TextStyle(color: AppColors.textMuted),
+                          style:  TextStyle(color: AppColors.textMuted),
                         ),
                         Text(
                           'Artisan: ${(req['artisan'] ?? req['artisanName'] ?? '').toString()}',
-                          style: const TextStyle(color: AppColors.textMuted),
+                          style:  TextStyle(color: AppColors.textMuted),
                         ),
                       ],
                     ),
@@ -109,7 +109,7 @@ class RequestDetailsView extends StatelessWidget {
                       Expanded(
                         child: TextField(
                           controller: timelineNote,
-                          style: const TextStyle(color: AppColors.text),
+                          style:  TextStyle(color: AppColors.text),
                           decoration: InputDecoration(hintText: 'Note'.tr),
                         ),
                       ),
@@ -131,7 +131,7 @@ class RequestDetailsView extends StatelessWidget {
                   _sectionTitle('Images'.tr),
                   const SizedBox(height: AppSizes.sm),
                   if (images.isEmpty)
-                    Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted))
+                    Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted))
                   else
                     Wrap(
                       spacing: AppSizes.sm,
@@ -144,10 +144,10 @@ class RequestDetailsView extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: AppColors.overlay,
                                 borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-                                border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                                border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
                               ),
                               child: Center(
-                                child: Text(img.toString(), style: const TextStyle(color: AppColors.textMuted)),
+                                child: Text(img.toString(), style:  TextStyle(color: AppColors.textMuted)),
                               ),
                             ),
                           )
@@ -180,23 +180,23 @@ class RequestDetailsView extends StatelessWidget {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text((m['sender'] ?? '').toString(),
-                                            style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                                            style:  TextStyle(color: AppColors.textMuted, fontSize: 12)),
                                         Text((m['message'] ?? '').toString(),
-                                            style: const TextStyle(color: AppColors.text)),
+                                            style:  TextStyle(color: AppColors.text)),
                                       ],
                                     ),
                                   ),
                                 )
                                 .toList(),
                           )
-                        : const Center(
+                        :  Center(
                             child: Text('Conversation history placeholder', style: TextStyle(color: AppColors.textMuted)),
                           ),
                   ),
                   const SizedBox(height: AppSizes.sm),
                   TextField(
                     controller: msgController,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     decoration: InputDecoration(
                       hintText: 'Type notification message'.tr,
                     ),
@@ -221,7 +221,7 @@ class RequestDetailsView extends StatelessWidget {
                   const SizedBox(height: AppSizes.sm),
                   _priceRow('Base price'.tr, 'EG ${price.toStringAsFixed(0)}'),
                   _priceRow('VAT 5%'.tr, 'EG ${(price * 0.05).toStringAsFixed(2)}'),
-                  const Divider(color: AppColors.border),
+                   Divider(color: AppColors.border),
                   _priceRow(
                     'Total'.tr,
                     'EG ${(price * 1.05).toStringAsFixed(2)}',
@@ -241,7 +241,7 @@ class RequestDetailsView extends StatelessWidget {
                 const SizedBox(width: AppSizes.sm),
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.border),
+                    side:  BorderSide(color: AppColors.border),
                     foregroundColor: AppColors.text,
                   ),
                   onPressed: () => controller.cancel(
@@ -257,7 +257,7 @@ class RequestDetailsView extends StatelessWidget {
             const SizedBox(height: AppSizes.sm),
             TextField(
               controller: actionNote,
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               decoration: InputDecoration(hintText: 'Note'.tr),
             ),
           ],
@@ -313,7 +313,7 @@ class RequestDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
       child: child,
     );
@@ -321,7 +321,7 @@ class RequestDetailsView extends StatelessWidget {
 
   Widget _sectionTitle(String text) => Text(
         text,
-        style: const TextStyle(
+        style:  TextStyle(
           color: AppColors.text,
           fontSize: 16,
           fontWeight: FontWeight.bold,

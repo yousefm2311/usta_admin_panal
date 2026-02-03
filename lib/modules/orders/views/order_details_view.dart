@@ -48,7 +48,7 @@ class OrderDetailsView extends StatelessWidget {
             padding: const EdgeInsets.all(AppSizes.md),
             child: Text(
               'No data'.tr,
-              style: const TextStyle(color: AppColors.textMuted),
+              style:  TextStyle(color: AppColors.textMuted),
             ),
           );
         }
@@ -67,7 +67,7 @@ class OrderDetailsView extends StatelessWidget {
           children: [
             Text(
               'Order Details'.tr,
-              style: const TextStyle(
+              style:  TextStyle(
                 color: AppColors.text,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -84,7 +84,7 @@ class OrderDetailsView extends StatelessWidget {
                       color: AppColors.primary.withOpacity(0.10),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child:  Icon(
                       Icons.build_rounded,
                       color: AppColors.primary,
                       size: 22,
@@ -99,7 +99,7 @@ class OrderDetailsView extends StatelessWidget {
                         Text(
                           (order['serviceType'] ?? order['service'] ?? '')
                               .toString(),
-                          style: const TextStyle(
+                          style:  TextStyle(
                             color: AppColors.text,
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
@@ -112,7 +112,7 @@ class OrderDetailsView extends StatelessWidget {
                           children: [
                             // Text(
                             //   '${order['customer']?['name'] ?? 'Unknown'}',
-                            //   style: const TextStyle(
+                            //   style:  TextStyle(
                             //     color: AppColors.textMuted,
                             //     fontSize: 13,
                             //     height: 1.3,
@@ -125,7 +125,7 @@ class OrderDetailsView extends StatelessWidget {
                             // الحرفي
                             Text(
                               '${order['artisan']?['name'] ?? 'No artisan'} (${order['artisan']?['phone'] ?? ''})',
-                              style: const TextStyle(
+                              style:  TextStyle(
                                 color: AppColors.textMuted,
                                 fontSize: 13,
                                 height: 1.3,
@@ -138,7 +138,7 @@ class OrderDetailsView extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           '${"created".tr}: ${formatDateString(order['createdAt'])}',
-                          style: const TextStyle(
+                          style:  TextStyle(
                             color: AppColors.textMuted,
                             fontSize: 12,
                           ),
@@ -159,7 +159,7 @@ class OrderDetailsView extends StatelessWidget {
                 children: [
                   Text(
                     'Status timeline'.tr,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       color: AppColors.text,
                       fontWeight: FontWeight.bold,
                     ),
@@ -219,7 +219,7 @@ class OrderDetailsView extends StatelessWidget {
                       Expanded(
                         child: TextField(
                           controller: timelineNote,
-                          style: const TextStyle(color: AppColors.text),
+                          style:  TextStyle(color: AppColors.text),
                           decoration: InputDecoration(hintText: 'Note'.tr),
                         ),
                       ),
@@ -244,7 +244,7 @@ class OrderDetailsView extends StatelessWidget {
                 children: [
                   Text(
                     'Payment info'.tr,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       color: AppColors.text,
                       fontWeight: FontWeight.bold,
                     ),
@@ -258,7 +258,7 @@ class OrderDetailsView extends StatelessWidget {
                     'Platform fee'.tr,
                     'EG ${(price * 0.1).toStringAsFixed(2)}',
                   ),
-                  const Divider(color: AppColors.border),
+                   Divider(color: AppColors.border),
                   _priceRow(
                     'Total'.tr,
                     'EG ${(price * 1.1).toStringAsFixed(2)}',
@@ -284,7 +284,7 @@ class OrderDetailsView extends StatelessWidget {
                 const SizedBox(width: AppSizes.sm),
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.border),
+                    side:  BorderSide(color: AppColors.border),
                     foregroundColor: AppColors.text,
                   ),
                   onPressed: () => controller.close(
@@ -301,7 +301,7 @@ class OrderDetailsView extends StatelessWidget {
             const SizedBox(height: AppSizes.sm),
             TextField(
               controller: actionNote,
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               decoration: InputDecoration(hintText: 'Note'.tr),
             ),
             const SizedBox(height: AppSizes.md),
@@ -311,7 +311,7 @@ class OrderDetailsView extends StatelessWidget {
                 children: [
                   Text(
                     'Chat (view only)'.tr,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       color: AppColors.text,
                       fontWeight: FontWeight.bold,
                     ),
@@ -338,14 +338,14 @@ class OrderDetailsView extends StatelessWidget {
                                       children: [
                                         Text(
                                           (m['sender'] ?? '').toString(),
-                                          style: const TextStyle(
+                                          style:  TextStyle(
                                             color: AppColors.textMuted,
                                             fontSize: 12,
                                           ),
                                         ),
                                         Text(
                                           (m['message'] ?? '').toString(),
-                                          style: const TextStyle(
+                                          style:  TextStyle(
                                             color: AppColors.text,
                                           ),
                                         ),
@@ -355,7 +355,7 @@ class OrderDetailsView extends StatelessWidget {
                                 )
                                 .toList(),
                           )
-                        : const Center(
+                        :  Center(
                             child: Text(
                               'Conversation history placeholder',
                               style: TextStyle(color: AppColors.textMuted),
@@ -365,7 +365,7 @@ class OrderDetailsView extends StatelessWidget {
                   const SizedBox(height: AppSizes.sm),
                   TextField(
                     controller: msgController,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     decoration: InputDecoration(
                       hintText: 'Type notification message'.tr,
                     ),
@@ -419,7 +419,7 @@ class OrderDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(
+        border:  Border.fromBorderSide(
           BorderSide(color: AppColors.border),
         ),
       ),

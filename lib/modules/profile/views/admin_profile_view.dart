@@ -30,7 +30,7 @@ class AdminProfileView extends StatelessWidget {
         if (data == null) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
         final name = (data['name'] ?? '').toString();
@@ -50,17 +50,17 @@ class AdminProfileView extends StatelessWidget {
                   backgroundColor: AppColors.primary.withOpacity(0.12),
                   child: Text(
                     name.isNotEmpty ? name[0].toUpperCase() : '?',
-                    style: const TextStyle(color: AppColors.text, fontSize: 24, fontWeight: FontWeight.bold),
+                    style:  TextStyle(color: AppColors.text, fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(width: AppSizes.md),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 18)),
-                    Text(email, style: const TextStyle(color: AppColors.textMuted)),
+                    Text(name, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 18)),
+                    Text(email, style:  TextStyle(color: AppColors.textMuted)),
                     if (role.isNotEmpty)
-                      Text(role.tr, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                      Text(role.tr, style:  TextStyle(color: AppColors.textMuted, fontSize: 12)),
                   ],
                 ),
               ],
@@ -72,12 +72,12 @@ class AdminProfileView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.card,
                 borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Account info'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                  Text('Account info'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
                   const SizedBox(height: AppSizes.sm),
                   _infoRow('Email'.tr, email),
                   _infoRow('Role'.tr, role),
@@ -98,9 +98,9 @@ class AdminProfileView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textMuted)),
+          Text(label, style:  TextStyle(color: AppColors.textMuted)),
           const Spacer(),
-          Text(value, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600)),
+          Text(value, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.w600)),
         ],
       ),
     );

@@ -31,7 +31,7 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
         children: [
           Text(
             'Change password'.tr,
-            style: const TextStyle(
+            style:  TextStyle(
               color: AppColors.text,
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -43,7 +43,7 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
             ),
             child: Form(
               key: _formKey,
@@ -53,7 +53,7 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
                   TextFormField(
                     controller: _currentController,
                     obscureText: true,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'Current password'.tr),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -69,7 +69,7 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
                   TextFormField(
                     controller: _newController,
                     obscureText: true,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'New password'.tr),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -85,7 +85,7 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
                   TextFormField(
                     controller: _confirmController,
                     obscureText: true,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'Confirm password'.tr),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {

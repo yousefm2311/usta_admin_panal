@@ -29,14 +29,14 @@ class PayoutRequestsView extends StatelessWidget {
         if (controller.withdrawals.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
           );
         }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Payout requests'.tr,
-                style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+                style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: AppSizes.md),
             TableWrapper(
               child: DataTable(
@@ -65,7 +65,7 @@ class PayoutRequestsView extends StatelessWidget {
                                     TextButton(
                                       onPressed: () =>
                                           controller.approve(p['id']?.toString() ?? p['_id']?.toString() ?? ''),
-                                      child: Text('Approve'.tr, style: const TextStyle(color: AppColors.success)),
+                                      child: Text('Approve'.tr, style:  TextStyle(color: AppColors.success)),
                                     ),
                                   if (canTakeAction) const SizedBox(width: AppSizes.xs),
                                   if (canTakeAction)

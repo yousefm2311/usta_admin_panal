@@ -185,6 +185,27 @@ import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_sizes.dart';
 
+class _SkeletonColors {
+  final Color base;
+  final Color highlight;
+
+  const _SkeletonColors(this.base, this.highlight);
+}
+
+_SkeletonColors _resolveSkeletonColors(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  if (isDark) {
+    return const _SkeletonColors(
+      Color(0xFF111827),
+      Color(0xFF1F2937),
+    );
+  }
+  return const _SkeletonColors(
+    Color(0xFFE2E8F0),
+    Color(0xFFF8FAFC),
+  );
+}
+
 class Shimmer extends StatefulWidget {
   final Widget child;
   const Shimmer({super.key, required this.child});
@@ -220,19 +241,12 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
       builder: (context, child) {
         final wave = _controller.value * 2 * math.pi;
 
-        // اللون يتغير حسب الثيم
-        final shimmerBase = Theme.of(context).brightness == Brightness.dark
-            ? Colors.white.withOpacity(0.12)
-            : Colors.black.withOpacity(0.06);
-
-        final shimmerHighlight = Theme.of(context).brightness == Brightness.dark
-            ? const Color.fromARGB(255, 196, 196, 196).withOpacity(0.24)
-            : Colors.black.withOpacity(0.12);
+        final palette = _resolveSkeletonColors(context);
 
         return ShaderMask(
           shaderCallback: (rect) {
             return LinearGradient(
-              colors: [shimmerBase, shimmerHighlight, shimmerBase],
+              colors: [palette.base, palette.highlight, palette.base],
               stops: const [0.2, 0.5, 0.8],
               begin: Alignment(-1 - math.cos(wave), -1),
               end: Alignment(1 + math.sin(wave), 1),
@@ -260,16 +274,14 @@ class ShimmerBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = _resolveSkeletonColors(context);
     return Shimmer(
       child: Container(
         height: height,
         width: width,
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: palette.base,
           borderRadius: BorderRadius.circular(radius),
-          border: const Border.fromBorderSide(
-            BorderSide(color: AppColors.border),
-          )
         ),
       ),
     );
@@ -288,13 +300,90 @@ class ShimmerListPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = itemHeight <= 32;
     return Column(
       children: List.generate(
         rows,
-        (i) => Padding(
-          padding: const EdgeInsets.only(bottom: AppSizes.sm),
-          child: ShimmerBox(height: itemHeight, radius: AppSizes.cardRadius),
-        ),
+        (i) {
+          if (compact) {
+            final widths = [0.9, 0.75, 0.6, 0.85];
+            final widthFactor = widths[i % widths.length];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSizes.sm),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: widthFactor,
+                  child: ShimmerBox(
+                    height: itemHeight,
+                    radius: itemHeight / 2,
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSizes.sm),
+            child: _ShimmerRow(height: itemHeight, index: i),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ShimmerRow extends StatelessWidget {
+  final double height;
+  final int index;
+
+  const _ShimmerRow({
+    required this.height,
+    required this.index,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final avatarSize = math.min(height * 0.6, 36.0);
+    final line1 = 0.55 + (index % 3) * 0.1;
+    final line2 = 0.35 + (index % 2) * 0.15;
+
+    return Container(
+      height: height,
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          ShimmerBox(
+            height: avatarSize,
+            width: avatarSize,
+            radius: avatarSize / 2,
+          ),
+          const SizedBox(width: AppSizes.sm),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FractionallySizedBox(
+                  widthFactor: line1,
+                  child: const ShimmerBox(height: 10, radius: 6),
+                ),
+                const SizedBox(height: 8),
+                FractionallySizedBox(
+                  widthFactor: line2,
+                  child: const ShimmerBox(height: 10, radius: 6),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSizes.sm),
+          const ShimmerBox(height: 12, width: 44, radius: 8),
+        ],
       ),
     );
   }
@@ -308,15 +397,25 @@ class ShimmerCardPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final shadowColor =
+        isDark ? Colors.black.withOpacity(0.35) : Colors.black.withOpacity(0.08);
     return Shimmer(
       child: Container(
         padding: const EdgeInsets.all(AppSizes.md),
         decoration: BoxDecoration(
           color: AppColors.card,
           borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-          border: const Border.fromBorderSide(
+          border: Border.fromBorderSide(
             BorderSide(color: AppColors.border),
-          )
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: shadowColor,
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,10 +425,13 @@ class ShimmerCardPlaceholder extends StatelessWidget {
               padding: EdgeInsets.only(
                 bottom: i == lines - 1 ? 0 : AppSizes.sm,
               ),
-              child: ShimmerBox(
-                height: 12,
-                width: i == 0 ? 140 : double.infinity,
-                radius: 8,
+              child: FractionallySizedBox(
+                widthFactor: i == 0 ? 0.4 : i == lines - 1 ? 0.7 : 1,
+                child: const ShimmerBox(
+                  height: 12,
+                  width: double.infinity,
+                  radius: 8,
+                ),
               ),
             ),
           ),
@@ -413,7 +515,7 @@ class TimelineLoading extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(
+        border:  Border.fromBorderSide(
           BorderSide(color: AppColors.border),
         ),
       ),

@@ -34,19 +34,19 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Send notification
-            Text('Send notification'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('Send notification'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: AppSizes.sm),
             _sendCard(controller),
             const SizedBox(height: AppSizes.md),
             // Templates section
             Row(
               children: [
-                Text('Notification Templates'.tr, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
+                Text('Notification Templates'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
                 const Spacer(),
                 TextButton.icon(
                   onPressed: () => _openTemplateDialog(controller),
-                  icon: const Icon(Icons.add, color: AppColors.primary),
-                  label: Text('Add'.tr, style: const TextStyle(color: AppColors.primary)),
+                  icon:  Icon(Icons.add, color: AppColors.primary),
+                  label: Text('Add'.tr, style:  TextStyle(color: AppColors.primary)),
                 ),
               ],
             ),
@@ -58,12 +58,12 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
               children: [
                 Text(
                   'Sent notifications'.tr,
-                  style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+                  style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const Spacer(),
                 IconButton(
                   onPressed: controller.loadHistory,
-                  icon: const Icon(Icons.refresh, color: AppColors.textMuted),
+                  icon:  Icon(Icons.refresh, color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -82,14 +82,14 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
       child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Target'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            Text('Target'.tr, style:  TextStyle(color: AppColors.textMuted)),
             const SizedBox(height: AppSizes.xs),
             Wrap(
               spacing: AppSizes.sm,
@@ -110,14 +110,14 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
             TextFormField(
               controller: _titleController,
               decoration: InputDecoration(labelText: 'Title'.tr),
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               validator: (v) => (v == null || v.isEmpty) ? 'Title'.tr : null,
             ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _messageController,
               decoration: InputDecoration(labelText: 'Message'.tr, hintText: 'Type notification message'.tr),
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               maxLines: 4,
               validator: (v) => (v == null || v.isEmpty) ? 'Message'.tr : null,
             ),
@@ -152,7 +152,7 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
       if (controller.templates.isEmpty) {
         return Padding(
           padding: const EdgeInsets.all(AppSizes.md),
-          child: Text('No templates'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          child: Text('No templates'.tr, style:  TextStyle(color: AppColors.textMuted)),
         );
       }
       return TableWrapper(
@@ -207,7 +207,7 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
       if (controller.history.isEmpty) {
         return Padding(
           padding: const EdgeInsets.all(AppSizes.md),
-          child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
         );
       }
       return Column(
@@ -220,11 +220,11 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
                 decoration: BoxDecoration(
                   color: AppColors.card,
                   borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                  border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                  border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.notifications_none, color: AppColors.primary),
+                     Icon(Icons.notifications_none, color: AppColors.primary),
                     const SizedBox(width: AppSizes.md),
                     Expanded(
                       child: Column(
@@ -232,22 +232,22 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
                         children: [
                           Text(
                             (n['title'] ?? '').toString(),
-                            style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
+                            style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
                           ),
                           Text(
                             (n['body'] ?? n['message'] ?? '').toString(),
-                            style: const TextStyle(color: AppColors.textMuted),
+                            style:  TextStyle(color: AppColors.textMuted),
                           ),
                           Text(
                             (n['target'] ?? '').toString().tr,
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                            style:  TextStyle(color: AppColors.textMuted, fontSize: 12),
                           ),
                         ],
                       ),
                     ),
                     Text(
                       _formatDate(n['date'] ?? n['createdAt']),
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                      style:  TextStyle(color: AppColors.textMuted, fontSize: 12),
                     ),
                     IconButton(
                       tooltip: 'Delete'.tr,
@@ -272,19 +272,19 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text(template == null ? 'Add'.tr : 'Edit'.tr, style: const TextStyle(color: AppColors.text)),
+        title: Text(template == null ? 'Add'.tr : 'Edit'.tr, style:  TextStyle(color: AppColors.text)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: name,
               decoration: const InputDecoration(labelText: 'Name'),
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
             ),
             const SizedBox(height: AppSizes.sm),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('Target'.tr, style: const TextStyle(color: AppColors.textMuted)),
+              child: Text('Target'.tr, style:  TextStyle(color: AppColors.textMuted)),
             ),
             Obx(
               () => Wrap(
@@ -306,12 +306,12 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
             TextField(
               controller: title,
               decoration: const InputDecoration(labelText: 'Title'),
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
             ),
             TextField(
               controller: message,
               decoration: const InputDecoration(labelText: 'Message'),
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               maxLines: 3,
             ),
           ],
@@ -319,7 +319,7 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
         actions: [
           TextButton(
             onPressed: Get.back,
-            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('Cancel'.tr, style:  TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () {
@@ -340,7 +340,7 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
               }
               Get.back();
             },
-            child: Text('Save'.tr, style: const TextStyle(color: AppColors.primary)),
+            child: Text('Save'.tr, style:  TextStyle(color: AppColors.primary)),
           ),
         ],
       ),

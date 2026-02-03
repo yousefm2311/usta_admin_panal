@@ -38,7 +38,7 @@ class _NotificationsBroadcastViewState extends State<NotificationsBroadcastView>
         children: [
           Text(
             'Broadcast notifications'.tr,
-            style: const TextStyle(
+            style:  TextStyle(
               color: AppColors.text,
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -50,14 +50,14 @@ class _NotificationsBroadcastViewState extends State<NotificationsBroadcastView>
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
             ),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Audience'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                  Text('Audience'.tr, style:  TextStyle(color: AppColors.textMuted)),
                   const SizedBox(height: AppSizes.sm),
                   DropdownButton<String>(
                     value: _audience,
@@ -76,7 +76,7 @@ class _NotificationsBroadcastViewState extends State<NotificationsBroadcastView>
                     const SizedBox(height: AppSizes.md),
                     TextFormField(
                       controller: _topicController,
-                      style: const TextStyle(color: AppColors.text),
+                      style:  TextStyle(color: AppColors.text),
                       decoration: InputDecoration(
                         labelText: 'Segment topic'.tr,
                         hintText: 'seg_example'.tr,
@@ -87,7 +87,7 @@ class _NotificationsBroadcastViewState extends State<NotificationsBroadcastView>
                     const SizedBox(height: AppSizes.md),
                     TextFormField(
                       controller: _customerIdsController,
-                      style: const TextStyle(color: AppColors.text),
+                      style:  TextStyle(color: AppColors.text),
                       decoration: InputDecoration(
                         labelText: 'Customer IDs'.tr,
                         hintText: 'id1,id2'.tr,
@@ -96,7 +96,7 @@ class _NotificationsBroadcastViewState extends State<NotificationsBroadcastView>
                     const SizedBox(height: AppSizes.sm),
                     TextFormField(
                       controller: _artisanIdsController,
-                      style: const TextStyle(color: AppColors.text),
+                      style:  TextStyle(color: AppColors.text),
                       decoration: InputDecoration(
                         labelText: 'Artisan IDs'.tr,
                         hintText: 'id1,id2'.tr,
@@ -105,7 +105,7 @@ class _NotificationsBroadcastViewState extends State<NotificationsBroadcastView>
                     const SizedBox(height: AppSizes.sm),
                     TextFormField(
                       controller: _adminIdsController,
-                      style: const TextStyle(color: AppColors.text),
+                      style:  TextStyle(color: AppColors.text),
                       decoration: InputDecoration(
                         labelText: 'Admin IDs'.tr,
                         hintText: 'id1,id2'.tr,
@@ -115,14 +115,14 @@ class _NotificationsBroadcastViewState extends State<NotificationsBroadcastView>
                   const SizedBox(height: AppSizes.md),
                   TextFormField(
                     controller: _titleController,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'Title'.tr),
                     validator: (value) => (value == null || value.trim().isEmpty) ? 'Title'.tr : null,
                   ),
                   const SizedBox(height: AppSizes.md),
                   TextFormField(
                     controller: _bodyController,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     maxLines: 4,
                     decoration: InputDecoration(labelText: 'Message'.tr),
                     validator: (value) => (value == null || value.trim().isEmpty) ? 'Message'.tr : null,

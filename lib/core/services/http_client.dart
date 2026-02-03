@@ -14,6 +14,10 @@ class HttpClient {
   final Dio dio;
   final TokenStorage _tokenStorage;
   final AuthService _authService;
+  final Connectivity _connectivity = Connectivity();
+  bool? _lastOnline;
+  DateTime? _lastConnectivityCheck;
+  static const Duration _connectivityCacheTtl = Duration(seconds: 5);
   HttpClient({TokenStorage? tokenStorage})
       : _tokenStorage = tokenStorage ?? Get.find<TokenStorage>(),
         dio = Dio(
@@ -77,14 +81,32 @@ class HttpClient {
   ApiException _mapError(DioException e) => mapDioException(e);
 
   Future<void> _ensureOnline() async {
-    String t(String en, String ar) {
-      final isAr = Get.locale?.languageCode == 'ar';
-      return isAr ? ar : en;
+    final message = 'No internet connection'.tr;
+    final now = DateTime.now();
+    if (_lastOnline != null &&
+        _lastConnectivityCheck != null &&
+        now.difference(_lastConnectivityCheck!) < _connectivityCacheTtl) {
+      if (_lastOnline == false) {
+        throw NetworkException(message);
+      }
+      return;
     }
-    final connectivity = await Connectivity().checkConnectivity();
-    if (connectivity == ConnectivityResult.none) {
-      throw NetworkException(t('No internet connection', 'لا يوجد اتصال بالإنترنت'));
+    final connectivity = await _connectivity.checkConnectivity();
+    _lastOnline = _isOnline(connectivity);
+    _lastConnectivityCheck = now;
+    if (_lastOnline == false) {
+      throw NetworkException(message);
     }
+  }
+
+  bool _isOnline(dynamic connectivity) {
+    if (connectivity is ConnectivityResult) {
+      return connectivity != ConnectivityResult.none;
+    }
+    if (connectivity is List<ConnectivityResult>) {
+      return connectivity.any((result) => result != ConnectivityResult.none);
+    }
+    return true;
   }
 }
 

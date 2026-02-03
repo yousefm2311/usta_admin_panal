@@ -31,7 +31,7 @@ class _SendNotificationViewState extends State<SendNotificationView> {
         children: [
           Text(
             'Create notification'.tr,
-            style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+            style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: AppSizes.md),
           Container(
@@ -39,14 +39,14 @@ class _SendNotificationViewState extends State<SendNotificationView> {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
             ),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Target audience'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                  Text('Target audience'.tr, style:  TextStyle(color: AppColors.textMuted)),
                   const SizedBox(height: AppSizes.sm),
                   Wrap(
                     spacing: AppSizes.sm,
@@ -68,14 +68,14 @@ class _SendNotificationViewState extends State<SendNotificationView> {
                   const SizedBox(height: AppSizes.md),
                   TextFormField(
                     controller: _titleController,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     decoration: InputDecoration(labelText: 'Title'.tr),
                     validator: (v) => (v == null || v.isEmpty) ? 'Title'.tr : null,
                   ),
                   const SizedBox(height: AppSizes.md),
                   TextFormField(
                     controller: _messageController,
-                    style: const TextStyle(color: AppColors.text),
+                    style:  TextStyle(color: AppColors.text),
                     maxLines: 5,
                     decoration: InputDecoration(
                       labelText: 'Message'.tr,

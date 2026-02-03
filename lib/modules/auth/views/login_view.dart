@@ -26,7 +26,7 @@ class LoginView extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(
+              border:  Border.fromBorderSide(
                 BorderSide(color: AppColors.border),
               ),
               boxShadow: [
@@ -50,7 +50,7 @@ class LoginView extends StatelessWidget {
                     color: AppColors.primary.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(Icons.shield_moon, color: AppColors.primary),
+                  child:  Icon(Icons.shield_moon, color: AppColors.primary),
                 ),
                 const SizedBox(width: AppSizes.md),
                 Column(
@@ -58,7 +58,7 @@ class LoginView extends StatelessWidget {
                   children: [
                     Text(
                       'USTA Platform'.tr,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         color: AppColors.text,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
@@ -66,7 +66,7 @@ class LoginView extends StatelessWidget {
                     ),
                     Text(
                       'Admin Panel'.tr,
-                      style: const TextStyle(color: AppColors.textMuted),
+                      style:  TextStyle(color: AppColors.textMuted),
                     ),
                   ],
                 ),
@@ -75,7 +75,7 @@ class LoginView extends StatelessWidget {
             const SizedBox(height: AppSizes.lg),
             Text(
               'Sign in to continue'.tr,
-              style: const TextStyle(
+              style:  TextStyle(
                 color: AppColors.text,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -84,7 +84,7 @@ class LoginView extends StatelessWidget {
             const SizedBox(height: AppSizes.md),
             TextField(
               controller: emailCtrl,
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               decoration: InputDecoration(
                 labelText: 'Email address'.tr,
               ),
@@ -93,7 +93,7 @@ class LoginView extends StatelessWidget {
             TextField(
               controller: passCtrl,
               obscureText: true,
-              style: const TextStyle(color: AppColors.text),
+              style:  TextStyle(color: AppColors.text),
               decoration: InputDecoration(
                 labelText: 'Password'.tr,
               ),
@@ -102,12 +102,12 @@ class LoginView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Text('Validation only - no backend'.tr, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                // Text('Validation only - no backend'.tr, style:  TextStyle(color: AppColors.textMuted, fontSize: 12)),
                 InkWell(
                   onTap: () {
                     Get.offAllNamed('/reset');
                   },
-                  child: Text('Forgot password?'.tr, style: const TextStyle(color: AppColors.primary, fontSize: 12))),
+                  child: Text('Forgot password?'.tr, style:  TextStyle(color: AppColors.primary, fontSize: 12))),
               ],
             ),
             const SizedBox(height: AppSizes.lg),

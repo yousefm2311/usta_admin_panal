@@ -34,7 +34,7 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
             children: [
               Text(
                 'FCM tokens'.tr,
-                style: const TextStyle(
+                style:  TextStyle(
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -43,7 +43,7 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
               const Spacer(),
               IconButton(
                 onPressed: controller.loadTokens,
-                icon: const Icon(Icons.refresh, color: AppColors.textMuted),
+                icon:  Icon(Icons.refresh, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -52,7 +52,7 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
           const SizedBox(height: AppSizes.md),
           Text(
             'Topic subscriptions'.tr,
-            style: const TextStyle(
+            style:  TextStyle(
               color: AppColors.text,
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -64,14 +64,14 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+              border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
                   controller: _topicController,
-                  style: const TextStyle(color: AppColors.text),
+                  style:  TextStyle(color: AppColors.text),
                   decoration: InputDecoration(
                     labelText: 'Topic'.tr,
                     hintText: 'seg_marketing'.tr,
@@ -80,7 +80,7 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
                 const SizedBox(height: AppSizes.sm),
                 TextField(
                   controller: _deviceIdController,
-                  style: const TextStyle(color: AppColors.text),
+                  style:  TextStyle(color: AppColors.text),
                   decoration: InputDecoration(
                     labelText: 'Device ID (optional)'.tr,
                   ),
@@ -114,7 +114,7 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.text,
-                            side: const BorderSide(color: AppColors.border),
+                            side:  BorderSide(color: AppColors.border),
                           ),
                           onPressed: controller.actioning.value
                               ? null
@@ -159,7 +159,7 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
       if (controller.tokens.isEmpty) {
         return Padding(
           padding: const EdgeInsets.all(AppSizes.md),
-          child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+          child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
         );
       }
 
@@ -185,7 +185,7 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
                           ),
                           IconButton(
                             tooltip: 'Copy'.tr,
-                            icon: const Icon(Icons.copy, size: 16, color: AppColors.textMuted),
+                            icon:  Icon(Icons.copy, size: 16, color: AppColors.textMuted),
                             onPressed: () => _copyToken(_field(item, ['token', 'fcmToken', 'value'])),
                           ),
                         ],
@@ -198,11 +198,11 @@ class _NotificationsTokensViewState extends State<NotificationsTokensView> {
                 ),
               )
               .toList(),
-          headingTextStyle: const TextStyle(
+          headingTextStyle:  TextStyle(
             color: AppColors.textMuted,
             fontWeight: FontWeight.w600,
           ),
-          dataTextStyle: const TextStyle(color: AppColors.text),
+          dataTextStyle:  TextStyle(color: AppColors.text),
         ),
       );
     });

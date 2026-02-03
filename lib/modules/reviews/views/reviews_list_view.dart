@@ -22,7 +22,7 @@ class ReviewsListView extends StatelessWidget {
             children: [
               Text(
                 'Reviews'.tr,
-                style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+                style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const Spacer(),
               Obx(
@@ -53,7 +53,7 @@ class ReviewsListView extends StatelessWidget {
             if (reviews.isEmpty) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text('No data'.tr, style: const TextStyle(color: AppColors.textMuted)),
+                child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
               );
             }
             return Column(
@@ -66,7 +66,7 @@ class ReviewsListView extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: AppColors.card,
                         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                        border: const Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                        border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +86,7 @@ class ReviewsListView extends StatelessWidget {
                               const Spacer(),
                               Text(
                                 _formatDate(review['date'] ?? review['createdAt']),
-                                style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                                style:  TextStyle(color: AppColors.textMuted, fontSize: 12),
                               ),
                               const SizedBox(width: AppSizes.xs),
                               IconButton(
@@ -99,12 +99,12 @@ class ReviewsListView extends StatelessWidget {
                           const SizedBox(height: 6),
                           Text(
                             (review['text'] ?? review['comment'] ?? '').toString(),
-                            style: const TextStyle(color: AppColors.text),
+                            style:  TextStyle(color: AppColors.text),
                           ),
                           const SizedBox(height: 6),
                           Text(
                             '${review['customerId']?['name'] ??  ''} • ${review['artisanId']?['name'] ?? ''}',
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                            style:  TextStyle(color: AppColors.textMuted, fontSize: 12),
                           ),
                         ],
                       ),
@@ -135,12 +135,12 @@ class ReviewsListView extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text('Delete'.tr, style: const TextStyle(color: AppColors.text)),
-        content: Text('Delete this review?'.tr, style: const TextStyle(color: AppColors.textMuted)),
+        title: Text('Delete'.tr, style:  TextStyle(color: AppColors.text)),
+        content: Text('Delete this review?'.tr, style:  TextStyle(color: AppColors.textMuted)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cancel'.tr, style: const TextStyle(color: AppColors.textMuted)),
+            child: Text('Cancel'.tr, style:  TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () {
