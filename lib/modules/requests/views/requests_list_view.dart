@@ -48,45 +48,7 @@ class _RequestsListViewState extends State<RequestsListView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                'Requests'.tr,
-                style: TextStyle(
-                  color: AppColors.text,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const Spacer(),
-              IconButton(
-                onPressed: controller.loadRequests,
-                icon: Icon(Icons.refresh, color: AppColors.textMuted),
-              ),
-              const SizedBox(width: AppSizes.sm),
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.text,
-                  side: BorderSide(color: AppColors.border),
-                ),
-                onPressed: () =>
-                    _openMaintenanceDialog(context, isExpire: true),
-                icon: const Icon(Icons.timelapse, size: 18),
-                label: Text('Expire stale'.tr),
-              ),
-              const SizedBox(width: AppSizes.sm),
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.text,
-                  side: BorderSide(color: AppColors.border),
-                ),
-                onPressed: () =>
-                    _openMaintenanceDialog(context, isExpire: false),
-                icon: const Icon(Icons.check_circle_outline, size: 18),
-                label: Text('Auto confirm'.tr),
-              ),
-            ],
-          ),
+          _headerSection(context),
 
           const SizedBox(height: AppSizes.sm),
 
@@ -164,7 +126,8 @@ class _RequestsListViewState extends State<RequestsListView> {
                                 r['customerId'] ??
                                 r['client'] ??
                                 r['user'],
-                            fallback: r['customerName'] ??
+                            fallback:
+                                r['customerName'] ??
                                 r['clientName'] ??
                                 r['userName'] ??
                                 r['customerEmail'] ??
@@ -179,7 +142,8 @@ class _RequestsListViewState extends State<RequestsListView> {
                                 r['artisanId'] ??
                                 r['worker'] ??
                                 r['technician'],
-                            fallback: r['artisanName'] ??
+                            fallback:
+                                r['artisanName'] ??
                                 r['workerName'] ??
                                 r['technicianName'] ??
                                 r['artisanPhone'],
@@ -228,6 +192,112 @@ class _RequestsListViewState extends State<RequestsListView> {
   }
 
   // -------- helpers --------
+
+  Widget _headerSection(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 860;
+
+        final refreshButton = Obx(() {
+          final isLoading = controller.loading.value;
+          return IconButton(
+            onPressed: isLoading ? null : controller.loadRequests,
+            tooltip: 'Refresh'.tr,
+            icon: isLoading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(Icons.refresh, color: AppColors.textMuted),
+          );
+        });
+
+        final expireButton = _maintenanceButton(
+          icon: Icons.timelapse,
+          label: 'Expire stale'.tr,
+          onPressed: () => _openMaintenanceDialog(context, isExpire: true),
+        );
+
+        final autoConfirmButton = _maintenanceButton(
+          icon: Icons.check_circle_outline,
+          label: 'Auto confirm'.tr,
+          onPressed: () => _openMaintenanceDialog(context, isExpire: false),
+        );
+
+        final titleBlock = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Requests'.tr,
+              style: TextStyle(
+                color: AppColors.text,
+                fontWeight: FontWeight.w900,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Manage and monitor requests'.tr,
+              style: TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        );
+
+        if (compact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(child: titleBlock),
+                  refreshButton,
+                ],
+              ),
+              const SizedBox(height: AppSizes.sm),
+              SizedBox(width: double.infinity, child: expireButton),
+              const SizedBox(height: AppSizes.xs),
+              SizedBox(width: double.infinity, child: autoConfirmButton),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: titleBlock),
+            refreshButton,
+            const SizedBox(width: AppSizes.sm),
+            expireButton,
+            const SizedBox(width: AppSizes.sm),
+            autoConfirmButton,
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _maintenanceButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return OutlinedButton.icon(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.text,
+        side: BorderSide(color: AppColors.border),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18),
+      label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+    );
+  }
 
   String _formatDate(dynamic value) {
     if (value is DateTime) return '${value.day}/${value.month}/${value.year}';

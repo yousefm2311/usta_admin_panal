@@ -21,6 +21,22 @@ class DashboardView extends StatelessWidget {
 
     return AdminLayout(
       title: 'Dashboard'.tr,
+      actions: [
+        Obx(() {
+          final loading = controller.loading.value;
+          return IconButton(
+            onPressed: loading ? null : controller.loadDashboard,
+            tooltip: 'Refresh'.tr,
+            icon: loading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(Icons.refresh_rounded, color: AppColors.textMuted),
+          );
+        }),
+      ],
       child: Obx(() {
         if (controller.loading.value) {
           return Column(
@@ -36,30 +52,57 @@ class DashboardView extends StatelessWidget {
         }
 
         if (controller.error.value != null) {
-          return Padding(
-            padding: const EdgeInsets.all(AppSizes.md),
-            child: Text(
-              controller.error.value!,
-              style: const TextStyle(color: Colors.redAccent),
+          return _card(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.redAccent),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Error'.tr,
+                        style: TextStyle(
+                          color: AppColors.text,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: controller.loadDashboard,
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: Text('Refresh'.tr),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  controller.error.value!,
+                  style: TextStyle(color: AppColors.textMuted),
+                ),
+              ],
             ),
           );
         }
 
         final stats = controller.stats.value ?? <String, dynamic>{};
 
-        final chartData =
-            (stats['monthly'] ?? stats['analytics'] ?? stats['chart'] ?? [])
-                as List<dynamic>;
+        final chartData = _asList(
+          stats['monthly'] ?? stats['analytics'] ?? stats['chart'],
+        );
 
-        final latestRaw =
-            (stats['latestRequests'] ?? stats['latest'] ?? []) as List<dynamic>;
+        final latestRaw = _asList(stats['latestRequests'] ?? stats['latest']);
 
         final latestAll = controller.latestRequests.isNotEmpty
             ? controller.latestRequests
             : (latestRaw.isNotEmpty ? latestRaw : controller.activities);
 
-        final latest = _limitLatestRequests(latestAll, 10);
-        final topArtisans = controller.topArtisans;
+        final latest = _limitLatestRequests(latestAll, 5);
+        final topArtisans = controller.topArtisans.isNotEmpty
+            ? controller.topArtisans
+            : _asList(stats['topArtisans'] ?? stats['top']);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,6 +440,7 @@ class DashboardView extends StatelessWidget {
       ],
     );
   }
+
   // =========================================
   // LATEST REQUESTS
   // =========================================
@@ -424,18 +468,24 @@ class DashboardView extends StatelessWidget {
               ),
             ),
           ...requests.map((raw) {
-            final req = raw as Map<String, dynamic>? ?? {};
+            final req = raw is Map<String, dynamic>
+                ? raw
+                : raw is Map
+                ? Map<String, dynamic>.from(raw)
+                : <String, dynamic>{};
             final createdAt = req['createdAt'] ?? req['created'] ?? req['date'];
             final time = _formatRelativeTime(createdAt);
 
-            final service = (req['serviceType'] ?? req['service'] ?? '')
-                .toString();
-            final customerName = (req['customer']?['name'] ?? '')
-                .toString()
-                .trim();
-            final artisanName = (req['artisan']?['name'] ?? '')
-                .toString()
-                .trim();
+            final service = _firstText([
+              req['serviceType'],
+              req['service'],
+              req['category']?['name'],
+            ], fallback: 'Service'.tr);
+            final customerName = _resolveEntityName(req['customer']);
+            final artisanName = _resolveEntityName(
+              req['artisan'],
+              fallback: 'Unknown artisan'.tr,
+            );
             final status = (req['status'] ?? '').toString();
             final id = (req['_id'] ?? req['id'] ?? '').toString();
 
@@ -443,7 +493,7 @@ class DashboardView extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppSizes.inputRadius),
               onTap: () {
                 if (id.isNotEmpty) {
-                  Get.toNamed('/orders/$id');
+                  Get.toNamed('/order/details', arguments: req);
                 } else {
                   Get.toNamed('/orders');
                 }
@@ -454,21 +504,28 @@ class DashboardView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.overlay,
                   borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-                  border: Border.all(color: AppColors.border.withOpacity(0.65)),
+
                 ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: AppColors.primary.withOpacity(0.12),
-                      child: Icon(Icons.build, color: AppColors.primary),
-                    ),
-                    const SizedBox(width: AppSizes.md),
-                    Expanded(
-                      child: Column(
+                child: LayoutBuilder(
+                  builder: (context, c) {
+                    final compact = c.maxWidth < 560;
+
+                    if (compact) {
+                      return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
+                              CircleAvatar(
+                                backgroundColor: AppColors.primary.withOpacity(
+                                  0.12,
+                                ),
+                                child: Icon(
+                                  Icons.build,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              const SizedBox(width: AppSizes.sm),
                               Expanded(
                                 child: Text(
                                   service,
@@ -493,7 +550,7 @@ class DashboardView extends StatelessWidget {
                               ],
                             ],
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           Text(
                             '${customerName.isEmpty ? '-' : customerName}  →  ${artisanName.isEmpty ? '-' : artisanName}',
                             style: TextStyle(
@@ -501,12 +558,65 @@ class DashboardView extends StatelessWidget {
                               fontSize: 12,
                             ),
                           ),
+                          const SizedBox(height: 8),
+                          _statusChip(status),
                         ],
-                      ),
-                    ),
-                    const SizedBox(width: AppSizes.sm),
-                    _statusChip(status),
-                  ],
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: AppColors.primary.withOpacity(0.12),
+                          child: Icon(Icons.build, color: AppColors.primary),
+                        ),
+                        const SizedBox(width: AppSizes.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      service,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: AppColors.text,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ),
+                                  if (time.isNotEmpty) ...[
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      time,
+                                      style: TextStyle(
+                                        color: AppColors.textMuted,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                '${customerName.isEmpty ? '-' : customerName}  →  ${artisanName.isEmpty ? '-' : artisanName}',
+                                style: TextStyle(
+                                  color: AppColors.textMuted,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: AppSizes.sm),
+                        _statusChip(status),
+                      ],
+                    );
+                  },
                 ),
               ),
             );
@@ -537,16 +647,58 @@ class DashboardView extends StatelessWidget {
           ...artisans.asMap().entries.map((entry) {
             final idx = entry.key;
             final raw = entry.value;
-            final artisan = raw as Map<String, dynamic>? ?? {};
+            final artisan = raw is Map<String, dynamic>
+                ? raw
+                : raw is Map
+                ? Map<String, dynamic>.from(raw)
+                : <String, dynamic>{};
+            final artisanObj = artisan['artisan'];
+            final artisanMap = artisanObj is Map<String, dynamic>
+                ? artisanObj
+                : artisanObj is Map
+                ? Map<String, dynamic>.from(artisanObj)
+                : <String, dynamic>{};
 
             final rating =
                 double.tryParse(
-                  (artisan['avg'] ?? artisan['score'] ?? 0).toString(),
+                  (artisan['avg'] ??
+                          artisan['score'] ??
+                          artisan['rating'] ??
+                          artisanMap['rating'] ??
+                          0)
+                      .toString(),
                 ) ??
                 0;
 
-            final name = (artisan['artisan']?['name'] ?? '').toString();
-            final prof = (artisan['artisan']?['profession'] ?? '').toString();
+            final artisanId = _firstText([
+              artisan['artisanId'],
+              artisanMap['_id'],
+              artisanMap['id'],
+              artisan['_id'],
+              artisan['id'],
+            ]);
+
+            final name = _firstText([
+              artisanMap['name'],
+              artisan['name'],
+              artisan['artisanName'],
+              artisan['userName'],
+              artisan['displayName'],
+              artisanId,
+            ], fallback: 'Unknown artisan'.tr);
+            final prof = _firstText([
+              artisanMap['profession'],
+              artisanMap['service'],
+              artisanMap['category']?['name'],
+              artisan['profession'],
+              artisan['service'],
+              artisan['category']?['name'],
+            ]);
+            final jobsCount = _firstText([
+              artisan['count'],
+              artisan['requestsCount'],
+              artisan['reviewsCount'],
+            ]);
 
             final rank = idx + 1;
             final rankColor = rank == 1
@@ -557,80 +709,112 @@ class DashboardView extends StatelessWidget {
                 ? Colors.deepOrange.shade300
                 : AppColors.textMuted;
 
-            return Container(
-              margin: const EdgeInsets.only(bottom: AppSizes.sm),
-              padding: const EdgeInsets.all(AppSizes.md),
-              decoration: BoxDecoration(
-                color: AppColors.overlay,
-                borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-                border: Border.all(color: AppColors.border.withOpacity(0.65)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    height: 34,
-                    width: 34,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: rankColor.withOpacity(0.14),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: rankColor.withOpacity(0.55)),
+            return InkWell(
+              borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+              onTap: artisanId.isEmpty
+                  ? null
+                  : () => Get.toNamed(
+                      '/artisan/details',
+                      arguments: {'_id': artisanId},
                     ),
-                    child: Text(
-                      '#$rank',
-                      style: TextStyle(
-                        color: rankColor,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 12,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: AppSizes.sm),
+                padding: const EdgeInsets.all(AppSizes.md),
+                decoration: BoxDecoration(
+                  color: AppColors.overlay,
+                  borderRadius: BorderRadius.circular(AppSizes.inputRadius),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      height: 34,
+                      width: 34,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: rankColor.withOpacity(0.14),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: rankColor.withOpacity(0.55)),
+                      ),
+                      child: Text(
+                        '#$rank',
+                        style: TextStyle(
+                          color: rankColor,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: AppSizes.md),
-                  CircleAvatar(
-                    backgroundColor: AppColors.primary.withOpacity(0.10),
-                    child: Icon(Icons.person, color: AppColors.text),
-                  ),
-                  const SizedBox(width: AppSizes.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(width: AppSizes.md),
+                    CircleAvatar(
+                      backgroundColor: AppColors.primary.withOpacity(0.10),
+                      child: Icon(Icons.person, color: AppColors.text),
+                    ),
+                    const SizedBox(width: AppSizes.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.text,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            prof.isEmpty ? '-' : prof,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (jobsCount.isNotEmpty) ...[
+                      Container(
+                        margin: const EdgeInsetsDirectional.only(end: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.card,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: AppColors.border.withOpacity(0.8),
+                          ),
+                        ),
+                        child: Text(
+                          jobsCount,
+                          style: TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                    Row(
                       children: [
+                        const Icon(Icons.star, color: Colors.amber, size: 18),
+                        const SizedBox(width: 4),
                         Text(
-                          name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          rating.toStringAsFixed(1),
                           style: TextStyle(
                             color: AppColors.text,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          prof,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: AppColors.textMuted,
-                            fontSize: 12,
-                          ),
-                        ),
                       ],
                     ),
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 18),
-                      const SizedBox(width: 4),
-                      Text(
-                        rating.toStringAsFixed(1),
-                        style: TextStyle(
-                          color: AppColors.text,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }),
@@ -699,6 +883,40 @@ class DashboardView extends StatelessWidget {
   // =========================================
   // DATA HELPERS
   // =========================================
+  List<dynamic> _asList(dynamic value) {
+    if (value is List<dynamic>) return value;
+    if (value is List) return value.cast<dynamic>();
+    return [];
+  }
+
+  String _firstText(Iterable<dynamic> values, {String fallback = ''}) {
+    for (final value in values) {
+      final text = value?.toString().trim() ?? '';
+      if (text.isNotEmpty && text.toLowerCase() != 'null') return text;
+    }
+    return fallback;
+  }
+
+  String _resolveEntityName(dynamic value, {String fallback = ''}) {
+    if (value is Map<String, dynamic>) {
+      return _firstText([
+        value['name'],
+        value['fullName'],
+        value['username'],
+        value['phone'],
+        value['_id'],
+        value['id'],
+      ], fallback: fallback);
+    }
+    if (value is Map) {
+      return _resolveEntityName(
+        Map<String, dynamic>.from(value),
+        fallback: fallback,
+      );
+    }
+    return _firstText([value], fallback: fallback);
+  }
+
   String _formatNumber(dynamic value) {
     if (value == null) return '0';
     final parsed = double.tryParse(value.toString());
@@ -728,6 +946,7 @@ class DashboardView extends StatelessWidget {
 
     final now = DateTime.now();
     final diff = now.difference(dt);
+    if (diff.isNegative) return 'Now'.tr;
 
     if (diff.inSeconds < 60) return '${diff.inSeconds}s';
     if (diff.inMinutes < 60) return '${diff.inMinutes}m';
@@ -787,9 +1006,11 @@ class DashboardView extends StatelessWidget {
       return Colors.amber.shade700;
     }
 
-    if (status == 'cancelled' || status == 'rejected') {
+    if (status == 'cancelled' || status == 'canceled' || status == 'rejected') {
       return Colors.redAccent;
     }
+
+    if (status == 'closed') return AppColors.textMuted;
 
     return AppColors.textMuted;
   }
