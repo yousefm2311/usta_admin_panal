@@ -23,9 +23,11 @@ class PaymentsListView extends StatelessWidget {
           // =========================
           // HEADER
           // =========================
-          Row(
-            children: [
-              Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow = constraints.maxWidth < 720;
+
+              final titleBlock = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -47,10 +49,9 @@ class PaymentsListView extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-              const Spacer(),
+              );
 
-              Obx(() {
+              final filterButton = Obx(() {
                 final count = controller.filter.length;
                 return OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
@@ -73,11 +74,9 @@ class PaymentsListView extends StatelessWidget {
                     ],
                   ),
                 );
-              }),
+              });
 
-              const SizedBox(width: AppSizes.sm),
-
-              Obx(
+              final clearButton = Obx(
                 () => OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textMuted,
@@ -93,16 +92,40 @@ class PaymentsListView extends StatelessWidget {
                   icon: const Icon(Icons.clear_rounded, size: 18),
                   label: Text('Clear'.tr),
                 ),
-              ),
+              );
 
-              const SizedBox(width: AppSizes.sm),
-
-              IconButton(
+              final refreshButton = IconButton(
                 onPressed: controller.loadTransactions,
                 icon: Icon(Icons.refresh_rounded, color: AppColors.textMuted),
                 tooltip: 'Refresh'.tr,
-              ),
-            ],
+              );
+
+              if (isNarrow) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleBlock,
+                    const SizedBox(height: AppSizes.sm),
+                    Wrap(
+                      spacing: AppSizes.sm,
+                      runSpacing: AppSizes.sm,
+                      children: [filterButton, clearButton, refreshButton],
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: titleBlock),
+                  filterButton,
+                  const SizedBox(width: AppSizes.sm),
+                  clearButton,
+                  const SizedBox(width: AppSizes.sm),
+                  refreshButton,
+                ],
+              );
+            },
           ),
 
           const SizedBox(height: AppSizes.md),
@@ -151,12 +174,9 @@ class PaymentsListView extends StatelessWidget {
                     final p =
                         raw as Map<String, dynamic>? ?? <String, dynamic>{};
 
-                    final customerName =
-                        (p['customer']?['name'] ?? p['customerName'] ?? '')
-                            .toString();
+                    final customerName = controller.userNameFor(p);
                     final amount = p['finalAmount'] ?? p['amount'] ?? 0;
-                    final method = (p['method'] ?? p['paymentMethod'] ?? '')
-                        .toString();
+                    final method = _resolveMethod(p);
                     final date = p['date'] ?? p['createdAt'];
                     final status = (p['status'] ?? '').toString();
 
@@ -307,6 +327,77 @@ class PaymentsListView extends StatelessWidget {
       final parsed = DateTime.tryParse(value);
       if (parsed != null) return '${parsed.day}/${parsed.month}/${parsed.year}';
       return value;
+    }
+    return '';
+  }
+
+  String _resolveMethod(Map<String, dynamic> payment) {
+    final direct = _stringFrom(
+      payment['method'] ??
+          payment['paymentMethod'] ??
+          payment['payment_method'] ??
+          payment['methodName'] ??
+          payment['methodType'] ??
+          payment['type'] ??
+          payment['channel'] ??
+          payment['gateway'] ??
+          payment['provider'] ??
+          payment['source'],
+    );
+    if (direct.isNotEmpty) return direct;
+
+    return _stringFrom(
+      payment['payment'] ??
+          payment['details'] ??
+          payment['meta'] ??
+          payment['data'],
+      keys: const [
+        'method',
+        'paymentMethod',
+        'payment_method',
+        'methodName',
+        'methodType',
+        'type',
+        'channel',
+        'gateway',
+        'provider',
+        'source',
+      ],
+    );
+  }
+
+  String _stringFrom(
+    dynamic value, {
+    List<String> keys = const [
+      'name',
+      'fullName',
+      'displayName',
+      'username',
+      'email',
+      'phone',
+      'title',
+      'label',
+      'type',
+      'method',
+      'paymentMethod',
+      'payment_method',
+      'methodName',
+      'methodType',
+      'channel',
+      'gateway',
+      'provider',
+      'source',
+    ],
+  }) {
+    if (value == null) return '';
+    if (value is String || value is num) return value.toString();
+    if (value is Map<String, dynamic>) {
+      for (final key in keys) {
+        final raw = value[key];
+        if (raw == null) continue;
+        final text = raw.toString();
+        if (text.trim().isNotEmpty) return text;
+      }
     }
     return '';
   }

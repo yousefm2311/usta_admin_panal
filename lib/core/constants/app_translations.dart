@@ -177,6 +177,7 @@ class AppTranslations extends Translations {
       'Method': 'Method',
       'IBAN': 'IBAN',
       'Action': 'Action',
+      'Unknown artisan': 'Unknown artisan',
       'Transactions': 'Transactions',
       'Payout requests': 'Payout requests',
       'Wallet balances placeholder': 'Wallet balances placeholder',
@@ -336,8 +337,8 @@ class AppTranslations extends Translations {
       "Action": "Action",
       "Module": "Module",
       "Time": "Time",
-      'Theme':'Theme',
-      'Unblock':'Unblock',
+      'Theme': 'Theme',
+      'Unblock': 'Unblock',
       'Reports': 'Reports',
       'Broadcast': 'Broadcast',
       'Broadcast notifications': 'Broadcast notifications',
@@ -361,7 +362,8 @@ class AppTranslations extends Translations {
       'Selected': 'Selected',
       'Segment topic': 'Segment topic',
       'Segment topic required': 'Segment topic required',
-      'Segment topic must start with seg_': 'Segment topic must start with seg_',
+      'Segment topic must start with seg_':
+          'Segment topic must start with seg_',
       'Please enter at least one ID': 'Please enter at least one ID',
       'Customer IDs': 'Customer IDs',
       'Artisan IDs': 'Artisan IDs',
@@ -385,6 +387,8 @@ class AppTranslations extends Translations {
       'Assign': 'Assign',
       'Agent ID': 'Agent ID',
       'Agent ID required': 'Agent ID required',
+      'Choose agent': 'Choose agent',
+      'No agents found': 'No agents found',
       'Internal note': 'Internal note',
       'Add note': 'Add note',
       'Note is required': 'Note is required',
@@ -405,7 +409,7 @@ class AppTranslations extends Translations {
       'id1,id2': 'id1,id2',
       'Edit category': 'Edit category',
       'Invalid category': 'Invalid category',
-            'Reports': 'Reports',
+      'Reports': 'Reports',
       'Broadcast': 'Broadcast',
       'Broadcast notifications': 'Broadcast notifications',
       'FCM Tokens': 'FCM Tokens',
@@ -428,7 +432,8 @@ class AppTranslations extends Translations {
       'Selected': 'Selected',
       'Segment topic': 'Segment topic',
       'Segment topic required': 'Segment topic required',
-      'Segment topic must start with seg_': 'Segment topic must start with seg_',
+      'Segment topic must start with seg_':
+          'Segment topic must start with seg_',
       'Please enter at least one ID': 'Please enter at least one ID',
       'Customer IDs': 'Customer IDs',
       'Artisan IDs': 'Artisan IDs',
@@ -490,7 +495,7 @@ class AppTranslations extends Translations {
       'Entity': 'Entity',
       'Score': 'Score',
       'Reason': 'Reason',
-      'Api Health':'Api Health'
+      'Api Health': 'Api Health',
     },
     'ar': {
       // Common
@@ -556,8 +561,11 @@ class AppTranslations extends Translations {
       'No internet connection': '?? ???? ????? ?????????',
       'Address': '\u0627\u0644\u0639\u0646\u0648\u0627\u0646',
       'Services': '\u0627\u0644\u062e\u062f\u0645\u0627\u062a',
-      'Profile completion': '\u0627\u0643\u062a\u0645\u0627\u0644 \u0627\u0644\u0645\u0644\u0641',      'Approved': 'مقبول',
-      'Full details': '\u0627\u0644\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0643\u0627\u0645\u0644\u0629',
+      'Profile completion':
+          '\u0627\u0643\u062a\u0645\u0627\u0644 \u0627\u0644\u0645\u0644\u0641',
+      'Approved': 'مقبول',
+      'Full details':
+          '\u0627\u0644\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0643\u0627\u0645\u0644\u0629',
       'Count': '\u0627\u0644\u0639\u062f\u062f',
       'Item': '\u0639\u0646\u0635\u0631',
       'Pending': 'قيد المراجعة',
@@ -664,6 +672,7 @@ class AppTranslations extends Translations {
       'Method': 'الطريقة',
       'IBAN': 'آيبان',
       'Action': 'إجراء',
+      'Unknown artisan': 'فني غير معروف',
       'Payout requests': 'طلبات السحب',
       'Wallet balances placeholder': 'أرصدة المحافظ (تجريبي)',
       'Per customer / artisan balance list': 'أرصدة العملاء/الفنيين',
@@ -859,6 +868,8 @@ class AppTranslations extends Translations {
       'Assign': 'تعيين',
       'Agent ID': 'معرّف الموظف',
       'Agent ID required': 'معرّف الموظف مطلوب',
+      'Choose agent': 'اختر الموظف',
+      'No agents found': 'لا يوجد موظفون متاحون',
       'Internal note': 'ملاحظة داخلية',
       'Add note': 'إضافة ملاحظة',
       'Note is required': 'الملاحظة مطلوبة',
@@ -897,12 +908,7 @@ class AppTranslations extends Translations {
       'Entity': 'الكيان',
       'Score': 'التقييم',
       'Reason': 'السبب',
-      'Api Health': 'حالة السيرفر'
+      'Api Health': 'حالة السيرفر',
     },
   };
 }
-
-
-
-
-

@@ -46,9 +46,11 @@ class _CategoriesListViewState extends State<CategoriesListView> {
           // =========================
           // HEADER
           // =========================
-          Row(
-            children: [
-              Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow = constraints.maxWidth < 760;
+
+              final titleBlock = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -70,11 +72,9 @@ class _CategoriesListViewState extends State<CategoriesListView> {
                     ),
                   ),
                 ],
-              ),
-              const Spacer(),
+              );
 
-              // Refresh
-              OutlinedButton.icon(
+              final refreshButton = OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.text,
                   side: BorderSide(color: AppColors.border),
@@ -86,12 +86,9 @@ class _CategoriesListViewState extends State<CategoriesListView> {
                 onPressed: controller.loadCategories,
                 icon: const Icon(Icons.refresh_rounded, size: 18),
                 label: Text('Refresh'.tr),
-              ),
+              );
 
-              const SizedBox(width: AppSizes.sm),
-
-              // New
-              ElevatedButton.icon(
+              final newButton = ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
@@ -101,8 +98,32 @@ class _CategoriesListViewState extends State<CategoriesListView> {
                 onPressed: () => Get.toNamed('/category/add'),
                 icon: const Icon(Icons.add_rounded, size: 18),
                 label: Text('New category'.tr),
-              ),
-            ],
+              );
+
+              if (isNarrow) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleBlock,
+                    const SizedBox(height: AppSizes.sm),
+                    Wrap(
+                      spacing: AppSizes.sm,
+                      runSpacing: AppSizes.sm,
+                      children: [refreshButton, newButton],
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: titleBlock),
+                  refreshButton,
+                  const SizedBox(width: AppSizes.sm),
+                  newButton,
+                ],
+              );
+            },
           ),
 
           const SizedBox(height: AppSizes.md),
@@ -458,7 +479,7 @@ class _CategoryCard extends StatelessWidget {
               Navigator.of(ctx).pop();
               onConfirm();
             },
-            child:  Text(
+            child: Text(
               'Delete'.tr,
               style: TextStyle(
                 color: Colors.redAccent,

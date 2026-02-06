@@ -10,8 +10,6 @@ import 'package:usta_admin_panal/core/constants/app_translations.dart';
 import 'package:usta_admin_panal/core/routing/app_routes.dart';
 import 'package:usta_admin_panal/core/services/api_client.dart';
 import 'package:usta_admin_panal/core/services/api_exceptions.dart';
-
-import 'core/constants/app_config.dart';
 import 'core/services/locale_service.dart';
 import 'core/services/theme_controller.dart';
 import 'core/services/token_storage.dart';
@@ -67,8 +65,6 @@ Future<String> _resolveInitialRoute(TokenStorage storage) async {
       final tokens = await authService.refresh(refresh);
       await storage.saveTokens(tokens.token, refreshToken: tokens.refreshToken);
       return '/dashboard';
-      await storage.clear();
-      return '/login';
     } on ApiException {
       await storage.clear();
       return '/login';

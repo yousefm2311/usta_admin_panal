@@ -27,21 +27,21 @@ class CustomersListView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Customers list'.tr,
-                        style: TextStyle(
-                          color: AppColors.text,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 18,
-                        ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isNarrow = constraints.maxWidth < 600;
+
+                    final title = Text(
+                      'Customers list'.tr,
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
                       ),
-                    ),
-                    const SizedBox(width: AppSizes.sm),
-                    SizedBox(
-                      width: 320,
+                    );
+
+                    final searchField = SizedBox(
+                      width: isNarrow ? double.infinity : 320,
                       child: TextField(
                         onChanged: controller.setQuery,
                         onSubmitted: (v) => controller.loadCustomers(
@@ -97,8 +97,27 @@ class CustomersListView extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    );
+
+                    if (isNarrow) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          title,
+                          const SizedBox(height: AppSizes.sm),
+                          searchField,
+                        ],
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        Expanded(child: title),
+                        const SizedBox(width: AppSizes.sm),
+                        searchField,
+                      ],
+                    );
+                  },
                 ),
 
                 const SizedBox(height: AppSizes.sm),
@@ -226,8 +245,22 @@ class CustomersListView extends StatelessWidget {
                       (id.isNotEmpty &&
                           controller.requestCountsLoading[id] == true);
 
-                  final name = (customer['name'] ?? '').toString();
-                  final phone = (customer['phone'] ?? '').toString();
+                  final name =
+                      (customer['name'] ??
+                              customer['fullName'] ??
+                              customer['displayName'] ??
+                              customer['username'] ??
+                              customer['email'] ??
+                              customer['phone'] ??
+                              '')
+                          .toString();
+                  final phone =
+                      (customer['phone'] ??
+                              customer['phoneNumber'] ??
+                              customer['mobile'] ??
+                              customer['customerPhone'] ??
+                              '')
+                          .toString();
 
                   return DataRow(
                     cells: [

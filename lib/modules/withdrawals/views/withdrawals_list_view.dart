@@ -24,12 +24,16 @@ class WithdrawalsListView extends StatelessWidget {
             children: [
               Text(
                 'Withdrawals'.tr,
-                style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
               const Spacer(),
               IconButton(
                 onPressed: controller.loadWithdrawals,
-                icon:  Icon(Icons.refresh, color: AppColors.textMuted),
+                icon: Icon(Icons.refresh, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -41,13 +45,19 @@ class WithdrawalsListView extends StatelessWidget {
             if (controller.error.value != null) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+                child: Text(
+                  controller.error.value!,
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
               );
             }
             if (controller.withdrawals.isEmpty) {
               return Padding(
                 padding: const EdgeInsets.all(AppSizes.md),
-                child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
+                child: Text(
+                  'No data'.tr,
+                  style: TextStyle(color: AppColors.textMuted),
+                ),
               );
             }
             return TableWrapper(
@@ -55,52 +65,64 @@ class WithdrawalsListView extends StatelessWidget {
                 columns: [
                   DataColumn(label: Text('Artisan'.tr)),
                   DataColumn(label: Text('Amount'.tr)),
+                  DataColumn(label: Text('Method'.tr)),
                   DataColumn(label: Text('IBAN'.tr)),
                   DataColumn(label: Text('Status'.tr)),
                   DataColumn(label: Text('Action'.tr)),
                 ],
-                rows: controller.withdrawals
-                    .map(
-                      (w) {
-                        final status = (w['status'] ?? '').toString();
-                        final canApprove = _isPendingStatus(status);
-                        return DataRow(
-                          cells: [
-                            DataCell(Text((w['artisan'] ?? w['artisanName'] ?? '').toString())),
-                            DataCell(Text(w['amount']?.toString() ?? '0')),
-                            DataCell(Text((w['iban'] ?? '').toString())),
-                            DataCell(_statusChip(status)),
-                            DataCell(
-                              Row(
-                                children: [
-                                  if (canApprove)
-                                    ElevatedButton(
-                                      onPressed: () => controller.approve(w['id']?.toString() ?? ''),
-                                      child: Text('Approve'.tr),
-                                    ),
-                                  if (canApprove) const SizedBox(width: AppSizes.xs),
-                                  if (canApprove)
-                                    OutlinedButton(
-                                      style: OutlinedButton.styleFrom(
-                                        side:  BorderSide(color: AppColors.border),
-                                        foregroundColor: AppColors.text,
-                                      ),
-                                      onPressed: () => controller.reject(w['id']?.toString() ?? ''),
-                                      child: Text('Reject'.tr),
-                                    ),
-                                ],
+                rows: controller.withdrawals.map((w) {
+                  final row = w is Map<String, dynamic>
+                      ? w
+                      : <String, dynamic>{};
+                  final status = (row['status'] ?? '').toString();
+                  final canApprove = _isPendingStatus(status);
+                  final id = controller.idFor(row);
+                  final artisan = controller.artisanNameFor(row);
+                  final amount = controller.amountFor(row);
+                  final method = controller.methodFor(row);
+                  final iban = controller.ibanFor(row);
+                  return DataRow(
+                    cells: [
+                      DataCell(
+                        Text(artisan.isEmpty ? 'Unknown artisan'.tr : artisan),
+                      ),
+                      DataCell(_amountText(amount)),
+                      DataCell(Text(method.isEmpty ? '—' : method)),
+                      DataCell(Text(iban.isEmpty ? '—' : iban)),
+                      DataCell(_statusChip(status)),
+                      DataCell(
+                        Row(
+                          children: [
+                            if (canApprove)
+                              ElevatedButton(
+                                onPressed: id.isEmpty
+                                    ? null
+                                    : () => controller.approve(id),
+                                child: Text('Approve'.tr),
                               ),
-                            ),
+                            if (canApprove) const SizedBox(width: AppSizes.xs),
+                            if (canApprove)
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(color: AppColors.border),
+                                  foregroundColor: AppColors.text,
+                                ),
+                                onPressed: id.isEmpty
+                                    ? null
+                                    : () => controller.reject(id),
+                                child: Text('Reject'.tr),
+                              ),
                           ],
-                        );
-                      },
-                    )
-                    .toList(),
-                headingTextStyle:  TextStyle(
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+                headingTextStyle: TextStyle(
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w600,
                 ),
-                dataTextStyle:  TextStyle(color: AppColors.text),
+                dataTextStyle: TextStyle(color: AppColors.text),
               ),
             );
           }),
@@ -110,7 +132,9 @@ class WithdrawalsListView extends StatelessWidget {
   }
 
   Widget _statusChip(String status) {
-    final color = status.toLowerCase() == 'approved' ? AppColors.success : AppColors.warning;
+    final color = status.toLowerCase() == 'approved'
+        ? AppColors.success
+        : AppColors.warning;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 6),
       decoration: BoxDecoration(
@@ -120,8 +144,31 @@ class WithdrawalsListView extends StatelessWidget {
       ),
       child: Text(
         status.tr,
-        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
       ),
+    );
+  }
+
+  Widget _amountText(dynamic value) {
+    final n = double.tryParse(value.toString()) ?? 0;
+    final abs = n.abs();
+
+    String txt;
+    if (abs >= 1000000) {
+      txt = '${(n / 1000000).toStringAsFixed(1)}M';
+    } else if (abs >= 1000) {
+      txt = '${(n / 1000).toStringAsFixed(1)}K';
+    } else {
+      txt = n % 1 == 0 ? n.toInt().toString() : n.toStringAsFixed(2);
+    }
+
+    return Text(
+      'EGP $txt',
+      style: TextStyle(color: AppColors.text, fontWeight: FontWeight.w700),
     );
   }
 
@@ -134,5 +181,3 @@ class WithdrawalsListView extends StatelessWidget {
         value == 'new';
   }
 }
-
-

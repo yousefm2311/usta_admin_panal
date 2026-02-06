@@ -32,7 +32,8 @@ class _AdminLayoutState extends State<AdminLayout> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 1000;
-        final isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1000;
+        final isTablet =
+            constraints.maxWidth >= 600 && constraints.maxWidth < 1000;
         final isMobile = constraints.maxWidth < 600;
         final sidebarCollapsed = isTablet || _collapsed;
 
@@ -40,10 +41,7 @@ class _AdminLayoutState extends State<AdminLayout> {
           key: _scaffoldKey,
           backgroundColor: AppColors.background,
           drawer: isMobile
-              ? Sidebar(
-                  collapsed: false,
-                  onNavigate: _navigateFromDrawer,
-                )
+              ? Sidebar(collapsed: false, onNavigate: _navigateFromDrawer)
               : null,
           endDrawer: const ControlCenter(),
           body: SafeArea(
@@ -51,18 +49,18 @@ class _AdminLayoutState extends State<AdminLayout> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (!isMobile)
-                  Sidebar(
-                    collapsed: sidebarCollapsed,
-                    onNavigate: _navigateTo,
-                  ),
+                  Sidebar(collapsed: sidebarCollapsed, onNavigate: _navigateTo),
                 Expanded(
                   child: Column(
                     children: [
                       TopBar(
                         title: widget.title,
-                        onMenuTap: isMobile ? () => _scaffoldKey.currentState?.openDrawer() : null,
-                        onToggleSidebar: isDesktop ? null : _toggleSidebar,
-                        onOpenSettings: () => _scaffoldKey.currentState?.openEndDrawer(),
+                        onMenuTap: isMobile
+                            ? () => _scaffoldKey.currentState?.openDrawer()
+                            : null,
+                        onToggleSidebar: isTablet ? _toggleSidebar : null,
+                        onOpenSettings: () =>
+                            _scaffoldKey.currentState?.openEndDrawer(),
                         actions: widget.actions,
                       ),
                       const SizedBox(height: AppSizes.md),

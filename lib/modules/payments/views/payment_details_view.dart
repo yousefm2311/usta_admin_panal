@@ -71,17 +71,16 @@ class _PaymentDetailsViewState extends State<PaymentDetailsView> {
         }
 
         final status = (payment['status'] ?? '').toString();
-        final method = (payment['method'] ?? payment['paymentMethod'] ?? '')
-            .toString();
+        final method = _resolveMethod(payment);
         final amountText = _formatAmount(payment);
         final createdAt = payment['createdAt'] ?? payment['date'] ?? '';
         final createdAtText = _formatDatePretty(createdAt);
 
         final customerName = _resolveName(
-          payment['customer'] ?? payment['customerId'],
+          payment['customer'] ?? payment['customerId'] ?? payment['user'],
         );
         final artisanName = _resolveName(
-          payment['artisan'] ?? payment['artisanId'],
+          payment['artisan'] ?? payment['artisanId'] ?? payment['worker'],
         );
         final reference = (payment['reference'] ?? payment['ref'] ?? '')
             .toString();
@@ -550,11 +549,53 @@ class _PaymentDetailsViewState extends State<PaymentDetailsView> {
       final name =
           value['name'] ??
           value['fullName'] ??
+          value['displayName'] ??
+          value['username'] ??
           value['email'] ??
           value['phone'];
       return (name ?? '').toString();
     }
     return value?.toString() ?? '';
+  }
+
+  String _resolveMethod(Map<String, dynamic> payment) {
+    final direct =
+        payment['method'] ??
+        payment['paymentMethod'] ??
+        payment['payment_method'] ??
+        payment['methodName'] ??
+        payment['methodType'] ??
+        payment['type'] ??
+        payment['channel'] ??
+        payment['gateway'] ??
+        payment['provider'] ??
+        payment['source'];
+    if (direct != null && direct.toString().trim().isNotEmpty) {
+      return direct.toString();
+    }
+
+    final nested = payment['payment'] ??
+        payment['details'] ??
+        payment['meta'] ??
+        payment['data'];
+    if (nested is Map<String, dynamic>) {
+      final inner =
+          nested['method'] ??
+          nested['paymentMethod'] ??
+          nested['payment_method'] ??
+          nested['methodName'] ??
+          nested['methodType'] ??
+          nested['type'] ??
+          nested['channel'] ??
+          nested['gateway'] ??
+          nested['provider'] ??
+          nested['source'];
+      if (inner != null && inner.toString().trim().isNotEmpty) {
+        return inner.toString();
+      }
+    }
+
+    return '';
   }
 
   String _formatAmount(Map<String, dynamic> payment) {

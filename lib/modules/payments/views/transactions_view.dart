@@ -183,6 +183,8 @@ class TransactionsView extends StatelessWidget {
                     final p = controller.transactions[i];
                     final amount = _formatAmountValue(p);
                     final isPositive = amount >= 0;
+                    final userName = controller.userNameFor(p);
+                    final method = controller.methodFor(p);
 
                     final status = (p['status'] ?? '').toString();
                     final statusUi = _statusChip(
@@ -210,8 +212,7 @@ class TransactionsView extends StatelessWidget {
                           _ZebraCell(
                             zebra: zebra,
                             child: Text(
-                              (p['customerName'] ?? p['customerId'] ?? '')
-                                  .toString(),
+                              userName.isEmpty ? '—' : userName,
                               style: TextStyle(
                                 color: AppColors.text,
                                 fontWeight: FontWeight.w600,
@@ -235,8 +236,7 @@ class TransactionsView extends StatelessWidget {
                           _ZebraCell(
                             zebra: zebra,
                             child: Text(
-                              (p['method'] ?? p['paymentMethod'] ?? '')
-                                  .toString(),
+                              method.isEmpty ? '—' : method,
                               style: TextStyle(color: AppColors.text),
                             ),
                           ),

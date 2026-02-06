@@ -103,6 +103,7 @@ class PayoutRequestsView extends StatelessWidget {
                   columns: [
                     DataColumn(label: Text('Artisan'.tr)),
                     DataColumn(label: Text('Amount'.tr)),
+                    DataColumn(label: Text('Method'.tr)),
                     DataColumn(label: Text('IBAN'.tr)),
                     DataColumn(label: Text('Status'.tr)),
                     DataColumn(label: Text('Actions'.tr)),
@@ -114,22 +115,17 @@ class PayoutRequestsView extends StatelessWidget {
                     final status = (p['status'] ?? '').toString();
                     final canTakeAction = _isPendingStatus(status);
 
-                    final id = (p['id'] ?? p['_id'] ?? '').toString();
-                    final artisan =
-                        (p['artisan'] ??
-                                p['artisanName'] ??
-                                p['artisan']?['name'] ??
-                                '')
-                            .toString();
-                    final amount =
-                        p['amount'] ?? p['value'] ?? p['finalAmount'] ?? 0;
-                    final iban = (p['iban'] ?? '').toString();
+                    final id = controller.idFor(p);
+                    final artisan = controller.artisanNameFor(p);
+                    final amount = controller.amountFor(p);
+                    final method = controller.methodFor(p);
+                    final iban = controller.ibanFor(p);
 
                     return DataRow(
                       cells: [
                         DataCell(
                           Text(
-                            artisan.isEmpty ? '—' : artisan,
+                            artisan.isEmpty ? 'Unknown artisan'.tr : artisan,
                             style: TextStyle(
                               color: AppColors.text,
                               fontWeight: FontWeight.w700,
@@ -137,6 +133,7 @@ class PayoutRequestsView extends StatelessWidget {
                           ),
                         ),
                         DataCell(_amountText(amount)),
+                        DataCell(_methodChip(method)),
                         DataCell(_ibanCell(iban)),
                         DataCell(_statusChip(status)),
                         DataCell(
@@ -181,7 +178,7 @@ class PayoutRequestsView extends StatelessWidget {
                                           onConfirm: () =>
                                               controller.reject(id),
                                         ),
-                                  child:  Text(
+                                  child: Text(
                                     'Reject'.tr,
                                     style: TextStyle(
                                       color: Colors.redAccent,
@@ -280,6 +277,39 @@ class PayoutRequestsView extends StatelessWidget {
     return Text(
       'EGP $txt',
       style: TextStyle(color: AppColors.text, fontWeight: FontWeight.w900),
+    );
+  }
+
+  Widget _methodChip(String method) {
+    final value = method.trim();
+    if (value.isEmpty) {
+      return Text('—', style: TextStyle(color: AppColors.textMuted));
+    }
+
+    final m = value.toLowerCase();
+    final isWithdraw = m.contains('withdraw');
+    final isTransfer = m.contains('bank') || m.contains('transfer');
+    final color = isWithdraw
+        ? AppColors.warning
+        : isTransfer
+        ? AppColors.primary
+        : AppColors.textMuted;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withOpacity(0.45)),
+      ),
+      child: Text(
+        value.tr,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.w800,
+          fontSize: 12,
+        ),
+      ),
     );
   }
 

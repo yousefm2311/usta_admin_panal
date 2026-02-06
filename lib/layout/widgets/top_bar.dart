@@ -29,6 +29,7 @@ class TopBar extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 520;
+        final showSidebarToggle = onToggleSidebar != null && onMenuTap == null;
         final profileController = Get.isRegistered<ProfileController>()
             ? Get.find<ProfileController>()
             : Get.put(ProfileController(), permanent: true);
@@ -49,7 +50,7 @@ class TopBar extends StatelessWidget {
                   onPressed: onMenuTap,
                   tooltip: 'Menu'.tr,
                 ),
-              if (onToggleSidebar != null)
+              if (showSidebarToggle)
                 IconButton(
                   icon: Icon(
                     Icons.view_sidebar_outlined,
@@ -79,7 +80,7 @@ class TopBar extends StatelessWidget {
                 );
               }),
 
-              const SizedBox(width: AppSizes.md),
+              SizedBox(width: isCompact ? AppSizes.xs : AppSizes.md),
 
               // title (responsive)
               Expanded(
@@ -104,10 +105,7 @@ class TopBar extends StatelessWidget {
                   if (onOpenSettings != null)
                     IconButton(
                       onPressed: onOpenSettings,
-                      icon: Icon(
-                        Icons.settings,
-                        color: AppColors.textMuted,
-                      ),
+                      icon: Icon(Icons.settings, color: AppColors.textMuted),
                       tooltip: 'Settings'.tr,
                     ),
                 ],
