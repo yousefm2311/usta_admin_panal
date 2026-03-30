@@ -825,24 +825,40 @@ class _ArtisanDetailsViewState extends State<ArtisanDetailsView> {
             ),
           if (controller.canReviewKyc) ...[
             const SizedBox(height: AppSizes.md),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => controller.approveKyc(artisanId),
-                    icon: const Icon(Icons.check_circle_outline),
-                    label: Text('Approve'.tr),
+            Obx(
+              () => Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: controller.actionLoading.value
+                          ? null
+                          : () => controller.approveKyc(artisanId),
+                      icon: controller.actionLoading.value
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.check_circle_outline),
+                      label: Text(
+                        controller.actionLoading.value
+                            ? 'Processing...'
+                            : 'Approve'.tr,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _showRejectKycDialog(),
-                    icon: const Icon(Icons.close),
-                    label: Text('Reject'.tr),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: controller.actionLoading.value
+                          ? null
+                          : () => _showRejectKycDialog(),
+                      icon: const Icon(Icons.close),
+                      label: Text('Reject'.tr),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ],
@@ -1010,6 +1026,21 @@ class _ArtisanDetailsViewState extends State<ArtisanDetailsView> {
                 imageUrl,
                 headers: headers,
                 fit: BoxFit.cover,
+                filterQuality: FilterQuality.medium,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) {
+                    return child;
+                  }
+                  return Container(
+                    color: AppColors.card,
+                    alignment: Alignment.center,
+                    child: const SizedBox(
+                      width: 28,
+                      height: 28,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  );
+                },
                 errorBuilder: (_, __, ___) => Container(
                   color: AppColors.card,
                   alignment: Alignment.center,
@@ -1537,86 +1568,100 @@ class _ArtisanDetailsViewState extends State<ArtisanDetailsView> {
     String category = 'face_mismatch';
 
     await Get.dialog(
-      AlertDialog(
-        title: Text('Reject verification'),
-        content: StatefulBuilder(
-          builder: (context, setLocalState) {
-            return SizedBox(
-              width: 420,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DropdownButtonFormField<String>(
-                    value: category,
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'id_blurry',
-                        child: Text('ID blurry'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'id_invalid',
-                        child: Text('ID invalid'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'face_mismatch',
-                        child: Text('Face mismatch'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'face_not_clear',
-                        child: Text('Face not clear'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'fraud_suspected',
-                        child: Text('Fraud suspected'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value == null) return;
-                      setLocalState(() => category = value);
-                    },
-                    decoration: const InputDecoration(labelText: 'Category'),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: safeReasonController,
-                    decoration: const InputDecoration(
-                      labelText: 'User-safe reason',
+      Obx(
+        () => AlertDialog(
+          title: Text('Reject verification'),
+          content: StatefulBuilder(
+            builder: (context, setLocalState) {
+              return SizedBox(
+                width: 420,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      value: category,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'id_blurry',
+                          child: Text('ID blurry'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'id_invalid',
+                          child: Text('ID invalid'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'face_mismatch',
+                          child: Text('Face mismatch'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'face_not_clear',
+                          child: Text('Face not clear'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'fraud_suspected',
+                          child: Text('Fraud suspected'),
+                        ),
+                      ],
+                      onChanged: controller.actionLoading.value
+                          ? null
+                          : (value) {
+                              if (value == null) return;
+                              setLocalState(() => category = value);
+                            },
+                      decoration: const InputDecoration(labelText: 'Category'),
                     ),
-                    minLines: 2,
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: internalReasonController,
-                    decoration: const InputDecoration(
-                      labelText: 'Internal note',
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: safeReasonController,
+                      enabled: !controller.actionLoading.value,
+                      decoration: const InputDecoration(
+                        labelText: 'User-safe reason',
+                      ),
+                      minLines: 2,
+                      maxLines: 3,
                     ),
-                    minLines: 2,
-                    maxLines: 3,
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: Get.back,
-            child: Text('Cancel'.tr),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-              await controller.rejectKyc(
-                artisanId,
-                rejectionCategory: category,
-                rejectionReasonUserSafe: safeReasonController.text.trim(),
-                rejectionReasonInternal: internalReasonController.text.trim(),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: internalReasonController,
+                      enabled: !controller.actionLoading.value,
+                      decoration: const InputDecoration(
+                        labelText: 'Internal note',
+                      ),
+                      minLines: 2,
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
               );
             },
-            child: Text('Reject'.tr),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: controller.actionLoading.value ? null : Get.back,
+              child: Text('Cancel'.tr),
+            ),
+            ElevatedButton(
+              onPressed: controller.actionLoading.value
+                  ? null
+                  : () async {
+                      Get.back();
+                      await controller.rejectKyc(
+                        artisanId,
+                        rejectionCategory: category,
+                        rejectionReasonUserSafe: safeReasonController.text.trim(),
+                        rejectionReasonInternal: internalReasonController.text.trim(),
+                      );
+                    },
+              child: controller.actionLoading.value
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text('Reject'.tr),
+            ),
+          ],
+        ),
       ),
     );
   }

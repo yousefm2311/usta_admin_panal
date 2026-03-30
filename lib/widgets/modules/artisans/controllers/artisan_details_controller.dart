@@ -12,6 +12,7 @@ class ArtisanDetailsController extends GetxController {
   final verification = Rxn<Map<String, dynamic>>();
   final loading = false.obs;
   final verificationLoading = false.obs;
+  final actionLoading = false.obs;
   final error = RxnString();
   String? _lastLoadedId;
 
@@ -230,12 +231,16 @@ class ArtisanDetailsController extends GetxController {
   }
 
   Future<void> approveKyc(String id) async {
+    if (actionLoading.value) return;
+    actionLoading.value = true;
     try {
       await _service.approveVerification(id);
       showSuccess('Success'.tr);
       await load(id, force: true);
     } catch (e) {
       showError(e is ApiException ? e.message : e.toString());
+    } finally {
+      actionLoading.value = false;
     }
   }
 
@@ -245,6 +250,8 @@ class ArtisanDetailsController extends GetxController {
     String? rejectionReasonUserSafe,
     String? rejectionReasonInternal,
   }) async {
+    if (actionLoading.value) return;
+    actionLoading.value = true;
     try {
       await _service.rejectVerification(
         id,
@@ -256,6 +263,8 @@ class ArtisanDetailsController extends GetxController {
       await load(id, force: true);
     } catch (e) {
       showError(e is ApiException ? e.message : e.toString());
+    } finally {
+      actionLoading.value = false;
     }
   }
 
