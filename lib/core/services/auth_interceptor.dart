@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
 
-import '../../modules/auth/controllers/auth_controller.dart';
-import '../../modules/auth/services/auth_service.dart';
+import '../../widgets/modules/auth/controllers/auth_controller.dart';
+import '../../widgets/modules/auth/services/auth_service.dart';
 import 'token_storage.dart';
 class AuthInterceptor extends Interceptor {
   final Dio dio;

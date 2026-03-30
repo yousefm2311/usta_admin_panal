@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
-import '../../modules/auth/controllers/auth_controller.dart';
-import '../../modules/profile/controllers/profile_controller.dart';
+import '../../widgets/modules/auth/controllers/auth_controller.dart';
+import '../../widgets/modules/profile/controllers/profile_controller.dart';
 
 class TopBar extends StatelessWidget {
   final String title;

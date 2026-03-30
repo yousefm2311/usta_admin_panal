@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart' hide Response;
 
-import '../../modules/auth/services/auth_service.dart';
+import '../../widgets/modules/auth/services/auth_service.dart';
 import '../constants/app_config.dart';
 import 'api_exceptions.dart';
 import 'auth_interceptor.dart';

@@ -1,0 +1,231 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_config.dart';
+import '../../../../core/constants/app_sizes.dart';
+import '../../../../layout/admin_layout.dart';
+import '../../../primary_button.dart';
+import '../../../shimmer_widgets.dart';
+import '../controllers/settings_general_controller.dart';
+
+class SettingsGeneralView extends StatefulWidget {
+  const SettingsGeneralView({super.key});
+
+  @override
+  State<SettingsGeneralView> createState() => _SettingsGeneralViewState();
+}
+
+class _SettingsGeneralViewState extends State<SettingsGeneralView> {
+  late final SettingsGeneralController controller;
+  final TextEditingController appNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController aboutController = TextEditingController();
+  bool _formHydrated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(SettingsGeneralController());
+  }
+
+  @override
+  void dispose() {
+    appNameController.dispose();
+    emailController.dispose();
+    aboutController.dispose();
+    super.dispose();
+  }
+
+  void _hydrateFormOnce() {
+    if (_formHydrated) return;
+    appNameController.text = controller.form['appName']?.value ?? '';
+    emailController.text = controller.form['supportEmail']?.value ?? '';
+    aboutController.text = controller.form['about']?.value ?? '';
+    _formHydrated = true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AdminLayout(
+      title: '',
+      child: Obx(() {
+        if (controller.loading.value) {
+          _formHydrated = false;
+          return const CardLoading(height: 260, lines: 6);
+        }
+
+        _hydrateFormOnce();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'General settings'.tr,
+                  style: TextStyle(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const Spacer(),
+                ElevatedButton.icon(
+                  onPressed: () => Get.toNamed('/logs/health'),
+                  icon: const Icon(Icons.health_and_safety_rounded),
+                  label: Text('Api Health'.tr),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSizes.md),
+            if (controller.error.value != null) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSizes.md),
+                child: Text(
+                  controller.error.value!,
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
+              ),
+            ],
+            Container(
+              padding: const EdgeInsets.all(AppSizes.lg),
+              decoration: BoxDecoration(
+                color: AppColors.card,
+                borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                border: Border.fromBorderSide(
+                  BorderSide(color: AppColors.border),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'App logo'.tr,
+                    style: TextStyle(color: AppColors.textMuted),
+                  ),
+                  const SizedBox(height: AppSizes.sm),
+                  Row(
+                    children: [
+                      Obx(
+                        () => Container(
+                          height: 64,
+                          width: 64,
+                          decoration: BoxDecoration(
+                            color: AppColors.overlay,
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.inputRadius,
+                            ),
+                            image: () {
+                              final raw =
+                                  controller.form['logoUrl']?.value ?? '';
+                              if (raw.isEmpty) return null;
+                              final url = raw.startsWith('http')
+                                  ? raw
+                                  : '${AppConfig.baseUrl}$raw';
+                              return DecorationImage(
+                                image: NetworkImage(url),
+                                fit: BoxFit.cover,
+                              );
+                            }(),
+                          ),
+                          child: controller.form['logoUrl']?.value.isNotEmpty ==
+                                  true
+                              ? null
+                              : Icon(
+                                  Icons.image_outlined,
+                                  color: AppColors.textMuted,
+                                ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSizes.md),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.text,
+                          side: BorderSide(color: AppColors.border),
+                        ),
+                        onPressed: controller.uploadingLogo.value
+                            ? null
+                            : () async {
+                                final result =
+                                    await FilePicker.platform.pickFiles(
+                                  withData: true,
+                                );
+                                if (result != null &&
+                                    result.files.isNotEmpty) {
+                                  final file = result.files.first;
+                                  Uint8List bytes;
+
+                                  if (kIsWeb) {
+                                    bytes = file.bytes!;
+                                  } else {
+                                    bytes = await File(
+                                      file.path!,
+                                    ).readAsBytes();
+                                  }
+
+                                  await controller.uploadLogo(
+                                    fileName: file.name,
+                                    bytes: bytes,
+                                  );
+                                }
+                              },
+                        icon: controller.uploadingLogo.value
+                            ? const ShimmerBox(
+                                height: 16,
+                                width: 16,
+                                radius: 6,
+                              )
+                            : const Icon(Icons.upload),
+                        label: Text('Upload logo'.tr),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSizes.lg),
+                  TextField(
+                    controller: appNameController,
+                    onChanged: (v) => controller.form['appName']?.value = v,
+                    style: TextStyle(color: AppColors.text),
+                    decoration: InputDecoration(labelText: 'App Name'),
+                  ),
+                  const SizedBox(height: AppSizes.md),
+                  TextField(
+                    controller: emailController,
+                    onChanged: (v) =>
+                        controller.form['supportEmail']?.value = v,
+                    style: TextStyle(color: AppColors.text),
+                    decoration: InputDecoration(labelText: 'Support email'.tr),
+                  ),
+                  const SizedBox(height: AppSizes.md),
+                  TextField(
+                    controller: aboutController,
+                    onChanged: (v) => controller.form['about']?.value = v,
+                    style: TextStyle(color: AppColors.text),
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      labelText: 'About info'.tr,
+                      hintText: 'Short description about USTA platform'.tr,
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.lg),
+                  Obx(
+                    () => PrimaryButton(
+                      expand: true,
+                      label: 'Save changes'.tr,
+                      loadingLabel: 'Loading'.tr,
+                      icon: Icons.save_outlined,
+                      isLoading: controller.saving.value,
+                      onPressed: controller.save,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+}

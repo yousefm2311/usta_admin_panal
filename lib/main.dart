@@ -10,11 +10,12 @@ import 'package:usta_admin_panal/core/constants/app_translations.dart';
 import 'package:usta_admin_panal/core/routing/app_routes.dart';
 import 'package:usta_admin_panal/core/services/api_client.dart';
 import 'package:usta_admin_panal/core/services/api_exceptions.dart';
+
 import 'core/services/locale_service.dart';
 import 'core/services/theme_controller.dart';
 import 'core/services/token_storage.dart';
 import 'core/theme/app_theme.dart';
-import 'modules/auth/services/auth_service.dart';
+import 'widgets/modules/auth/services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

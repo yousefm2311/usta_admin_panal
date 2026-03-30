@@ -7,7 +7,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../core/services/locale_service.dart';
 import '../../core/services/theme_controller.dart';
-import '../../modules/auth/controllers/auth_controller.dart';
+import '../../widgets/modules/auth/controllers/auth_controller.dart';
 
 class ControlCenter extends StatelessWidget {
   const ControlCenter({super.key});
