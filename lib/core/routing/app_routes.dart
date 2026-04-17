@@ -56,7 +56,11 @@ import '../../widgets/theme_rebuild.dart';
 
 class AppPages {
   static GetPage _themed(String name, WidgetBuilder builder) {
-    return GetPage(name: name, page: () => ThemeRebuild(builder: builder));
+    return GetPage(
+      name: name,
+      page: () => ThemeRebuild(builder: builder),
+      transition: Transition.noTransition,
+    );
   }
 
   static final pages = <GetPage>[
@@ -145,6 +149,5 @@ class AppPages {
     _themed('/ai/top-artisans', (_) => AITopArtisansView()),
     _themed('/ai/fraud', (_) => AIFraudDetectionView()),
     _themed('/ai/word-cloud', (_) => AIWordCloudView()),
-
   ];
 }

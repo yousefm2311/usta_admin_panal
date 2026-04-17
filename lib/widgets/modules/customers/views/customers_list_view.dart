@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../layout/admin_layout.dart';
+import '../../../../layout/widgets/admin_page_header.dart';
 import '../../../shimmer_widgets.dart';
 import '../../../table_wrapper.dart';
 import '../controllers/customers_controller.dart';
@@ -20,161 +21,90 @@ class CustomersListView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // =========================
-          // HEADER (Title + Search)
-          // =========================
-          _card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isNarrow = constraints.maxWidth < 600;
+          Obx(() {
+            final total = controller.customers.length;
+            final blocked = controller.customers
+                .where(
+                  (c) => (c['blocked'] == true) || (c['status'] == 'Blocked'),
+                )
+                .length;
+            final active = total - blocked;
 
-                    final title = Text(
-                      'Customers list'.tr,
-                      style: TextStyle(
-                        color: AppColors.text,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 18,
-                      ),
-                    );
+            return _card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isNarrow = constraints.maxWidth < 600;
 
-                    final searchField = SizedBox(
-                      width: isNarrow ? double.infinity : 320,
-                      child: TextField(
-                        onChanged: controller.setQuery,
-                        onSubmitted: (v) => controller.loadCustomers(
-                          search: v.trim().isEmpty ? null : v.trim(),
-                        ),
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: AppColors.textMuted,
+                      final searchField = SizedBox(
+                        width: isNarrow ? double.infinity : 320,
+                        child: TextField(
+                          onChanged: controller.setQuery,
+                          onSubmitted: (v) => controller.loadCustomers(
+                            search: v.trim().isEmpty ? null : v.trim(),
                           ),
-                          hintText: 'Search by name or phone'.tr,
-                          hintStyle: TextStyle(color: AppColors.textMuted),
-                          filled: true,
-                          fillColor: AppColors.overlay,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSizes.inputRadius,
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: AppColors.textMuted,
                             ),
-                            borderSide: BorderSide(
-                              color: AppColors.border,
-                              width: 1,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSizes.inputRadius,
-                            ),
-                            borderSide: BorderSide(
-                              color: AppColors.border,
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSizes.inputRadius,
-                            ),
-                            borderSide: BorderSide(
-                              color: AppColors.primary.withOpacity(0.8),
-                              width: 1.2,
-                            ),
-                          ),
-                          suffixIcon: IconButton(
-                            tooltip: 'Search'.tr,
-                            icon: Icon(
-                              Icons.arrow_forward,
-                              color: AppColors.text,
-                            ),
-                            onPressed: () => controller.loadCustomers(
-                              search: controller.query.value.trim().isEmpty
-                                  ? null
-                                  : controller.query.value.trim(),
+                            hintText: 'Search by name or phone'.tr,
+                            hintStyle: TextStyle(color: AppColors.textMuted),
+                            suffixIcon: IconButton(
+                              tooltip: 'Search'.tr,
+                              icon: Icon(
+                                Icons.arrow_forward,
+                                color: AppColors.text,
+                              ),
+                              onPressed: () => controller.loadCustomers(
+                                search: controller.query.value.trim().isEmpty
+                                    ? null
+                                    : controller.query.value.trim(),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
+                      );
 
-                    if (isNarrow) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          title,
-                          const SizedBox(height: AppSizes.sm),
-                          searchField,
+                          AdminPageHeader(
+                            title: 'Customers List',
+                            subtitle:
+                                'Search customers, inspect their profiles, and spot blocked accounts quickly.',
+                            actions: isNarrow ? null : [searchField],
+                            badges: [
+                              AdminInfoBadge(
+                                icon: Icons.group_outlined,
+                                label: '${'Total'.tr}: $total',
+                              ),
+                              AdminInfoBadge(
+                                icon: Icons.verified_outlined,
+                                label: '${'Active'.tr}: $active',
+                                color: AppColors.success,
+                              ),
+                              AdminInfoBadge(
+                                icon: Icons.block_outlined,
+                                label: '${'Blocked'.tr}: $blocked',
+                                color: Colors.redAccent,
+                              ),
+                            ],
+                          ),
+                          if (isNarrow) ...[
+                            const SizedBox(height: AppSizes.md),
+                            searchField,
+                          ],
                         ],
                       );
-                    }
-
-                    return Row(
-                      children: [
-                        Expanded(child: title),
-                        const SizedBox(width: AppSizes.sm),
-                        searchField,
-                      ],
-                    );
-                  },
-                ),
-
-                const SizedBox(height: AppSizes.sm),
-
-                Text(
-                  'Manage customers, view details, and control access.'.tr,
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-                ),
-
-                const SizedBox(height: AppSizes.md),
-
-                // =========================
-                // MINI KPI ROW (auto calc)
-                // =========================
-                Obx(() {
-                  if (controller.loading.value ||
-                      controller.customers.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  final total = controller.customers.length;
-                  final blocked = controller.customers
-                      .where(
-                        (c) =>
-                            (c['blocked'] == true) ||
-                            (c['status'] == 'Blocked'),
-                      )
-                      .length;
-                  final active = total - blocked;
-
-                  return Wrap(
-                    spacing: AppSizes.sm,
-                    runSpacing: AppSizes.sm,
-                    children: [
-                      _miniStat(
-                        title: 'Total'.tr,
-                        value: total.toString(),
-                        color: AppColors.primary,
-                        icon: Icons.group_outlined,
-                      ),
-                      _miniStat(
-                        title: 'Active'.tr,
-                        value: active.toString(),
-                        color: AppColors.success,
-                        icon: Icons.verified_outlined,
-                      ),
-                      _miniStat(
-                        title: 'Blocked'.tr,
-                        value: blocked.toString(),
-                        color: Colors.redAccent,
-                        icon: Icons.block_outlined,
-                      ),
-                    ],
-                  );
-                }),
-              ],
-            ),
-          ),
+                    },
+                  ),
+                ],
+              ),
+            );
+          }),
 
           const SizedBox(height: AppSizes.md),
 
@@ -398,58 +328,6 @@ class CustomersListView extends StatelessWidget {
         ],
       ),
       child: child,
-    );
-  }
-
-  Widget _miniStat({
-    required String title,
-    required String value,
-    required Color color,
-    required IconData icon,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.overlay,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border.withOpacity(0.7)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            height: 30,
-            width: 30,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 16, color: color),
-          ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: AppColors.textMuted,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: TextStyle(
-                  color: AppColors.text,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 

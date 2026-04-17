@@ -5,6 +5,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/responsive.dart';
 import '../../../../layout/admin_layout.dart';
+import '../../../../layout/widgets/admin_page_header.dart';
 import '../../../shimmer_widgets.dart';
 import '../../../table_wrapper.dart';
 import '../controllers/orders_controller.dart';
@@ -47,9 +48,23 @@ class _AllOrdersViewState extends State<AllOrdersView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _pageHeader(
-            title: 'Orders'.tr,
-            subtitle: 'Manage and review all requests'.tr,
+          AdminPageHeader(
+            title: 'Orders',
+            subtitle:
+                'Review requests, check statuses, and move quickly between order workflows.',
+            badges: [
+              AdminInfoBadge(
+                icon: Icons.filter_alt_outlined,
+                label: '${'Filters'.tr}: ${statuses.length - 1}',
+              ),
+              AdminInfoBadge(
+                icon: Icons.search,
+                label: _query.trim().isEmpty
+                    ? 'Search ready'.tr
+                    : '${'Searching'.tr}: ${_query.trim()}',
+                color: Colors.orange.shade700,
+              ),
+            ],
           ),
           const SizedBox(height: AppSizes.md),
 
@@ -119,116 +134,115 @@ class _AllOrdersViewState extends State<AllOrdersView> {
 
           // Content
           Obx(() {
-              if (controller.loading.value) {
-                return const CardLoading(lines: 10);
-              }
-              if (controller.error.value != null) {
-                return Padding(
-                  padding: const EdgeInsets.all(AppSizes.md),
-                  child: Text(
-                    controller.error.value!,
-                    style: const TextStyle(color: Colors.redAccent),
-                  ),
-                );
-              }
-
-              // فلترة محلية بالبحث (لو مش عندك Search API)
-              final list = controller.orders;
-              final filtered = _query.trim().isEmpty
-                  ? list
-                  : _filterOrders(list, _query);
-
-              if (filtered.isEmpty) {
-                return _emptyState(
-                  title: 'No orders'.tr,
-                  subtitle: _query.trim().isEmpty
-                      ? 'No data'.tr
-                      : 'No results'.tr,
-                );
-              }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TableWrapper(
-                    child: DataTable(
-                      columns: [
-                        DataColumn(label: Text('Service'.tr)),
-                        DataColumn(label: Text('Customer'.tr)),
-                        DataColumn(label: Text('Artisan'.tr)),
-                        DataColumn(label: Text('Status'.tr)),
-                        DataColumn(label: Text('Date'.tr)),
-                        DataColumn(label: Text('Actions'.tr)),
-                      ],
-                      rows: filtered.map((o) {
-                        final service =
-                            (o['serviceType'] ?? o['service'] ?? '')
-                                .toString();
-                        final customer = _resolveName(o['customer']);
-                        final artisan = _resolveName(o['artisan']);
-                        final status = (o['status'] ?? '').toString();
-                        final dateText = _formatDate(o['createdAt']);
-
-                        return DataRow(
-                          cells: [
-                            DataCell(_cellText(service)),
-                            DataCell(_cellText(customer)),
-                            DataCell(_cellText(artisan)),
-                            DataCell(_statusChip(status)),
-                            DataCell(_cellText(dateText)),
-                            DataCell(
-                              Row(
-                                spacing: 20,
-                                children: [
-                                  TextButton(
-                                    onPressed: () => Get.toNamed(
-                                      '/order/details',
-                                      arguments: o,
-                                    ),
-                                    child: Text('Details'.tr),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Get.toNamed(
-                                      '/order/timeline',
-                                      arguments: o,
-                                    ),
-                                    child: Text('Timeline'.tr),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
-                      headingTextStyle: TextStyle(
-                        color: AppColors.textMuted,
-                        fontWeight: FontWeight.w800,
-                      ),
-                      dataTextStyle: TextStyle(color: AppColors.text),
-                      headingRowColor: MaterialStateProperty.all(
-                        AppColors.overlay,
-                      ),
-                      dividerThickness: 0.2,
-                    ),
-                  ),
-
-                  const SizedBox(height: AppSizes.sm),
-
-                  // Footer / Pagination placeholder
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      '${'Showing'.tr} ${filtered.length} ${'items'.tr}',
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
+            if (controller.loading.value) {
+              return const CardLoading(lines: 10);
+            }
+            if (controller.error.value != null) {
+              return Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Text(
+                  controller.error.value!,
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
               );
-            }),
+            }
+
+            // فلترة محلية بالبحث (لو مش عندك Search API)
+            final list = controller.orders;
+            final filtered = _query.trim().isEmpty
+                ? list
+                : _filterOrders(list, _query);
+
+            if (filtered.isEmpty) {
+              return _emptyState(
+                title: 'No orders'.tr,
+                subtitle: _query.trim().isEmpty
+                    ? 'No data'.tr
+                    : 'No results'.tr,
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TableWrapper(
+                  child: DataTable(
+                    columns: [
+                      DataColumn(label: Text('Service'.tr)),
+                      DataColumn(label: Text('Customer'.tr)),
+                      DataColumn(label: Text('Artisan'.tr)),
+                      DataColumn(label: Text('Status'.tr)),
+                      DataColumn(label: Text('Date'.tr)),
+                      DataColumn(label: Text('Actions'.tr)),
+                    ],
+                    rows: filtered.map((o) {
+                      final service = (o['serviceType'] ?? o['service'] ?? '')
+                          .toString();
+                      final customer = _resolveName(o['customer']);
+                      final artisan = _resolveName(o['artisan']);
+                      final status = (o['status'] ?? '').toString();
+                      final dateText = _formatDate(o['createdAt']);
+
+                      return DataRow(
+                        cells: [
+                          DataCell(_cellText(service)),
+                          DataCell(_cellText(customer)),
+                          DataCell(_cellText(artisan)),
+                          DataCell(_statusChip(status)),
+                          DataCell(_cellText(dateText)),
+                          DataCell(
+                            Row(
+                              spacing: 20,
+                              children: [
+                                TextButton(
+                                  onPressed: () => Get.toNamed(
+                                    '/order/details',
+                                    arguments: o,
+                                  ),
+                                  child: Text('Details'.tr),
+                                ),
+                                TextButton(
+                                  onPressed: () => Get.toNamed(
+                                    '/order/timeline',
+                                    arguments: o,
+                                  ),
+                                  child: Text('Timeline'.tr),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                    headingTextStyle: TextStyle(
+                      color: AppColors.textMuted,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    dataTextStyle: TextStyle(color: AppColors.text),
+                    headingRowColor: MaterialStateProperty.all(
+                      AppColors.overlay,
+                    ),
+                    dividerThickness: 0.2,
+                  ),
+                ),
+
+                const SizedBox(height: AppSizes.sm),
+
+                // Footer / Pagination placeholder
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    '${'Showing'.tr} ${filtered.length} ${'items'.tr}',
+                    style: TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }),
         ],
       ),
     );
@@ -237,33 +251,6 @@ class _AllOrdersViewState extends State<AllOrdersView> {
   // =========================
   // UI
   // =========================
-
-  Widget _pageHeader({required String title, required String subtitle}) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: AppColors.text,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 18,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                subtitle,
-                style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _toolbar({
     required bool isMobile,

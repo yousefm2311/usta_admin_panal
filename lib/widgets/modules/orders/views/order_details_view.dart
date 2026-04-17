@@ -9,6 +9,8 @@ import '../../../../core/constants/app_config.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/utils/notify.dart';
 import '../../../../layout/admin_layout.dart';
+import '../../../../layout/widgets/admin_content_widgets.dart';
+import '../../../../layout/widgets/admin_page_header.dart';
 import '../../../shimmer_widgets.dart';
 import '../controllers/order_details_controller.dart';
 
@@ -125,8 +127,25 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _pageTitle('Order Details'.tr),
-              const SizedBox(height: AppSizes.sm),
+              const AdminBreadcrumbs(
+                items: [
+                  AdminBreadcrumbItem(label: 'Orders', route: '/orders'),
+                  AdminBreadcrumbItem(label: 'Order Details'),
+                ],
+              ),
+              const SizedBox(height: AppSizes.md),
+              AdminPageHeader(
+                title: 'Order Details',
+                subtitle:
+                    'Review the request timeline, attached assets, payment summary, and actions from one screen.',
+                badges: [
+                  AdminInfoBadge(
+                    icon: Icons.shopping_bag_outlined,
+                    label: 'Orders / Order details',
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSizes.md),
 
               // Header summary card
               _card(
@@ -386,18 +405,19 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                       children: [
                         Obx(() {
                           final isBusy = controller.cancelling.value;
-                          final disabled = _isCancelDisabled(statusKey) ||
+                          final disabled =
+                              _isCancelDisabled(statusKey) ||
                               controller.closing.value;
                           return ElevatedButton.icon(
                             onPressed: disabled || isBusy || orderId.isEmpty
                                 ? null
                                 : () => controller.cancel(
-                                      orderId,
-                                      note: actionNoteCtrl.text.trim().isEmpty
-                                          ? null
-                                          : actionNoteCtrl.text.trim(),
-                                      reason: 'Canceled by admin',
-                                    ),
+                                    orderId,
+                                    note: actionNoteCtrl.text.trim().isEmpty
+                                        ? null
+                                        : actionNoteCtrl.text.trim(),
+                                    reason: 'Canceled by admin',
+                                  ),
                             icon: isBusy
                                 ? const SizedBox(
                                     width: 18,
@@ -416,7 +436,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                           final isBusy = controller.closing.value;
                           final disabled =
                               _isCloseDisabled(statusKey) ||
-                                  controller.cancelling.value;
+                              controller.cancelling.value;
                           return OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(color: AppColors.border),
@@ -425,11 +445,11 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                             onPressed: disabled || isBusy || orderId.isEmpty
                                 ? null
                                 : () => controller.close(
-                                      orderId,
-                                      note: actionNoteCtrl.text.trim().isEmpty
-                                          ? null
-                                          : actionNoteCtrl.text.trim(),
-                                    ),
+                                    orderId,
+                                    note: actionNoteCtrl.text.trim().isEmpty
+                                        ? null
+                                        : actionNoteCtrl.text.trim(),
+                                  ),
                             icon: isBusy
                                 ? const SizedBox(
                                     width: 18,
@@ -449,7 +469,8 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                     const SizedBox(height: AppSizes.sm),
                     Obx(() {
                       final isBusy =
-                          controller.cancelling.value || controller.closing.value;
+                          controller.cancelling.value ||
+                          controller.closing.value;
                       if (!isBusy) {
                         return const SizedBox.shrink();
                       }
@@ -530,40 +551,38 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                     const SizedBox(height: AppSizes.sm),
 
                     // send notification message
-                    Obx(
-                      () {
-                        final isBusy = controller.sendingMessage.value;
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: msgCtrl,
-                                style: TextStyle(color: AppColors.text),
-                                decoration: InputDecoration(
-                                  hintText: 'Type notification message'.tr,
-                                ),
-                                onSubmitted: (_) {
-                                  if (!isBusy) _sendMsg();
-                                },
+                    Obx(() {
+                      final isBusy = controller.sendingMessage.value;
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: msgCtrl,
+                              style: TextStyle(color: AppColors.text),
+                              decoration: InputDecoration(
+                                hintText: 'Type notification message'.tr,
                               ),
+                              onSubmitted: (_) {
+                                if (!isBusy) _sendMsg();
+                              },
                             ),
-                            const SizedBox(width: AppSizes.sm),
-                            ElevatedButton(
-                              onPressed: isBusy ? null : _sendMsg,
-                              child: isBusy
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text('Send'.tr),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                          ),
+                          const SizedBox(width: AppSizes.sm),
+                          ElevatedButton(
+                            onPressed: isBusy ? null : _sendMsg,
+                            child: isBusy
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text('Send'.tr),
+                          ),
+                        ],
+                      );
+                    }),
                   ],
                 ),
               ),
@@ -586,15 +605,6 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
   }
 
   // ---------- UI helpers ----------
-
-  Widget _pageTitle(String text) => Text(
-    text,
-    style: TextStyle(
-      color: AppColors.text,
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    ),
-  );
 
   Widget _sectionTitle(String text) => Text(
     text,
@@ -795,10 +805,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
 
   Widget _imageFallback() {
     return Center(
-      child: Text(
-        'Image'.tr,
-        style: TextStyle(color: AppColors.textMuted),
-      ),
+      child: Text('Image'.tr, style: TextStyle(color: AppColors.textMuted)),
     );
   }
 

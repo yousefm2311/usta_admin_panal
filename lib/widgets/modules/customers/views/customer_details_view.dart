@@ -257,7 +257,7 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
               // =========================
               // FULL DETAILS (clean sections)
               // =========================
-             _card(
+              _card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -289,9 +289,7 @@ class _CustomerDetailsViewState extends State<CustomerDetailsView> {
     );
   }
 
-
-
-Widget _detailsSections(Map<String, dynamic> data) {
+  Widget _detailsSections(Map<String, dynamic> data) {
     // ترتيب مفيد: الأول الحاجات الأهم
     final preferredOrder = <String>[
       'name',
@@ -392,8 +390,7 @@ Widget _detailsSections(Map<String, dynamic> data) {
     );
   }
 
-
-Widget _renderAnyValue(String label, dynamic value) {
+  Widget _renderAnyValue(String label, dynamic value) {
     if (value == null) return _valueBox(label, '-');
 
     if (value is Map) {
@@ -604,6 +601,7 @@ Widget _renderAnyValue(String label, dynamic value) {
     if (cleaned.isEmpty) return '-';
     return cleaned[0].toUpperCase() + cleaned.substring(1);
   }
+
   String _valueMeta(dynamic value) {
     if (value == null) return 'null';
     if (value is Map) return 'map • ${value.length}';
@@ -617,6 +615,7 @@ Widget _renderAnyValue(String label, dynamic value) {
     }
     return value.runtimeType.toString().toLowerCase();
   }
+
   // =====================================================
   // UI Components
   // =====================================================
@@ -903,103 +902,6 @@ Widget _renderAnyValue(String label, dynamic value) {
   }
 
   // =====================================================
-  // Details renderer (grouped)
-  // =====================================================
-  List<Widget> _buildDetailRows(Map<String, dynamic> data) {
-    final rows = <Widget>[];
-
-    for (final entry in data.entries) {
-      final key = _labelKey(entry.key);
-      final value = entry.value;
-
-      if (value is Map) {
-        rows.add(_sectionHeader(key));
-        rows.addAll(_mapRows(value));
-      } else if (value is List) {
-        rows.add(_sectionHeader(key));
-        rows.addAll(_listRows(value));
-      } else {
-        rows.add(_infoRow(key, _formatSimple(value)));
-      }
-    }
-
-    return rows;
-  }
-
-  List<Widget> _mapRows(Map<dynamic, dynamic> map) {
-    final rows = <Widget>[];
-    for (final entry in map.entries) {
-      rows.add(
-        _infoRow(
-          '  ${_labelKey(entry.key.toString())}',
-          _formatSimple(entry.value),
-        ),
-      );
-    }
-    return rows;
-  }
-
-  List<Widget> _listRows(List<dynamic> list) {
-    if (list.isEmpty) {
-      return [_infoRow('  ${"Count".tr}', '0')];
-    }
-
-    final rows = <Widget>[_infoRow('  ${"Count".tr}', list.length.toString())];
-
-    final preview = list.take(5).toList();
-    for (var i = 0; i < preview.length; i++) {
-      rows.add(_infoRow('  ${"Item".tr} ${i + 1}', _summarizeItem(preview[i])));
-    }
-    return rows;
-  }
-
-  Widget _sectionHeader(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSizes.xs, top: AppSizes.sm),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: AppColors.text,
-          fontWeight: FontWeight.w900,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-
-  Widget _infoRow(String label, String value) {
-    final canCopy = _canCopyValue(label, value);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSizes.xs),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 160,
-            child: Text(
-              label,
-              style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value.isEmpty ? '-' : value,
-              style: TextStyle(color: AppColors.text),
-            ),
-          ),
-          if (canCopy)
-            IconButton(
-              tooltip: 'Copy'.tr,
-              onPressed: () => _copyText(value),
-              icon: Icon(Icons.copy, size: 16, color: AppColors.textMuted),
-            ),
-        ],
-      ),
-    );
-  }
-
-  // =====================================================
   // Stats / formatting helpers
   // =====================================================
   Map<String, dynamic> _statsFromRequests(List<dynamic> requests) {
@@ -1069,8 +971,6 @@ Widget _renderAnyValue(String label, dynamic value) {
         ? parsed.toInt().toString()
         : parsed.toStringAsFixed(2);
   }
-
-  String _labelKey(String key) => key.replaceAll('_', ' ');
 
   String _formatSimple(dynamic value) {
     if (value == null) return '-';

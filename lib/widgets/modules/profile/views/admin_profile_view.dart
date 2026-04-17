@@ -6,6 +6,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/responsive.dart';
 import '../../../../layout/admin_layout.dart';
+import '../../../../layout/widgets/admin_content_widgets.dart';
+import '../../../../layout/widgets/admin_page_header.dart';
 import '../../../shimmer_widgets.dart';
 import '../controllers/profile_controller.dart';
 
@@ -55,10 +57,75 @@ class AdminProfileView extends StatelessWidget {
         final language = (settings['language'] ?? '').toString().trim();
         final theme = (settings['theme'] ?? '').toString().trim();
         final createdAt = (data['createdAt'] ?? '').toString().trim();
+        final currentTheme = theme.isEmpty ? '-' : theme.tr;
+        final currentLanguage = language.isEmpty ? '-' : language.tr;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            AdminPageHeader(
+              title: 'Profile',
+              subtitle:
+                  'See account identity, system preferences, and quick security actions for the current admin.',
+              badges: [
+                AdminInfoBadge(
+                  icon: Icons.badge_outlined,
+                  label: 'Profile overview',
+                ),
+                AdminInfoBadge(
+                  icon: Icons.security_outlined,
+                  label: 'Secure account',
+                  color: Colors.redAccent,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSizes.md),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final itemWidth = constraints.maxWidth >= 1100
+                    ? (constraints.maxWidth - AppSizes.md * 2) / 3
+                    : constraints.maxWidth >= 720
+                    ? (constraints.maxWidth - AppSizes.md) / 2
+                    : constraints.maxWidth;
+                return Wrap(
+                  spacing: AppSizes.md,
+                  runSpacing: AppSizes.md,
+                  children: [
+                    SizedBox(
+                      width: itemWidth,
+                      child: AdminStatTile(
+                        label: 'Status overview',
+                        value: role.isEmpty ? 'Admin'.tr : role.tr,
+                        subtitle: 'Role access',
+                        icon: Icons.admin_panel_settings_outlined,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: AdminStatTile(
+                        label: 'Language',
+                        value: currentLanguage,
+                        subtitle: 'Preferences',
+                        icon: Icons.language_rounded,
+                        color: AppColors.success,
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: AdminStatTile(
+                        label: 'Theme',
+                        value: currentTheme,
+                        subtitle: 'Secure account',
+                        icon: Icons.dark_mode_outlined,
+                        color: Colors.orange.shade700,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: AppSizes.md),
             _headerCard(
               context,
               name: name,
@@ -265,9 +332,9 @@ class AdminProfileView extends StatelessWidget {
       icon: Icons.tune,
       child: Column(
         children: [
-          _kvRow('Language'.tr, language.isEmpty ? '-' : language),
+          _kvRow('Language'.tr, language.isEmpty ? '-' : language.tr),
           _divider(),
-          _kvRow('Theme'.tr, theme.isEmpty ? '-' : theme),
+          _kvRow('Theme'.tr, theme.isEmpty ? '-' : theme.tr),
         ],
       ),
     );
@@ -335,44 +402,7 @@ class AdminProfileView extends StatelessWidget {
     required IconData icon,
     required Widget child,
   }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSizes.md),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                height: 42,
-                width: 42,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(icon, color: AppColors.primary),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: AppColors.text,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.md),
-          child,
-        ],
-      ),
-    );
+    return AdminSectionCard(title: title, icon: icon, child: child);
   }
 
   Widget _kvRow(String k, String v) {

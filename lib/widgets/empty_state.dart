@@ -17,23 +17,38 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(AppSizes.lg),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border:  Border.fromBorderSide(
-          BorderSide(color: AppColors.border),
-        ),
+        border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.18 : 0.04),
+            blurRadius: 22,
+            offset: const Offset(0, 12),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: AppColors.textMuted, size: 40),
+          Container(
+            width: 68,
+            height: 68,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 32),
+          ),
           const SizedBox(height: AppSizes.sm),
           Text(
             title,
-            style:  TextStyle(
+            style: TextStyle(
               color: AppColors.text,
               fontWeight: FontWeight.bold,
             ),
@@ -41,7 +56,7 @@ class EmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             subtitle,
-            style:  TextStyle(color: AppColors.textMuted),
+            style: TextStyle(color: AppColors.textMuted),
             textAlign: TextAlign.center,
           ),
         ],

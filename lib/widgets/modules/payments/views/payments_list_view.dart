@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../layout/admin_layout.dart';
+import '../../../../layout/widgets/admin_content_widgets.dart';
+import '../../../../layout/widgets/admin_page_header.dart';
 import '../../../shimmer_widgets.dart';
 import '../../../table_wrapper.dart';
 import '../controllers/payments_controller.dart';
@@ -16,206 +18,200 @@ class PaymentsListView extends StatelessWidget {
     final controller = Get.put(PaymentsController());
 
     return AdminLayout(
-      title: 'Payments'.tr,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // =========================
-          // HEADER
-          // =========================
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isNarrow = constraints.maxWidth < 720;
+      title: '',
+      child: Obx(() {
+        final totalTransactions = controller.transactions.length;
+        final pendingTransactions = controller.transactions.where((payment) {
+          final status = (payment['status'] ?? '').toString().toLowerCase();
+          return status == 'pending' || status == 'new';
+        }).length;
+        final totalAmount = controller.transactions.fold<double>(
+          0,
+          (sum, payment) =>
+              sum +
+              (double.tryParse(
+                    (payment['finalAmount'] ?? payment['amount'] ?? 0)
+                        .toString(),
+                  ) ??
+                  0),
+        );
+        final Widget body;
 
-              final titleBlock = Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Payments'.tr,
-                    style: TextStyle(
-                      color: AppColors.text,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 18,
-                      height: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    'Track transactions and settlements'.tr,
-                    style: TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+        if (controller.loading.value) {
+          body = const CardLoading(lines: 10);
+        } else if (controller.error.value != null) {
+          body = Padding(
+            padding: const EdgeInsets.all(AppSizes.md),
+            child: Text(
+              controller.error.value!,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
+          );
+        } else if (controller.transactions.isEmpty) {
+          body = Padding(
+            padding: const EdgeInsets.all(AppSizes.md),
+            child: Text(
+              'No data'.tr,
+              style: TextStyle(color: AppColors.textMuted),
+            ),
+          );
+        } else {
+          body = TableWrapper(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columns: [
+                  DataColumn(label: Text('Customer'.tr)),
+                  DataColumn(label: Text('Amount'.tr)),
+                  DataColumn(label: Text('Method'.tr)),
+                  DataColumn(label: Text('Date'.tr)),
+                  DataColumn(label: Text('Status'.tr)),
+                  DataColumn(label: Text('Actions'.tr)),
                 ],
-              );
+                rows: controller.transactions.map((raw) {
+                  final p = raw as Map<String, dynamic>? ?? <String, dynamic>{};
 
-              final filterButton = Obx(() {
-                final count = controller.filter.length;
-                return OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.text,
-                    side: BorderSide(color: AppColors.border),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
-                  ),
+                  final customerName = controller.userNameFor(p);
+                  final amount = p['finalAmount'] ?? p['amount'] ?? 0;
+                  final method = _resolveMethod(p);
+                  final date = p['date'] ?? p['createdAt'];
+                  final status = (p['status'] ?? '').toString();
+
+                  return DataRow(
+                    cells: [
+                      DataCell(
+                        Text(
+                          customerName.isEmpty ? '—' : customerName,
+                          style: TextStyle(
+                            color: AppColors.text,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      DataCell(_amountText(amount)),
+                      DataCell(_methodChip(method)),
+                      DataCell(Text(_formatDate(date))),
+                      DataCell(_statusChip(status)),
+                      DataCell(
+                        TextButton(
+                          onPressed: () =>
+                              Get.toNamed('/payment/details', arguments: p),
+                          child: Text('View details'.tr),
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+                headingTextStyle: TextStyle(
+                  color: AppColors.textMuted,
+                  fontWeight: FontWeight.w700,
+                ),
+                dataTextStyle: TextStyle(color: AppColors.text),
+              ),
+            ),
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AdminPageHeader(
+              title: 'Payments',
+              subtitle:
+                  'Track transactions and settlements with a cleaner overview for finance operations.',
+              actions: [
+                OutlinedButton.icon(
                   onPressed: () => _openFilterDialog(context, controller),
                   icon: const Icon(Icons.filter_list_rounded, size: 18),
                   label: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text('Filter'.tr),
-                      if (count > 0) ...[
+                      if (controller.filter.isNotEmpty) ...[
                         const SizedBox(width: 8),
-                        _miniBadge(count.toString()),
+                        _miniBadge(controller.filter.length.toString()),
                       ],
                     ],
                   ),
-                );
-              });
-
-              final clearButton = Obx(
-                () => OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textMuted,
-                    side: BorderSide(color: AppColors.border),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
-                  ),
+                ),
+                OutlinedButton.icon(
                   onPressed: controller.filter.isEmpty
                       ? null
                       : controller.clearFilter,
                   icon: const Icon(Icons.clear_rounded, size: 18),
                   label: Text('Clear'.tr),
                 ),
-              );
-
-              final refreshButton = IconButton(
-                onPressed: controller.loadTransactions,
-                icon: Icon(Icons.refresh_rounded, color: AppColors.textMuted),
-                tooltip: 'Refresh'.tr,
-              );
-
-              if (isNarrow) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                IconButton(
+                  onPressed: controller.loadTransactions,
+                  icon: Icon(Icons.refresh_rounded, color: AppColors.textMuted),
+                  tooltip: 'Refresh'.tr,
+                ),
+              ],
+              badges: [
+                AdminInfoBadge(
+                  icon: Icons.account_balance_wallet_outlined,
+                  label: 'Payments hub',
+                ),
+                AdminInfoBadge(
+                  icon: Icons.query_stats_outlined,
+                  label: controller.filter.isEmpty
+                      ? 'Settlement health'
+                      : '${'Filters'.tr}: ${controller.filter.length}',
+                  color: Colors.teal,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSizes.md),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final itemWidth = constraints.maxWidth >= 1100
+                    ? (constraints.maxWidth - AppSizes.md * 2) / 3
+                    : constraints.maxWidth >= 720
+                    ? (constraints.maxWidth - AppSizes.md) / 2
+                    : constraints.maxWidth;
+                return Wrap(
+                  spacing: AppSizes.md,
+                  runSpacing: AppSizes.md,
                   children: [
-                    titleBlock,
-                    const SizedBox(height: AppSizes.sm),
-                    Wrap(
-                      spacing: AppSizes.sm,
-                      runSpacing: AppSizes.sm,
-                      children: [filterButton, clearButton, refreshButton],
+                    SizedBox(
+                      width: itemWidth,
+                      child: AdminStatTile(
+                        label: 'Transaction volume',
+                        value: totalTransactions.toString(),
+                        subtitle: 'Payments volume',
+                        icon: Icons.receipt_long_outlined,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: AdminStatTile(
+                        label: 'Total revenue',
+                        value: 'EGP ${totalAmount.toStringAsFixed(0)}',
+                        subtitle: 'Settlement health',
+                        icon: Icons.payments_outlined,
+                        color: Colors.teal,
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: AdminStatTile(
+                        label: 'Need review',
+                        value: pendingTransactions.toString(),
+                        subtitle: 'Pending and new payments',
+                        icon: Icons.flag_outlined,
+                        color: Colors.amber.shade700,
+                      ),
                     ),
                   ],
                 );
-              }
-
-              return Row(
-                children: [
-                  Expanded(child: titleBlock),
-                  filterButton,
-                  const SizedBox(width: AppSizes.sm),
-                  clearButton,
-                  const SizedBox(width: AppSizes.sm),
-                  refreshButton,
-                ],
-              );
-            },
-          ),
-
-          const SizedBox(height: AppSizes.md),
-
-          // =========================
-          // BODY
-          // =========================
-          Obx(() {
-            if (controller.loading.value) {
-              return const CardLoading(lines: 10);
-            }
-
-            if (controller.error.value != null) {
-              return Padding(
-                padding: const EdgeInsets.all(AppSizes.md),
-                child: Text(
-                  controller.error.value!,
-                  style: const TextStyle(color: Colors.redAccent),
-                ),
-              );
-            }
-
-            if (controller.transactions.isEmpty) {
-              return Padding(
-                padding: const EdgeInsets.all(AppSizes.md),
-                child: Text(
-                  'No data'.tr,
-                  style: TextStyle(color: AppColors.textMuted),
-                ),
-              );
-            }
-
-            return TableWrapper(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: [
-                    DataColumn(label: Text('Customer'.tr)),
-                    DataColumn(label: Text('Amount'.tr)),
-                    DataColumn(label: Text('Method'.tr)),
-                    DataColumn(label: Text('Date'.tr)),
-                    DataColumn(label: Text('Status'.tr)),
-                    DataColumn(label: Text('Actions'.tr)),
-                  ],
-                  rows: controller.transactions.map((raw) {
-                    final p =
-                        raw as Map<String, dynamic>? ?? <String, dynamic>{};
-
-                    final customerName = controller.userNameFor(p);
-                    final amount = p['finalAmount'] ?? p['amount'] ?? 0;
-                    final method = _resolveMethod(p);
-                    final date = p['date'] ?? p['createdAt'];
-                    final status = (p['status'] ?? '').toString();
-
-                    return DataRow(
-                      cells: [
-                        DataCell(
-                          Text(
-                            customerName.isEmpty ? '—' : customerName,
-                            style: TextStyle(
-                              color: AppColors.text,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        DataCell(_amountText(amount)),
-                        DataCell(_methodChip(method)),
-                        DataCell(Text(_formatDate(date))),
-                        DataCell(_statusChip(status)),
-                        DataCell(
-                          TextButton(
-                            onPressed: () =>
-                                Get.toNamed('/payment/details', arguments: p),
-                            child: Text('View details'.tr),
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                  headingTextStyle: TextStyle(
-                    color: AppColors.textMuted,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  dataTextStyle: TextStyle(color: AppColors.text),
-                ),
-              ),
-            );
-          }),
-        ],
-      ),
+              },
+            ),
+            const SizedBox(height: AppSizes.md),
+            body,
+          ],
+        );
+      }),
     );
   }
 

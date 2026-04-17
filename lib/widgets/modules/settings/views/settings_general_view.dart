@@ -7,6 +7,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_config.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../layout/admin_layout.dart';
+import '../../../../layout/widgets/admin_page_header.dart';
 import '../../../primary_button.dart';
 import '../../../shimmer_widgets.dart';
 import '../controllers/settings_general_controller.dart';
@@ -62,21 +63,26 @@ class _SettingsGeneralViewState extends State<SettingsGeneralView> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Text(
-                  'General settings'.tr,
-                  style: TextStyle(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                const Spacer(),
+            AdminPageHeader(
+              title: 'General Settings',
+              subtitle:
+                  'Control branding, support details, and the public-facing profile of the admin system.',
+              actions: [
                 ElevatedButton.icon(
                   onPressed: () => Get.toNamed('/logs/health'),
                   icon: const Icon(Icons.health_and_safety_rounded),
                   label: Text('Api Health'.tr),
+                ),
+              ],
+              badges: [
+                AdminInfoBadge(
+                  icon: Icons.palette_outlined,
+                  label: 'Brand assets'.tr,
+                ),
+                AdminInfoBadge(
+                  icon: Icons.support_agent_outlined,
+                  label: 'Support info'.tr,
+                  color: AppColors.success,
                 ),
               ],
             ),
@@ -131,7 +137,8 @@ class _SettingsGeneralViewState extends State<SettingsGeneralView> {
                               );
                             }(),
                           ),
-                          child: controller.form['logoUrl']?.value.isNotEmpty ==
+                          child:
+                              controller.form['logoUrl']?.value.isNotEmpty ==
                                   true
                               ? null
                               : Icon(
@@ -149,12 +156,9 @@ class _SettingsGeneralViewState extends State<SettingsGeneralView> {
                         onPressed: controller.uploadingLogo.value
                             ? null
                             : () async {
-                                final result =
-                                    await FilePicker.platform.pickFiles(
-                                  withData: true,
-                                );
-                                if (result != null &&
-                                    result.files.isNotEmpty) {
+                                final result = await FilePicker.platform
+                                    .pickFiles(withData: true);
+                                if (result != null && result.files.isNotEmpty) {
                                   final file = result.files.first;
                                   Uint8List bytes;
 
@@ -173,11 +177,7 @@ class _SettingsGeneralViewState extends State<SettingsGeneralView> {
                                 }
                               },
                         icon: controller.uploadingLogo.value
-                            ? const ShimmerBox(
-                                height: 16,
-                                width: 16,
-                                radius: 6,
-                              )
+                            ? const ShimmerBox(height: 16, width: 16, radius: 6)
                             : const Icon(Icons.upload),
                         label: Text('Upload logo'.tr),
                       ),

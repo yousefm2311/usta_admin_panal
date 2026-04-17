@@ -285,7 +285,6 @@ class _HeaderBadge extends StatelessWidget {
     final badgeWidth = isCompact ? 148.0 : 168.0;
 
     return Container(
-
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: AppColors.card.withOpacity(isDark ? 0.7 : 0.96),
@@ -569,7 +568,7 @@ class _AccountTab extends StatelessWidget {
 
   void _navigateFromDrawer(BuildContext context, String route) {
     Navigator.of(context).maybePop();
-    Future<void>.microtask(() => Get.offAllNamed(route));
+    Future<void>.microtask(() => Get.offNamed(route));
   }
 
   Future<void> _logout(BuildContext context) async {

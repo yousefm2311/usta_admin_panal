@@ -3,16 +3,13 @@ import 'package:get/get.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
+import '../navigation/admin_navigation.dart';
 
 class Sidebar extends StatefulWidget {
   final bool collapsed;
   final ValueChanged<String>? onNavigate;
 
-  const Sidebar({
-    super.key,
-    this.collapsed = false,
-    this.onNavigate,
-  });
+  const Sidebar({super.key, this.collapsed = false, this.onNavigate});
 
   @override
   State<Sidebar> createState() => _SidebarState();
@@ -23,7 +20,9 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final sections = _sections();
+    final sections = AdminNavigation.sections;
+    final currentItem = AdminNavigation.findItem(Get.currentRoute);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 220),
@@ -32,12 +31,12 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
           ? AppSizes.sidebarCollapsed
           : AppSizes.sidebarWidth,
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: AppColors.card.withOpacity(0.96),
         border: BorderDirectional(end: BorderSide(color: AppColors.border)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 18,
+            color: Colors.black.withOpacity(isDark ? 0.24 : 0.05),
+            blurRadius: 30,
             offset: const Offset(8, 0),
           ),
         ],
@@ -45,7 +44,7 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
       child: ListView(
         padding: const EdgeInsets.all(AppSizes.md),
         children: [
-          _buildBrandHeader(),
+          _buildBrandHeader(currentItem),
           const SizedBox(height: AppSizes.sm),
           if (widget.collapsed)
             ..._buildCollapsedItems(sections)
@@ -56,46 +55,84 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildBrandHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSizes.md),
-      child: Row(
+  Widget _buildBrandHeader(AdminNavItem? currentItem) {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.md),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppSizes.cardRadius + 4),
+        border: Border.all(color: AppColors.border.withOpacity(0.9)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.primary.withOpacity(0.12), AppColors.card],
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 40,
-            width: 40,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.primary.withOpacity(0.25)),
-            ),
-            child: Icon(Icons.shield_moon, color: AppColors.primary),
+          Row(
+            children: [
+              Container(
+                height: 42,
+                width: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.primary.withOpacity(0.25),
+                  ),
+                ),
+                child: Icon(Icons.shield_moon, color: AppColors.primary),
+              ),
+              if (!widget.collapsed) ...[
+                const SizedBox(width: AppSizes.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'USTA Platform'.tr,
+                        style: TextStyle(
+                          color: AppColors.text,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                          height: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Operations Console'.tr,
+                        style: TextStyle(
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
           ),
           if (!widget.collapsed) ...[
-            const SizedBox(width: AppSizes.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'USTA Platform'.tr,
-                    style: TextStyle(
-                      color: AppColors.text,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 15,
-                      height: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Admin Panel'.tr,
-                    style: TextStyle(
-                      color: AppColors.textMuted,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
+            const SizedBox(height: AppSizes.md),
+            Text(
+              'Now viewing'.tr,
+              style: TextStyle(
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w600,
+                fontSize: 11,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              (currentItem?.title ?? 'Dashboard').tr,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: AppColors.text,
+                fontWeight: FontWeight.w800,
+                fontSize: 16,
               ),
             ),
           ],
@@ -104,121 +141,18 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
     );
   }
 
-  List<_SidebarSection> _sections() {
-    return [
-      _SidebarSection(
-        title: 'Main'.tr,
-        icon: Icons.home_outlined,
-        items: [
-          _SidebarItem('Dashboard'.tr, Icons.space_dashboard_outlined, '/dashboard'),
-          _SidebarItem('Analytics'.tr, Icons.analytics_outlined, '/analytics'),
-        ],
-      ),
-      _SidebarSection(
-        title: 'Users'.tr,
-        icon: Icons.people_alt_outlined,
-        items: [
-          _SidebarItem('Customers'.tr, Icons.people_alt_outlined, '/customers'),
-          _SidebarItem('Artisans'.tr, Icons.handyman, '/artisans'),
-          _SidebarItem('Roles'.tr, Icons.admin_panel_settings_outlined, '/roles'),
-          _SidebarItem('Profile'.tr, Icons.account_circle_outlined, '/profile'),
-        ],
-      ),
-      _SidebarSection(
-        title: 'Orders'.tr,
-        icon: Icons.shopping_bag_outlined,
-        items: [
-          _SidebarItem('Orders'.tr, Icons.shopping_bag_outlined, '/orders'),
-          _SidebarItem('Requests'.tr, Icons.list_alt_outlined, '/requests'),
-          _SidebarItem('Complaints'.tr, Icons.support_agent, '/complaints'),
-          _SidebarItem('Reviews'.tr, Icons.star_half, '/reviews'),
-        ],
-      ),
-      _SidebarSection(
-        title: 'Finance'.tr,
-        icon: Icons.account_balance_wallet_outlined,
-        items: [
-          _SidebarItem('Payments'.tr, Icons.payments_outlined, '/payments'),
-          _SidebarItem('Transactions'.tr, Icons.swap_horiz, '/transactions'),
-          _SidebarItem('Payout Requests'.tr, Icons.payments_outlined, '/payouts'),
-          _SidebarItem('Withdrawals'.tr, Icons.account_balance_wallet_outlined, '/withdrawals'),
-          _SidebarItem('Wallets'.tr, Icons.account_balance, '/wallets'),
-        ],
-      ),
-      _SidebarSection(
-        title: 'Content'.tr,
-        icon: Icons.category_outlined,
-        items: [
-          _SidebarItem('Categories'.tr, Icons.category_outlined, '/categories'),
-          _SidebarItem('Reports'.tr, Icons.report_outlined, '/reports'),
-        ],
-      ),
-      _SidebarSection(
-        title: 'Notifications'.tr,
-        icon: Icons.notifications_none,
-        items: [
-          _SidebarItem('Notifications'.tr, Icons.notifications_none, '/notifications'),
-          _SidebarItem('Templates'.tr, Icons.note_outlined, '/notifications/templates'),
-          _SidebarItem('Broadcast'.tr, Icons.campaign_outlined, '/notifications/broadcast'),
-          _SidebarItem('FCM Tokens'.tr, Icons.phonelink_ring_outlined, '/notifications/tokens'),
-        ],
-      ),
-      _SidebarSection(
-        title: 'Marketing'.tr,
-        icon: Icons.campaign_outlined,
-        items: [
-          _SidebarItem('Coupons'.tr, Icons.local_offer_outlined, '/marketing/coupons'),
-          _SidebarItem('Referral'.tr, Icons.share_outlined, '/marketing/referral'),
-          _SidebarItem('Rewards'.tr, Icons.emoji_events_outlined, '/marketing/rewards'),
-        ],
-      ),
-      _SidebarSection(
-        title: 'AI Tools'.tr,
-        icon: Icons.auto_awesome,
-        items: [
-          _SidebarItem('AI Reviews Insights'.tr, Icons.auto_awesome, '/ai/reviews'),
-          _SidebarItem('AI Top Artisans'.tr, Icons.emoji_events_outlined, '/ai/top-artisans'),
-          _SidebarItem('Fraud detection'.tr, Icons.gpp_maybe_outlined, '/ai/fraud'),
-          _SidebarItem('Word cloud'.tr, Icons.cloud_outlined, '/ai/word-cloud'),
-        ],
-      ),
-      _SidebarSection(
-        title: 'Settings'.tr,
-        icon: Icons.settings_outlined,
-        items: [
-          _SidebarItem('Settings'.tr, Icons.settings_outlined, '/settings'),
-          _SidebarItem('Feature flags'.tr, Icons.tune, '/settings/features'),
-          _SidebarItem('Security'.tr, Icons.security_outlined, '/settings/security'),
-          _SidebarItem('Change password'.tr, Icons.lock_reset_outlined, '/settings/change-password'),
-        ],
-      ),
-      _SidebarSection(
-        title: 'System'.tr,
-        icon: Icons.monitor_heart_outlined,
-        items: [
-          _SidebarItem('Logs'.tr, Icons.list_alt_outlined, '/logs/activity'),
-          _SidebarItem('System Health'.tr, Icons.health_and_safety_rounded, '/logs/health'),
-        ],
-      ),
-    ];
+  List<Widget> _buildExpandedSections(List<AdminNavSection> sections) {
+    return [for (final section in sections) _buildSection(section)];
   }
 
-  List<Widget> _buildExpandedSections(List<_SidebarSection> sections) {
-    return [
-      for (final section in sections) _buildSection(section),
-    ];
-  }
-
-List<Widget> _buildCollapsedItems(List<_SidebarSection> sections) {
+  List<Widget> _buildCollapsedItems(List<AdminNavSection> sections) {
     final items = sections.expand((s) => s.items).toList();
 
     return [
       for (final item in items)
         Builder(
           builder: (context) {
-            final current = Get.currentRoute;
-            final isActive =
-                current == item.route || current.startsWith('${item.route}/');
+            final isActive = item.matches(Get.currentRoute);
 
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSizes.sm),
@@ -258,7 +192,7 @@ List<Widget> _buildCollapsedItems(List<_SidebarSection> sections) {
     ];
   }
 
-Widget _buildSection(_SidebarSection section) {
+  Widget _buildSection(AdminNavSection section) {
     final expanded = _expanded[section.title] ?? _isSectionActive(section);
     final isActiveSection = _isSectionActive(section);
 
@@ -333,10 +267,8 @@ Widget _buildSection(_SidebarSection section) {
     );
   }
 
- Widget _buildItem(_SidebarItem item) {
-    final current = Get.currentRoute;
-    final isActive =
-        current == item.route || current.startsWith('${item.route}/');
+  Widget _buildItem(AdminNavItem item) {
+    final isActive = item.matches(Get.currentRoute);
 
     final indicator = AnimatedContainer(
       duration: const Duration(milliseconds: 180),
@@ -416,36 +348,15 @@ Widget _buildSection(_SidebarSection section) {
     if (widget.onNavigate != null) {
       widget.onNavigate!(route);
     } else {
-      Get.offAllNamed(route);
+      if (Get.currentRoute != route) {
+        Get.offNamed(route);
+      }
     }
   }
 
-  bool _isSectionActive(_SidebarSection section) {
-    final current = Get.currentRoute;
-    return section.items.any(
-      (item) => current == item.route || current.startsWith('${item.route}/'),
-    );
+  bool _isSectionActive(AdminNavSection section) {
+    return section.items.any((item) => item.matches(Get.currentRoute));
   }
-}
-
-class _SidebarItem {
-  final String title;
-  final IconData icon;
-  final String route;
-
-  _SidebarItem(this.title, this.icon, this.route);
-}
-
-class _SidebarSection {
-  final String title;
-  final IconData icon;
-  final List<_SidebarItem> items;
-
-  _SidebarSection({
-    required this.title,
-    required this.icon,
-    required this.items,
-  });
 }
 
 class _HoverTap extends StatefulWidget {

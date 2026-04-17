@@ -8,6 +8,7 @@ import '../../widgets/modules/profile/controllers/profile_controller.dart';
 
 class TopBar extends StatelessWidget {
   final String title;
+  final String sectionTitle;
   final VoidCallback? onMenuTap;
   final VoidCallback? onToggleSidebar;
   final VoidCallback? onOpenSettings;
@@ -16,6 +17,7 @@ class TopBar extends StatelessWidget {
   const TopBar({
     super.key,
     required this.title,
+    required this.sectionTitle,
     this.onMenuTap,
     this.onToggleSidebar,
     this.onOpenSettings,
@@ -28,86 +30,156 @@ class TopBar extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isCompact = constraints.maxWidth < 520;
+        final isCompact = constraints.maxWidth < 760;
         final showSidebarToggle = onToggleSidebar != null && onMenuTap == null;
         final profileController = Get.isRegistered<ProfileController>()
             ? Get.find<ProfileController>()
             : Get.put(ProfileController(), permanent: true);
 
         return Container(
-          height: AppSizes.topBarHeight,
-          padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+          padding: const EdgeInsets.fromLTRB(
+            AppSizes.md,
+            AppSizes.md,
+            AppSizes.md,
+            AppSizes.sm,
+          ),
           decoration: BoxDecoration(
-            color: AppColors.background,
+            color: AppColors.background.withOpacity(0.92),
             border: Border(bottom: BorderSide(color: AppColors.border)),
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // left controls
-              if (onMenuTap != null)
-                IconButton(
-                  icon: Icon(Icons.menu_rounded, color: AppColors.text),
-                  onPressed: onMenuTap,
-                  tooltip: 'Menu'.tr,
-                ),
-              if (showSidebarToggle)
-                IconButton(
-                  icon: Icon(
-                    Icons.view_sidebar_outlined,
-                    color: AppColors.textMuted,
-                  ),
-                  onPressed: onToggleSidebar,
-                  tooltip: 'Sidebar'.tr,
-                ),
-
-              // profile chip
-              Obx(() {
-                final data =
-                    profileController.profile.value ?? <String, dynamic>{};
-                final name = (data['name'] ?? 'Admin'.tr).toString();
-                final role = (data['role'] ?? data['kind'] ?? '').toString();
-                final email = (data['email'] ?? '').toString();
-                final avatar = _resolveAvatarUrl(data);
-
-                return _ProfileChip(
-                  isCompact: isCompact,
-                  name: name,
-                  roleOrEmail: role.isNotEmpty ? role.tr : email,
-                  avatarUrl: avatar,
-                  isDark: isDark,
-                  onLogout: _logout,
-                  onOpenSettings: onOpenSettings,
-                );
-              }),
-
-              SizedBox(width: isCompact ? AppSizes.xs : AppSizes.md),
-
-              // title (responsive)
               Expanded(
-                child: Text(
-                  title.trim().isEmpty ? '' : title.tr,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.w900,
-                    fontSize: isCompact ? 14 : 16,
-                    height: 1.1,
-                  ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (onMenuTap != null)
+                      _TopBarIconButton(
+                        icon: Icons.menu_rounded,
+                        tooltip: 'Menu'.tr,
+                        onTap: onMenuTap!,
+                      ),
+                    if (showSidebarToggle)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.only(end: 8),
+                        child: _TopBarIconButton(
+                          icon: Icons.view_sidebar_outlined,
+                          tooltip: 'Sidebar'.tr,
+                          onTap: onToggleSidebar!,
+                        ),
+                      ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                    color: AppColors.primary.withOpacity(0.18),
+                                  ),
+                                ),
+                                child: Text(
+                                  sectionTitle.tr,
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                title.trim().isEmpty ? '' : title.tr,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.text,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: isCompact ? 19 : 24,
+                                  height: 1.05,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Manage modules, monitor activity, and keep the platform healthy.'
+                                .tr,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-
-              // actions on the right
-              Row(
-                mainAxisSize: MainAxisSize.min,
+              const SizedBox(width: AppSizes.sm),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  if (actions != null) ...actions!,
-                  if (onOpenSettings != null)
-                    IconButton(
-                      onPressed: onOpenSettings,
-                      icon: Icon(Icons.settings, color: AppColors.textMuted),
-                      tooltip: 'Settings'.tr,
+                  if (actions != null && actions!.isNotEmpty)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.end,
+                      children: actions!,
                     ),
+                  SizedBox(
+                    height: actions != null && actions!.isNotEmpty
+                        ? AppSizes.sm
+                        : 0,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (onOpenSettings != null)
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(end: 8),
+                          child: _TopBarIconButton(
+                            icon: Icons.tune_rounded,
+                            tooltip: 'Settings'.tr,
+                            onTap: onOpenSettings!,
+                          ),
+                        ),
+                      Obx(() {
+                        final data =
+                            profileController.profile.value ??
+                            <String, dynamic>{};
+                        final name = (data['name'] ?? 'Admin'.tr).toString();
+                        final role = (data['role'] ?? data['kind'] ?? '')
+                            .toString();
+                        final email = (data['email'] ?? '').toString();
+                        final avatar = _resolveAvatarUrl(data);
+
+                        return _ProfileChip(
+                          isCompact: isCompact,
+                          name: name,
+                          roleOrEmail: role.isNotEmpty ? role.tr : email,
+                          avatarUrl: avatar,
+                          isDark: isDark,
+                          onLogout: _logout,
+                          onOpenSettings: onOpenSettings,
+                        );
+                      }),
+                    ],
+                  ),
                 ],
               ),
             ],
@@ -137,6 +209,39 @@ class TopBar extends StatelessWidget {
       if (value is String && value.trim().isNotEmpty) return value.trim();
     }
     return null;
+  }
+}
+
+class _TopBarIconButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _TopBarIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Icon(icon, size: 20, color: AppColors.text),
+        ),
+      ),
+    );
   }
 }
 

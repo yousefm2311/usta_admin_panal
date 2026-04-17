@@ -6,6 +6,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/utils/notify.dart';
 import '../../../../layout/admin_layout.dart';
+import '../../../../layout/widgets/admin_content_widgets.dart';
+import '../../../../layout/widgets/admin_page_header.dart';
 import '../../../shimmer_widgets.dart';
 import '../../../table_wrapper.dart';
 import '../controllers/notifications_controller.dart';
@@ -14,7 +16,8 @@ class NotificationsCenterView extends StatefulWidget {
   const NotificationsCenterView({super.key});
 
   @override
-  State<NotificationsCenterView> createState() => _NotificationsCenterViewState();
+  State<NotificationsCenterView> createState() =>
+      _NotificationsCenterViewState();
 }
 
 class _NotificationsCenterViewState extends State<NotificationsCenterView> {
@@ -29,46 +32,117 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
 
     return AdminLayout(
       title: '',
-      child: SingleChildScrollView(
-        child: Column(
+      child: Obx(
+        () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Send notification
-            Text('Send notification'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: AppSizes.sm),
-            _sendCard(controller),
-            const SizedBox(height: AppSizes.md),
-            // Templates section
-            Row(
-              children: [
-                Text('Notification Templates'.tr, style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16)),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: () => _openTemplateDialog(controller),
-                  icon:  Icon(Icons.add, color: AppColors.primary),
-                  label: Text('Add'.tr, style:  TextStyle(color: AppColors.primary)),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSizes.sm),
-            _templatesTable(controller),
-            const SizedBox(height: AppSizes.md),
-            // Notifications list
-            Row(
-              children: [
-                Text(
-                  'Sent notifications'.tr,
-                  style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const Spacer(),
+            AdminPageHeader(
+              title: 'Notifications',
+              subtitle:
+                  'Manage templates, send broadcasts, and monitor notification history from one workspace.',
+              actions: [
                 IconButton(
                   onPressed: controller.loadHistory,
-                  icon:  Icon(Icons.refresh, color: AppColors.textMuted),
+                  icon: Icon(Icons.refresh, color: AppColors.textMuted),
+                  tooltip: 'Refresh'.tr,
+                ),
+              ],
+              badges: [
+                AdminInfoBadge(
+                  icon: Icons.campaign_outlined,
+                  label: 'Broadcast center',
+                ),
+                AdminInfoBadge(
+                  icon: Icons.note_alt_outlined,
+                  label: 'Templates ready',
+                  color: AppColors.success,
+                ),
+                AdminInfoBadge(
+                  icon: Icons.history_rounded,
+                  label: 'History stream',
+                  color: Colors.orange.shade700,
                 ),
               ],
             ),
-            const SizedBox(height: AppSizes.sm),
-            _historyList(controller),
+            const SizedBox(height: AppSizes.md),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final itemWidth = constraints.maxWidth >= 1100
+                    ? (constraints.maxWidth - AppSizes.md * 2) / 3
+                    : constraints.maxWidth >= 720
+                    ? (constraints.maxWidth - AppSizes.md) / 2
+                    : constraints.maxWidth;
+                return Wrap(
+                  spacing: AppSizes.md,
+                  runSpacing: AppSizes.md,
+                  children: [
+                    SizedBox(
+                      width: itemWidth,
+                      child: AdminStatTile(
+                        label: 'Templates',
+                        value: controller.templates.length.toString(),
+                        subtitle: 'Templates ready',
+                        icon: Icons.note_alt_outlined,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: AdminStatTile(
+                        label: 'Sent notifications',
+                        value: controller.history.length.toString(),
+                        subtitle: 'History stream',
+                        icon: Icons.notifications_active_outlined,
+                        color: Colors.orange.shade700,
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: AdminStatTile(
+                        label: 'Status overview',
+                        value: controller.sending.value
+                            ? 'Sending'.tr
+                            : 'Ready'.tr,
+                        subtitle: 'All notifications in one place',
+                        icon: Icons.published_with_changes_outlined,
+                        color: AppColors.success,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: AppSizes.md),
+            AdminSectionCard(
+              title: 'Send notification',
+              subtitle: 'Broadcast center',
+              icon: Icons.send_outlined,
+              child: _sendCard(controller),
+            ),
+            const SizedBox(height: AppSizes.md),
+            AdminSectionCard(
+              title: 'Notification Templates',
+              subtitle: 'Template library',
+              icon: Icons.note_alt_outlined,
+              actions: [
+                TextButton.icon(
+                  onPressed: () => _openTemplateDialog(controller),
+                  icon: Icon(Icons.add, color: AppColors.primary),
+                  label: Text(
+                    'Add'.tr,
+                    style: TextStyle(color: AppColors.primary),
+                  ),
+                ),
+              ],
+              child: _templatesTable(controller),
+            ),
+            const SizedBox(height: AppSizes.md),
+            AdminSectionCard(
+              title: 'Sent notifications',
+              subtitle: 'Recent activity',
+              icon: Icons.history_rounded,
+              child: _historyList(controller),
+            ),
           ],
         ),
       ),
@@ -76,73 +150,71 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
   }
 
   Widget _sendCard(NotificationsController controller) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSizes.md),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Target'.tr, style:  TextStyle(color: AppColors.textMuted)),
-            const SizedBox(height: AppSizes.xs),
-            Wrap(
-              spacing: AppSizes.sm,
-              children: ['All', 'Customers', 'Artisans']
-                  .map(
-                    (t) => ChoiceChip(
-                      label: Text(t.tr),
-                      selected: target == t,
-                      onSelected: (_) => setState(() => target = t),
-                      selectedColor: AppColors.primary,
-                      backgroundColor: AppColors.card,
-                      labelStyle: TextStyle(color: target == t ? Colors.white : AppColors.textMuted),
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Target'.tr, style: TextStyle(color: AppColors.textMuted)),
+          const SizedBox(height: AppSizes.xs),
+          Wrap(
+            spacing: AppSizes.sm,
+            children: ['all', 'customers', 'artisans']
+                .map(
+                  (t) => ChoiceChip(
+                    label: Text(_targetLabel(t).tr),
+                    selected: target == t,
+                    onSelected: (_) => setState(() => target = t),
+                    selectedColor: AppColors.primary,
+                    backgroundColor: AppColors.card,
+                    labelStyle: TextStyle(
+                      color: target == t ? Colors.white : AppColors.textMuted,
                     ),
-                  )
-                  .toList(),
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: AppSizes.md),
+          TextFormField(
+            controller: _titleController,
+            decoration: InputDecoration(labelText: 'Title'.tr),
+            style: TextStyle(color: AppColors.text),
+            validator: (v) => (v == null || v.isEmpty) ? 'Title'.tr : null,
+          ),
+          const SizedBox(height: AppSizes.md),
+          TextFormField(
+            controller: _messageController,
+            decoration: InputDecoration(
+              labelText: 'Message'.tr,
+              hintText: 'Type notification message'.tr,
             ),
-            const SizedBox(height: AppSizes.md),
-            TextFormField(
-              controller: _titleController,
-              decoration: InputDecoration(labelText: 'Title'.tr),
-              style:  TextStyle(color: AppColors.text),
-              validator: (v) => (v == null || v.isEmpty) ? 'Title'.tr : null,
-            ),
-            const SizedBox(height: AppSizes.md),
-            TextFormField(
-              controller: _messageController,
-              decoration: InputDecoration(labelText: 'Message'.tr, hintText: 'Type notification message'.tr),
-              style:  TextStyle(color: AppColors.text),
-              maxLines: 4,
-              validator: (v) => (v == null || v.isEmpty) ? 'Message'.tr : null,
-            ),
-            const SizedBox(height: AppSizes.md),
-            Obx(
-              () => SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.send),
-                  onPressed: controller.sending.value
-                      ? null
-                      : () {
-                          if (!(_formKey.currentState?.validate() ?? false)) return;
-                          controller.send(
-                            title: _titleController.text.trim(),
-                            message: _messageController.text.trim(),
-                            target: target,
-                          );
-                        },
-                  label: Text(controller.sending.value ? 'Loading'.tr : 'Send notification'.tr),
-                ),
+            style: TextStyle(color: AppColors.text),
+            maxLines: 4,
+            validator: (v) => (v == null || v.isEmpty) ? 'Message'.tr : null,
+          ),
+          const SizedBox(height: AppSizes.md),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.send),
+              onPressed: controller.sending.value
+                  ? null
+                  : () {
+                      if (!(_formKey.currentState?.validate() ?? false)) return;
+                      controller.send(
+                        title: _titleController.text.trim(),
+                        message: _messageController.text.trim(),
+                        target: target,
+                      );
+                    },
+              label: Text(
+                controller.sending.value
+                    ? 'Loading'.tr
+                    : 'Send notification'.tr,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -150,9 +222,9 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
   Widget _templatesTable(NotificationsController controller) {
     return Obx(() {
       if (controller.templates.isEmpty) {
-        return Padding(
-          padding: const EdgeInsets.all(AppSizes.md),
-          child: Text('No templates'.tr, style:  TextStyle(color: AppColors.textMuted)),
+        return Text(
+          'No templates'.tr,
+          style: TextStyle(color: AppColors.textMuted),
         );
       }
       return TableWrapper(
@@ -169,17 +241,25 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
                   cells: [
                     DataCell(Text((t['name'] ?? '').toString())),
                     DataCell(Text((t['target'] ?? '').toString())),
-                    DataCell(Text((formatDateString(t['updatedAt'])).toString())),
+                    DataCell(
+                      Text((formatDateString(t['updatedAt'])).toString()),
+                    ),
                     DataCell(
                       Row(
                         children: [
                           TextButton(
-                            onPressed: () => _openTemplateDialog(controller, template: t),
+                            onPressed: () =>
+                                _openTemplateDialog(controller, template: t),
                             child: Text('Edit'.tr),
                           ),
                           TextButton(
-                            onPressed: () => controller.deleteTemplate((t['_id'] ?? t['id'] ?? '').toString()),
-                            child: Text('Delete'.tr, style: const TextStyle(color: Colors.redAccent)),
+                            onPressed: () => controller.deleteTemplate(
+                              (t['_id'] ?? t['id'] ?? '').toString(),
+                            ),
+                            child: Text(
+                              'Delete'.tr,
+                              style: const TextStyle(color: Colors.redAccent),
+                            ),
                           ),
                         ],
                       ),
@@ -201,14 +281,14 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
       if (controller.error.value != null) {
         return Padding(
           padding: const EdgeInsets.all(AppSizes.md),
-          child: Text(controller.error.value!, style: const TextStyle(color: Colors.redAccent)),
+          child: Text(
+            controller.error.value!,
+            style: const TextStyle(color: Colors.redAccent),
+          ),
         );
       }
       if (controller.history.isEmpty) {
-        return Padding(
-          padding: const EdgeInsets.all(AppSizes.md),
-          child: Text('No data'.tr, style:  TextStyle(color: AppColors.textMuted)),
-        );
+        return Text('No data'.tr, style: TextStyle(color: AppColors.textMuted));
       }
       return Column(
         children: controller.history
@@ -220,11 +300,13 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
                 decoration: BoxDecoration(
                   color: AppColors.card,
                   borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                  border:  Border.fromBorderSide(BorderSide(color: AppColors.border)),
+                  border: Border.fromBorderSide(
+                    BorderSide(color: AppColors.border),
+                  ),
                 ),
                 child: Row(
                   children: [
-                     Icon(Icons.notifications_none, color: AppColors.primary),
+                    Icon(Icons.notifications_none, color: AppColors.primary),
                     const SizedBox(width: AppSizes.md),
                     Expanded(
                       child: Column(
@@ -232,27 +314,41 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
                         children: [
                           Text(
                             (n['title'] ?? '').toString(),
-                            style:  TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              color: AppColors.text,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           Text(
                             (n['body'] ?? n['message'] ?? '').toString(),
-                            style:  TextStyle(color: AppColors.textMuted),
+                            style: TextStyle(color: AppColors.textMuted),
                           ),
                           Text(
                             (n['target'] ?? '').toString().tr,
-                            style:  TextStyle(color: AppColors.textMuted, fontSize: 12),
+                            style: TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     Text(
                       _formatDate(n['date'] ?? n['createdAt']),
-                      style:  TextStyle(color: AppColors.textMuted, fontSize: 12),
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 12,
+                      ),
                     ),
                     IconButton(
                       tooltip: 'Delete'.tr,
-                      onPressed: () => controller.deleteNotification((n['_id'] ?? n['id'] ?? '').toString()),
-                      icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                      onPressed: () => controller.deleteNotification(
+                        (n['_id'] ?? n['id'] ?? '').toString(),
+                      ),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.redAccent,
+                      ),
                     ),
                   ],
                 ),
@@ -263,28 +359,45 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
     });
   }
 
-  void _openTemplateDialog(NotificationsController controller, {Map<String, dynamic>? template}) {
-    final name = TextEditingController(text: template?['name']?.toString() ?? '');
-    final target = RxString((template?['target']?.toString() ?? 'customers').toLowerCase());
-    final title = TextEditingController(text: template?['title']?.toString() ?? '');
-    final message = TextEditingController(text: template?['message']?.toString() ?? '');
+  void _openTemplateDialog(
+    NotificationsController controller, {
+    Map<String, dynamic>? template,
+  }) {
+    final name = TextEditingController(
+      text: template?['name']?.toString() ?? '',
+    );
+    final target = RxString(
+      (template?['target']?.toString() ?? 'customers').toLowerCase(),
+    );
+    final title = TextEditingController(
+      text: template?['title']?.toString() ?? '',
+    );
+    final message = TextEditingController(
+      text: template?['message']?.toString() ?? '',
+    );
 
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColors.card,
-        title: Text(template == null ? 'Add'.tr : 'Edit'.tr, style:  TextStyle(color: AppColors.text)),
+        title: Text(
+          template == null ? 'Add'.tr : 'Edit'.tr,
+          style: TextStyle(color: AppColors.text),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: name,
-              decoration: const InputDecoration(labelText: 'Name'),
-              style:  TextStyle(color: AppColors.text),
+              decoration: InputDecoration(labelText: 'Name'.tr),
+              style: TextStyle(color: AppColors.text),
             ),
             const SizedBox(height: AppSizes.sm),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('Target'.tr, style:  TextStyle(color: AppColors.textMuted)),
+              child: Text(
+                'Target'.tr,
+                style: TextStyle(color: AppColors.textMuted),
+              ),
             ),
             Obx(
               () => Wrap(
@@ -297,7 +410,11 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
                         onSelected: (_) => target.value = t,
                         selectedColor: AppColors.primary,
                         backgroundColor: AppColors.card,
-                        labelStyle: TextStyle(color: target.value == t ? Colors.white : AppColors.textMuted),
+                        labelStyle: TextStyle(
+                          color: target.value == t
+                              ? Colors.white
+                              : AppColors.textMuted,
+                        ),
                       ),
                     )
                     .toList(),
@@ -305,13 +422,13 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
             ),
             TextField(
               controller: title,
-              decoration: const InputDecoration(labelText: 'Title'),
-              style:  TextStyle(color: AppColors.text),
+              decoration: InputDecoration(labelText: 'Title'.tr),
+              style: TextStyle(color: AppColors.text),
             ),
             TextField(
               controller: message,
-              decoration: const InputDecoration(labelText: 'Message'),
-              style:  TextStyle(color: AppColors.text),
+              decoration: InputDecoration(labelText: 'Message'.tr),
+              style: TextStyle(color: AppColors.text),
               maxLines: 3,
             ),
           ],
@@ -319,11 +436,16 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
         actions: [
           TextButton(
             onPressed: Get.back,
-            child: Text('Cancel'.tr, style:  TextStyle(color: AppColors.textMuted)),
+            child: Text(
+              'Cancel'.tr,
+              style: TextStyle(color: AppColors.textMuted),
+            ),
           ),
           TextButton(
             onPressed: () {
-              if (name.text.trim().isEmpty || title.text.trim().isEmpty || message.text.trim().isEmpty) {
+              if (name.text.trim().isEmpty ||
+                  title.text.trim().isEmpty ||
+                  message.text.trim().isEmpty) {
                 showError('Please fill required fields'.tr);
                 return;
               }
@@ -336,11 +458,14 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
               if (template == null) {
                 controller.createTemplate(payload);
               } else {
-                controller.updateTemplate((template['_id'] ?? template['id'] ?? '').toString(), payload);
+                controller.updateTemplate(
+                  (template['_id'] ?? template['id'] ?? '').toString(),
+                  payload,
+                );
               }
               Get.back();
             },
-            child: Text('Save'.tr, style:  TextStyle(color: AppColors.primary)),
+            child: Text('Save'.tr, style: TextStyle(color: AppColors.primary)),
           ),
         ],
       ),
@@ -357,6 +482,17 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
     return '';
   }
 
+  String _targetLabel(String value) {
+    switch (value) {
+      case 'customers':
+        return 'Customers';
+      case 'artisans':
+        return 'Artisans';
+      default:
+        return 'All';
+    }
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -364,5 +500,3 @@ class _NotificationsCenterViewState extends State<NotificationsCenterView> {
     super.dispose();
   }
 }
-
-

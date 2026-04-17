@@ -8,6 +8,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/responsive.dart';
 import '../../../../layout/admin_layout.dart';
+import '../../../../layout/widgets/admin_page_header.dart';
 import '../../../shimmer_widgets.dart';
 import '../controllers/dashboard_controller.dart';
 
@@ -107,18 +108,29 @@ class DashboardView extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Dashboard'.tr,
-              style: TextStyle(
-                color: AppColors.text,
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: AppSizes.sm),
-            Text(
-              'Overview and insights'.tr,
-              style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+            AdminPageHeader(
+              title: 'Dashboard',
+              subtitle:
+                  'Track marketplace performance, recent activity, and operational health from one place.',
+              badges: [
+                AdminInfoBadge(
+                  icon: Icons.timeline,
+                  label:
+                      '${'Requests'.tr}: ${_formatNumber(stats['totalRequests'] ?? stats['requests'] ?? stats['requestsCount'])}',
+                ),
+                AdminInfoBadge(
+                  icon: Icons.payments_outlined,
+                  label:
+                      '${'Revenue'.tr}: ${_formatMoney(stats['totalEarnings'] ?? stats['earnings'] ?? 0)}',
+                  color: Colors.teal.shade600,
+                ),
+                AdminInfoBadge(
+                  icon: Icons.run_circle_outlined,
+                  label:
+                      '${'Active'.tr}: ${_formatNumber(stats['activeRequests'] ?? stats['active'] ?? stats['inProgress'])}',
+                  color: Colors.amber.shade700,
+                ),
+              ],
             ),
             const SizedBox(height: AppSizes.lg),
 
@@ -504,7 +516,6 @@ class DashboardView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.overlay,
                   borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-
                 ),
                 child: LayoutBuilder(
                   builder: (context, c) {

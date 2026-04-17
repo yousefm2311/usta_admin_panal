@@ -104,7 +104,7 @@ void main() async {
     await _createFileWithBoilerplate(path);
   }
 
-  print('✅ Admin panel structure created successfully.');
+  stdout.writeln('✅ Admin panel structure created successfully.');
 }
 
 Future<void> _createFileWithBoilerplate(String filePath) async {
@@ -113,14 +113,14 @@ Future<void> _createFileWithBoilerplate(String filePath) async {
 
   if (!await dir.exists()) {
     await dir.create(recursive: true);
-    print('📁 Created directory: ${dir.path}');
+    stdout.writeln('📁 Created directory: ${dir.path}');
   }
 
   if (!await file.exists()) {
     await file.writeAsString(_boilerplateFor(filePath));
-    print('📄 Created file: ${file.path}');
+    stdout.writeln('📄 Created file: ${file.path}');
   } else {
-    print('⚠️ File already exists, skipped: ${file.path}');
+    stdout.writeln('⚠️ File already exists, skipped: ${file.path}');
   }
 }
 

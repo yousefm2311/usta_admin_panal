@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../layout/admin_layout.dart';
+import '../../../../layout/widgets/admin_content_widgets.dart';
+import '../../../../layout/widgets/admin_page_header.dart';
 import '../../../shimmer_widgets.dart';
 import '../controllers/payment_details_controller.dart';
 
@@ -88,40 +90,24 @@ class _PaymentDetailsViewState extends State<PaymentDetailsView> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // =========================
-            // HEADER
-            // =========================
-            Row(
-              children: [
-                Text(
-                  'Payment details'.tr,
-                  style: TextStyle(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 18,
-                    height: 1.1,
-                  ),
-                ),
-                const Spacer(),
-
+            const AdminBreadcrumbs(
+              items: [
+                AdminBreadcrumbItem(label: 'Payments', route: '/payments'),
+                AdminBreadcrumbItem(label: 'Payment details'),
+              ],
+            ),
+            const SizedBox(height: AppSizes.md),
+            AdminPageHeader(
+              title: 'Payment details',
+              subtitle: 'Transaction overview and technical payload',
+              actions: [
                 if (paymentId.isNotEmpty)
                   OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.text,
-                      side: BorderSide(color: AppColors.border),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
-                    ),
                     onPressed: () =>
                         _copyToClipboard(paymentId, label: 'Payment ID'.tr),
                     icon: const Icon(Icons.copy_rounded, size: 18),
                     label: Text('Copy ID'.tr),
                   ),
-
-                const SizedBox(width: AppSizes.sm),
-
                 IconButton(
                   onPressed: paymentId.isEmpty
                       ? null
@@ -129,9 +115,6 @@ class _PaymentDetailsViewState extends State<PaymentDetailsView> {
                   icon: Icon(Icons.refresh_rounded, color: AppColors.textMuted),
                   tooltip: 'Refresh'.tr,
                 ),
-
-                const SizedBox(width: AppSizes.sm),
-
                 IconButton(
                   onPressed: () => Get.back(),
                   icon: Icon(
@@ -141,17 +124,13 @@ class _PaymentDetailsViewState extends State<PaymentDetailsView> {
                   tooltip: 'Back'.tr,
                 ),
               ],
+              badges: [
+                AdminInfoBadge(
+                  icon: Icons.receipt_long_outlined,
+                  label: 'Payments / Payment details',
+                ),
+              ],
             ),
-            const SizedBox(height: 6),
-            Text(
-              'Transaction overview and technical payload'.tr,
-              style: TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-
             const SizedBox(height: AppSizes.lg),
 
             // =========================
@@ -574,7 +553,8 @@ class _PaymentDetailsViewState extends State<PaymentDetailsView> {
       return direct.toString();
     }
 
-    final nested = payment['payment'] ??
+    final nested =
+        payment['payment'] ??
         payment['details'] ??
         payment['meta'] ??
         payment['data'];
