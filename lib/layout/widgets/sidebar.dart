@@ -25,6 +25,7 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AnimatedContainer(
+      key: ValueKey(Get.locale?.languageCode),
       duration: const Duration(milliseconds: 220),
       curve: Curves.easeOut,
       width: widget.collapsed
@@ -126,7 +127,7 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 4),
             Text(
-              (currentItem?.title ?? 'Dashboard').tr,
+              (currentItem?.title ?? 'dashboard').tr,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -157,7 +158,7 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSizes.sm),
               child: Tooltip(
-                message: item.title,
+                message: item.title.tr,
                 preferBelow: false,
                 child: _HoverTap(
                   borderRadius: BorderRadius.circular(14),
@@ -202,7 +203,9 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
         children: [
           _HoverTap(
             borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-            onTap: () => setState(() => _expanded[section.title] = !expanded),
+            onTap: () => setState(() {
+              _expanded[section.title] = !expanded;
+            }),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               decoration: BoxDecoration(
@@ -226,7 +229,7 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
                   const SizedBox(width: AppSizes.sm),
                   Expanded(
                     child: Text(
-                      section.title,
+                      section.title.tr,
                       style: TextStyle(
                         color: AppColors.text,
                         fontWeight: FontWeight.w800,
@@ -247,7 +250,6 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
               ),
             ),
           ),
-
           AnimatedSize(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
@@ -315,7 +317,7 @@ class _SidebarState extends State<Sidebar> with TickerProviderStateMixin {
             const SizedBox(width: AppSizes.sm),
             Expanded(
               child: Text(
-                item.title,
+                item.title.tr,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(

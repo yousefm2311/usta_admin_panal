@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AdminNavigation {
-  static final List<AdminNavSection> sections = [
+  static List<AdminNavSection> get sections => [
     AdminNavSection(
       title: 'Main',
       icon: Icons.home_outlined,
@@ -194,12 +194,12 @@ class AdminNavigation {
           route: '/ai/top-artisans',
         ),
         AdminNavItem(
-          title: 'Fraud Detection',
+          title: 'Fraud detection',
           icon: Icons.gpp_maybe_outlined,
           route: '/ai/fraud',
         ),
         AdminNavItem(
-          title: 'Word Cloud',
+          title: 'Word cloud',
           icon: Icons.cloud_outlined,
           route: '/ai/word-cloud',
         ),
@@ -215,7 +215,7 @@ class AdminNavigation {
           route: '/settings',
         ),
         AdminNavItem(
-          title: 'Feature Flags',
+          title: 'Feature flags',
           icon: Icons.tune,
           route: '/settings/features',
         ),
@@ -225,7 +225,7 @@ class AdminNavigation {
           route: '/settings/security',
         ),
         AdminNavItem(
-          title: 'Change Password',
+          title: 'Change password',
           icon: Icons.lock_reset_outlined,
           route: '/settings/change-password',
         ),
@@ -260,7 +260,9 @@ class AdminNavigation {
 
   static AdminNavSection? findSection(String route) {
     for (final section in sections) {
-      if (section.items.any((item) => item.matches(route))) return section;
+      if (section.items.any((item) => item.matches(route))) {
+        return section;
+      }
     }
     return null;
   }
