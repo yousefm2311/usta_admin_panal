@@ -1,16 +1,54 @@
-# usta_admin_panal
+# Usta Admin Panel
 
-A new Flutter project.
+A Flutter admin panel project for managing Usta-related workflows through a mobile or dashboard-style interface.
+
+## Status
+
+Public portfolio candidate.
+
+## Features
+
+- Admin panel UI foundation
+- Usta management workflow concept
+- Flutter dashboard-style screens
+- Ready for API and authentication documentation
+
+## Tech Stack
+
+- Flutter
+- Dart
+- REST API integration-ready structure
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+```bash
+git clone https://github.com/yousefm2311/usta_admin_panal.git
+cd usta_admin_panal
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Environment Variables
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Create local configuration only when connecting to backend services.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```env
+API_BASE_URL=
+AUTH_TOKEN=
+```
+
+Never commit real admin credentials, tokens, or production secrets.
+
+## Screenshots
+
+Add admin dashboard screenshots before pinning this repository.
+
+```md
+![Admin dashboard](docs/screenshots/dashboard.png)
+```
+
+## Author
+
+Yousef Mohamed
+
+- GitHub: https://github.com/yousefm2311
