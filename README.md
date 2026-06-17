@@ -1,23 +1,33 @@
 # Usta Admin Panel
 
-A Flutter admin panel project for managing Usta-related workflows through a mobile or dashboard-style interface.
+A Flutter admin dashboard for managing Usta platform workflows, analytics, operational data, and API-backed admin screens.
 
 ## Status
 
-Public portfolio candidate.
+Public pinned candidate.
 
-## Features
+## Key Features
 
-- Admin panel UI foundation
-- Usta management workflow concept
-- Flutter dashboard-style screens
-- Ready for API and authentication documentation
+- Admin dashboard UI foundation
+- GetX state management and local storage
+- Dio API communication
+- Connectivity-aware app flow
+- File picker support for uploads/import workflows
+- Charts and analytics with fl_chart
+- Arabic/RTL-ready localization support
+- Cairo font and custom icon font setup
 
 ## Tech Stack
 
 - Flutter
 - Dart
-- REST API integration-ready structure
+- GetX
+- Dio
+- Get Storage
+- Connectivity Plus
+- File Picker
+- fl_chart
+- Intl / Flutter Localizations
 
 ## Getting Started
 
@@ -37,15 +47,22 @@ API_BASE_URL=
 AUTH_TOKEN=
 ```
 
-Never commit real admin credentials, tokens, or production secrets.
+Never commit real admin credentials, auth tokens, API keys, or production secrets.
 
 ## Screenshots
 
-Add admin dashboard screenshots before pinning this repository.
+Add dashboard, charts, users, services, and admin workflow screenshots before pinning publicly.
 
 ```md
 ![Admin dashboard](docs/screenshots/dashboard.png)
 ```
+
+## Roadmap
+
+- Add screenshots and demo flow
+- Document API modules
+- Add authentication notes
+- Add build/release instructions
 
 ## Author
 
